@@ -11,17 +11,16 @@ import {
 export const DialogModal = (props: any) => {
   const { onClose, isDelete, modalDialog } = props
   return (
-    <Dialog
-      onClose={() => onClose()}
-      open={isDelete}
-    >
+    <Dialog onClose={() => onClose()} open={isDelete}>
       <DialogTitle
         sx={{
           padding: '15px',
           width: '500px',
           color: 'black'
         }}
-      >{modalDialog}</DialogTitle>
+      >
+        {modalDialog}
+      </DialogTitle>
       <DialogContent>
         <DialogContentText style={{ fontSize: '14px' }}>
           {/* {props.lead.title} */}
@@ -36,7 +35,12 @@ export const DialogModal = (props: any) => {
         </Button>
         <Button
           // onClick={() => props.onDelete(props.lead.id)}
-          style={{ textTransform: 'capitalize', backgroundColor: '#3E79F7', color: 'white', height: '30px' }}
+          style={{
+            textTransform: 'capitalize',
+            backgroundColor: '#3E79F7',
+            color: 'white',
+            height: '30px'
+          }}
         >
           Yes
         </Button>

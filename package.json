@@ -16,6 +16,8 @@
     "@types/material-ui": "^0.21.12",
     "@types/node": "^20.3.2",
     "@types/react-dom": "^18.2.6",
+    "eslint-plugin-n": "^17.14.0",
+    "eslint-plugin-promise": "^7.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.10.1",
@@ -51,7 +53,8 @@
   },
   "devDependencies": {
     "@mui/types": "^7.2.4",
-    "@types/react": "^18.2.14"
+    "@types/react": "^18.2.14",
+    "prettier": "3.4.1"
   },
   "overrides": {
     "typescript": "^5.1.6"
