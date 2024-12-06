@@ -22,7 +22,7 @@
 
   "rules": {
     "no-var": "warn",
-    "object-shorthand": ["warn", "properties"],
+    "object-shorthand": ["off", "properties"],
 
     "accessor-pairs": [
       "error",
