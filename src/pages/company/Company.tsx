@@ -387,17 +387,13 @@ export default function Company() {
                           </TableCell>
                         </TableRow>
                       ))
-                  ) : (
-                    <TableRow>
-                      {' '}
-                      <TableCell colSpan={6} sx={{ border: 0 }}>
-                        <Spinner />
-                      </TableCell>
-                    </TableRow>
-                  )}
+                  ) : ''}
                 </TableBody>
               </Table>
             </TableContainer>
+            {loading && (
+              <Spinner />
+            )}
           </Paper>
         </Box>
       </Container>

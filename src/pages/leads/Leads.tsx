@@ -640,7 +640,7 @@ export default function Leads(props: any) {
                   </Box>
                 </Box>
               ))
-            ) : (
+            ) : loading && (
               <Spinner />
             )
           }
@@ -737,21 +737,12 @@ export default function Leads(props: any) {
                   </Box>
                 </Box>
               ))
-            ) : (
+            ) : loading && (
               <Spinner />
             )
           }
         </Box>
       )}
-      {/* {loading &&
-        <Spinner />} */}
-      {/* <DeleteModal
-        onClose={deleteLeadModalClose}
-        open={deleteLeadModal}
-        id={selectedId}
-        modalDialog={modalDialog}
-        modalTitle={modalTitle}
-      /> */}
       <DeleteModal
         onClose={deleteLeadModalClose}
         open={deleteLeadModal}

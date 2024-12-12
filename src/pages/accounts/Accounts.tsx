@@ -761,14 +761,7 @@ export default function Accounts() {
                             </TableRow>
                           )
                         })
-                    ) : (
-                      <TableRow>
-                        {' '}
-                        <TableCell colSpan={6} sx={{ border: 0 }}>
-                          <Spinner />
-                        </TableCell>
-                      </TableRow>
-                    )}
+                    ) : ''}
                     {
                       // emptyRows > 0 && (
                       //     <TableRow
@@ -879,18 +872,14 @@ export default function Accounts() {
                           </TableRow>
                         )
                       })
-                    ) : (
-                      <TableRow>
-                        {' '}
-                        <TableCell colSpan={6} sx={{ border: 0 }}>
-                          <Spinner />
-                        </TableCell>
-                      </TableRow>
-                    )}
+                    ) : ''}
                   </TableBody>
                 )}
               </Table>
             </TableContainer>
+            {loading && (
+              <Spinner />
+            )}
           </Paper>
         </Box>
       </Container>

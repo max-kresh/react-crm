@@ -55,6 +55,7 @@ interface HeadCell {
   label: string
   numeric: boolean
 }
+
 const headCells: readonly HeadCell[] = [
   // {
   //   id: '',
@@ -111,10 +112,6 @@ const headCells: readonly HeadCell[] = [
     label: 'Action'
   }
 ]
-
-type Item = {
-  id: string
-}
 
 export default function Opportunities(props: any) {
   const navigate = useNavigate()
@@ -173,16 +170,9 @@ export default function Opportunities(props: any) {
         null as any,
         Header
       )
-        // fetchData(`${OpportunityUrl}/`, 'GET', null as any, Header)
         .then((res) => {
-          // console.log(res, 'Opportunity')
-          if (!res.error) {
-            setOpportunities(res?.opportunities)
-            // setOpenOpportunities(res?.open_leads?.open_leads)
-            // setOpenOpportunitiesCount(res?.open_leads?.leads_count)
-            // setClosedOpportunities(res?.close_leads?.close_leads)
-            // setClosedOpportunitiesCount(res?.close_leads?.leads_count)
             setTotalPages(Math.ceil(res?.opportunities_count / recordsPerPage))
+            setOpportunities(res?.opportunities)
             setContacts(res?.contacts_list)
             setAccount(res?.accounts_list)
             setCurrency(res?.currency)
@@ -193,7 +183,6 @@ export default function Opportunities(props: any) {
             setUsers(res?.users)
             setCountries(res?.countries)
             setLoading(false)
-          }
         })
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -295,32 +284,6 @@ export default function Opportunities(props: any) {
     setRecordsPerPage(parseInt(event.target.value))
     setCurrentPage(1)
   }
-  // const handleSelectAllClick = () => {
-  //   if (tab === 'open') {
-  //     if (selected.length === openOpportunities.length) {
-  //       setSelected([]);
-  //       setSelectedId([]);
-  //       setIsSelectedId([]);
-  //     } else {
-  //       const newSelectedIds = openOpportunities.map((opportunities) => opportunities?.id);
-  //       setSelected(newSelectedIds);
-  //       setSelectedId(newSelectedIds);
-  //       setIsSelectedId(newSelectedIds.map(() => true));
-  //     }
-  //   } else {
-  //     if (selected.length === closedOpportunities.length) {
-  //       setSelected([]);
-  //       setSelectedId([]);
-  //       setIsSelectedId([]);
-  //     } else {
-  //       const newSelectedIds = closedOpportunities.map((opportunities) => opportunities?.id);
-  //       setSelected(newSelectedIds);
-  //       setSelectedId(newSelectedIds);
-  //       setIsSelectedId(newSelectedIds.map(() => true));
-  //     }
-  //   }
-
-  // };
 
   const handleRowSelect = (accountId: string) => {
     const selectedIndex = selected.indexOf(accountId)
@@ -622,26 +585,14 @@ export default function Opportunities(props: any) {
                   ) : (
                     <TableRow>
                       {' '}
-                      <TableCell colSpan={8} sx={{ border: 0 }}>
-                        <Spinner />
-                      </TableCell>
                     </TableRow>
                   )}
-                  {/* {
-                    emptyRows > 0 && (
-                        <TableRow
-                            style={{
-                                height: (dense ? 33 : 53) * emptyRows
-                            }}
-                        >
-                            <TableCell colSpan={6} />
-                        </TableRow>
-                    )
-                  }
- */}
                 </TableBody>
               </Table>
             </TableContainer>
+            {loading && (
+              <Spinner />
+            )}
           </Paper>
         </Box>
       </Container>
