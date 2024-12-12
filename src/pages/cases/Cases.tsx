@@ -164,10 +164,6 @@ export default function Cases(props: any) {
           if (!res.error) {
             setCases(res?.cases)
             setTotalPages(Math.ceil(res?.cases_count / recordsPerPage))
-            // setOpenCases(res?.open_leads?.open_leads)
-            // setOpenCasesCount(res?.open_leads?.leads_count)
-            // setClosedCases(res?.close_leads?.close_leads)
-            // setClosedCasesCount(res?.close_leads?.leads_count)
             setStatus(res?.status)
             setPriority(res?.priority)
             setTypeOfCases(res?.type_of_case)
@@ -270,32 +266,6 @@ export default function Cases(props: any) {
     setRecordsPerPage(parseInt(event.target.value))
     setCurrentPage(1)
   }
-  // const handleSelectAllClick = () => {
-  //   if (tab === 'open') {
-  //     if (selected.length === openCases.length) {
-  //       setSelected([]);
-  //       setSelectedId([]);
-  //       setIsSelectedId([]);
-  //     } else {
-  //       const newSelectedIds = openCases.map((cases) => cases?.id);
-  //       setSelected(newSelectedIds);
-  //       setSelectedId(newSelectedIds);
-  //       setIsSelectedId(newSelectedIds.map(() => true));
-  //     }
-  //   } else {
-  //     if (selected.length === closedCases.length) {
-  //       setSelected([]);
-  //       setSelectedId([]);
-  //       setIsSelectedId([]);
-  //     } else {
-  //       const newSelectedIds = closedCases.map((cases) => cases?.id);
-  //       setSelected(newSelectedIds);
-  //       setSelectedId(newSelectedIds);
-  //       setIsSelectedId(newSelectedIds.map(() => true));
-  //     }
-  //   }
-
-  // };
 
   const handleRowSelect = (casesId: string) => {
     const selectedIndex = selected.indexOf(casesId)
@@ -574,29 +544,13 @@ export default function Cases(props: any) {
                         )
                       }
                     )
-                  ) : (
-                    <TableRow>
-                      {' '}
-                      <TableCell colSpan={8} sx={{ border: 0 }}>
-                        <Spinner />
-                      </TableCell>
-                    </TableRow>
-                  )}
-                  {/* {
-                    emptyRows > 0 && (
-                        <TableRow
-                            style={{
-                                height: (dense ? 33 : 53) * emptyRows
-                            }}
-                        >
-                            <TableCell colSpan={6} />
-                        </TableRow>
-                    )
-                  }
- */}
+                  ) : ''}
                 </TableBody>
               </Table>
             </TableContainer>
+            {loading && (
+              <Spinner />
+            )}
           </Paper>
         </Box>
       </Container>

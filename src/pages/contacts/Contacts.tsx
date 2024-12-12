@@ -171,14 +171,6 @@ export default function Contacts() {
             // setTotalPages(data?.contacts_count)
             setTotalPages(Math.ceil(data?.contacts_count / recordsPerPage))
             setLoading(false)
-            // setTotalPages(Math.ceil(result.total / recordsPerPage));
-            // setInitial(false)
-            // } else {
-            // setContactList(Object.assign([], contacts, [data.contact_obj_list]))
-            // setContactList(prevContactList => prevContactList.concat(data.contact_obj_list));
-            // setContactList(...contactList,data.contact_obj_list)
-            // setLoading(false)
-            // }
           }
         })
     } catch (error) {
@@ -227,33 +219,6 @@ export default function Contacts() {
     setRecordsPerPage(parseInt(event.target.value))
     setCurrentPage(1)
   }
-  // const renderPageNumbers = () => {
-  //     const pageNumbers = [];
-  //     if (totalPages <= 1) return null;
-  //     for (let i = 1; i <= totalPages; i++) {
-  //         if (
-  //             i === 1 ||
-  //             i === totalPages ||
-  //             (i >= currentPage - 1 && i <= currentPage + 1) ||
-  //             (i <= 2 && currentPage <= 4) ||
-  //             (i >= totalPages - 1 && currentPage >= totalPages - 3)
-  //         ) {
-  //             pageNumbers.push(
-  //                 <button
-  //                     key={i}
-  //                     onClick={() => setCurrentPage(i)}
-  //                     className={i === currentPage ? 'active' : ''}
-  //                 >
-  //                     {i}
-  //                 </button>
-  //             );
-  //         } else if ((i === 3 && currentPage > 4) || (i === totalPages - 2 && currentPage < totalPages - 3)) {
-  //             // Add ellipsis if necessary
-  //             pageNumbers.push(<span key={-i}>...</span>);
-  //         }
-  //     }
-  //     return pageNumbers;
-  // };
 
   const onAddContact = () => {
     if (!loading) {
@@ -467,9 +432,6 @@ export default function Contacts() {
               </Table>
             </TableContainer>
             {loading && (
-              // <Skeleton variant="rectangular"
-              // width={210} height={118}
-              // />
               <Spinner />
             )}
           </Paper>
@@ -484,13 +446,6 @@ export default function Contacts() {
           modalTitle={modalTitle}
           DeleteItem={DeleteItem}
         />
-        // <DialogModal
-        //     contact={contact}
-        //     isDelete={isDelete}
-        //     modalDialog={modalDialog}
-        //     onClose={onclose}
-        //     onDelete={onDelete}
-        // />
       }
     </Box>
   )
