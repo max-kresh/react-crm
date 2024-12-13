@@ -70,7 +70,7 @@ interface FormData {
   file: string | null
 }
 
-export function AddCase() {
+export function AddCase () {
   const navigate = useNavigate()
   const { state } = useLocation()
   const { quill, quillRef } = useQuill()

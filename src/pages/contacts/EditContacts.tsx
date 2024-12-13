@@ -62,7 +62,7 @@ type FormErrors = {
 //   salutation: string;
 //   // Add other form fields as needed
 // }
-function EditContact() {
+function EditContact () {
   const navigate = useNavigate()
   const location = useLocation()
   const { state } = location

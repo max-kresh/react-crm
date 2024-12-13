@@ -103,7 +103,7 @@ type response = {
   created_from_site: boolean
   id: string
 }
-function LeadDetails(props: any) {
+function LeadDetails (props: any) {
   const { state } = useLocation()
   const navigate = useNavigate()
   const [leadDetails, setLeadDetails] = useState<response | null>(null)

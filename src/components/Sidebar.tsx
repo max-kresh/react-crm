@@ -71,7 +71,7 @@ import MyContext from '../context/Context'
 //     }
 // }
 
-export default function Sidebar(props: any) {
+export default function Sidebar (props: any) {
   const navigate = useNavigate()
   const location = useLocation()
   const [screen, setScreen] = useState('contacts')

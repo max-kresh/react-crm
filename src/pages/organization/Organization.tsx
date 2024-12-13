@@ -11,7 +11,7 @@ interface Item {
   }
 }
 
-export default function Organization() {
+export default function Organization () {
   const navigate = useNavigate()
 
   const [organizationModal, setOrganizationModal] = useState(false)

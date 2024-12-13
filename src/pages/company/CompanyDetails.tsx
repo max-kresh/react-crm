@@ -9,7 +9,7 @@ type response = {
   name: string
 }
 
-export default function CompanyDetails() {
+export default function CompanyDetails () {
   const navigate = useNavigate()
   const { state } = useLocation()
   const [companyDetails, setCompanyDetails] = useState<response | null>(null)

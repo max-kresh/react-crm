@@ -98,7 +98,7 @@ const headCells: readonly HeadCell[] = [
   }
 ]
 
-export default function Contacts() {
+export default function Contacts () {
   const navigate = useNavigate()
   // const context = useMyContext();
 

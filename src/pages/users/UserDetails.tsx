@@ -57,7 +57,7 @@ export const formatDate = (dateString: any) => {
   return new Date(dateString).toLocaleDateString(undefined, options)
 }
 
-export default function UserDetails() {
+export default function UserDetails () {
   const navigate = useNavigate()
   const { state } = useLocation()
   const [userDetails, setUserDetails] = useState<response | null>(null)

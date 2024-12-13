@@ -5,7 +5,7 @@ import { useMyContext } from '../context/Context'
 import { FaCheckCircle, FaEdit, FaTimesCircle } from 'react-icons/fa'
 import { FiChevronLeft } from '@react-icons/all-files/fi/FiChevronLeft'
 
-export function CustomAppBar(props: any) {
+export function CustomAppBar (props: any) {
   const location = useLocation()
   const sharedData = useMyContext()
   const navigate = useNavigate()

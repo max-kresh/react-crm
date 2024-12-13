@@ -25,7 +25,7 @@ type FormErrors = {
   name?: string[]
 }
 
-function AddCompany() {
+function AddCompany () {
   const navigate = useNavigate()
   const { state } = useLocation()
   const [error, setError] = useState(false)

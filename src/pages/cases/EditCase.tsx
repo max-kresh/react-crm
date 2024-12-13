@@ -66,7 +66,7 @@ interface FormData {
   file: string | null
 }
 
-export function EditCase() {
+export function EditCase () {
   const navigate = useNavigate()
   const { state } = useLocation()
   const { quill, quillRef } = useQuill()

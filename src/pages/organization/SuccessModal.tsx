@@ -15,7 +15,7 @@ const style = {
   pb: 3
 }
 
-function ChildModal() {
+function ChildModal () {
   const [open, setOpen] = React.useState(false)
   const handleOpen = () => {
     setOpen(true)

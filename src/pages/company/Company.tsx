@@ -78,7 +78,7 @@ const headCells: readonly HeadCell[] = [
   }
 ]
 
-export default function Company() {
+export default function Company () {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [companyList, setCompanyList] = useState([])

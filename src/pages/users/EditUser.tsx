@@ -61,7 +61,7 @@ interface FormData {
   // has_marketing_access: boolean,
   // is_organization_admin: boolean
 }
-export function EditUser() {
+export function EditUser () {
   const { state } = useLocation()
   const navigate = useNavigate()
 

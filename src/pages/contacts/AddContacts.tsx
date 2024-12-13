@@ -58,7 +58,7 @@ type FormErrors = {
 //   salutation: string;
 //   // Add other form fields as needed
 // }
-function AddContacts() {
+function AddContacts () {
   const navigate = useNavigate()
   const { state } = useLocation()
   const { quill, quillRef } = useQuill()

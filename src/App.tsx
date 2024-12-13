@@ -9,7 +9,7 @@ import {
 import Login from './pages/auth/Login'
 import { Home } from './pages/home/Home'
 
-function App() {
+function App () {
   return (
     <>
       <Router>

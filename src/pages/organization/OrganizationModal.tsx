@@ -26,7 +26,7 @@ interface Item {
   }
 }
 
-export default function OrganizationModal(props: any) {
+export default function OrganizationModal (props: any) {
   const navigate = useNavigate()
   const { open, handleClose } = props
 

@@ -125,7 +125,7 @@ export const ToolbarNew = styled(Toolbar)({
 // interface LeadList {
 //   drawer: number;
 // }
-export default function Leads(props: any) {
+export default function Leads (props: any) {
   // const {drawer}=props
   const navigate = useNavigate()
   const [tab, setTab] = useState('open')

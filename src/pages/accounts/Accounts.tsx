@@ -162,7 +162,7 @@ const headCells: readonly HeadCell[] = [
 type Item = {
   id: string
 }
-export default function Accounts() {
+export default function Accounts () {
   const navigate = useNavigate()
 
   const [tab, setTab] = useState('open')
