@@ -379,7 +379,7 @@ export default function Users() {
               has_marketing_access: data?.has_marketing_access,
               is_organization_admin: data?.is_organization_admin
             },
-            id: id,
+            id,
             edit: true
           }
         })

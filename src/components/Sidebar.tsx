@@ -211,7 +211,7 @@ export default function Sidebar(props: any) {
   const open = Boolean(anchorEl)
   const id = open ? 'simple-popover' : undefined
   // console.log(screen, 'sidebar');
-  const context = { drawerWidth: drawerWidth, screen: screen }
+  const context = { drawerWidth, screen }
   return (
     <>
       <Box>
