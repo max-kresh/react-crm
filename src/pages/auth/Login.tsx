@@ -17,7 +17,7 @@ declare global {
   }
 }
 
-export default function Login() {
+export default function Login () {
   const navigate = useNavigate()
   const [token, setToken] = useState(false)
 

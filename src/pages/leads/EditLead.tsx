@@ -77,13 +77,6 @@ import '../../styles/style.css'
 //   }
 // }))
 
-// function getStyles (name, personName, theme) {
-//   return {
-//     fontWeight:
-//       theme.typography.fontWeightRegular
-//   }
-// }
-
 type FormErrors = {
   title?: string[]
   first_name?: string[]
@@ -143,7 +136,7 @@ interface FormData {
   file: string | null
 }
 
-export function EditLead() {
+export function EditLead () {
   const navigate = useNavigate()
   const location = useLocation()
   const { state } = location

@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function FormateTime(props: any) {
+export default function FormateTime (props: any) {
   // console.log(props,'tttt')
   // const { inputDate } = props;
   const formatDate = (inputDate: string): string => {

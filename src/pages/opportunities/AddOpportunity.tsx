@@ -79,7 +79,7 @@ interface FormData {
   file: string | null
 }
 
-export function AddOpportunity() {
+export function AddOpportunity () {
   const navigate = useNavigate()
   const { state } = useLocation()
   const { quill, quillRef } = useQuill()

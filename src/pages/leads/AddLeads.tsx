@@ -78,13 +78,6 @@ import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 //   }
 // }))
 
-// function getStyles (name, personName, theme) {
-//   return {
-//     fontWeight:
-//       theme.typography.fontWeightRegular
-//   }
-// }
-
 type FormErrors = {
   title?: string[]
   first_name?: string[]
@@ -144,7 +137,7 @@ interface FormData {
   file: string | null
 }
 
-export function AddLeads() {
+export function AddLeads () {
   const navigate = useNavigate()
   const { state } = useLocation()
   const { quill, quillRef } = useQuill()

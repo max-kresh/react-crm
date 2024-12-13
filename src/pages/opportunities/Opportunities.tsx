@@ -113,7 +113,7 @@ const headCells: readonly HeadCell[] = [
   }
 ]
 
-export default function Opportunities(props: any) {
+export default function Opportunities (props: any) {
   const navigate = useNavigate()
   const [tab, setTab] = useState('open')
   const [loading, setLoading] = useState(true)

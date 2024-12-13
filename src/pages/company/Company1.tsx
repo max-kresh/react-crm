@@ -29,7 +29,7 @@ interface Item {
   }
 }
 
-export default function Organization() {
+export default function Organization () {
   const [organization, setOrganization] = useState<Item[]>([])
   const [newOrganization, setNewOrganization] = useState('')
   const [loading, setLoading] = useState(true)

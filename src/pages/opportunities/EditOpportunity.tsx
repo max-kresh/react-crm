@@ -78,7 +78,7 @@ interface FormData {
   contact_name: string
 }
 
-export function EditOpportunity() {
+export function EditOpportunity () {
   const navigate = useNavigate()
   const { state } = useLocation()
   const { quill, quillRef } = useQuill()

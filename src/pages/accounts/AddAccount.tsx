@@ -74,7 +74,7 @@ interface FormData {
   file?: string | null
 }
 
-export function AddAccount() {
+export function AddAccount () {
   const navigate = useNavigate()
   const { state } = useLocation()
   const autocompleteRef = useRef<any>(null)

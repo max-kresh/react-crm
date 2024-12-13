@@ -107,7 +107,7 @@ type Item = {
   id: string
   // Other properties
 }
-export default function Users() {
+export default function Users () {
   const navigate = useNavigate()
   const [tab, setTab] = useState('active')
   const [loading, setLoading] = useState(true)

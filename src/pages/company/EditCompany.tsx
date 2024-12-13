@@ -21,7 +21,7 @@ type FormErrors = {
   name?: string[]
 }
 
-function EditCompany() {
+function EditCompany () {
   const navigate = useNavigate()
   const location = useLocation()
   const [reset, setReset] = useState(false)
