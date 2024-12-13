@@ -742,7 +742,7 @@ export default function Users () {
                           </TableRow>
                         )
                       })
-                    ) : (
+                    ) : loading && (
                       <TableRow>
                         {' '}
                         <TableCell colSpan={8} sx={{ border: 0 }}>
@@ -850,7 +850,7 @@ export default function Users () {
                           </TableRow>
                         )
                       })
-                    ) : (
+                    ) : loading && (
                       <TableRow>
                         {' '}
                         <TableCell colSpan={8} sx={{ border: 0 }}>
