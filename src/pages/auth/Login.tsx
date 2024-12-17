@@ -6,8 +6,8 @@ import imgGoogle from '../../assets/images/auth/google.svg'
 import imgLogo from '../../assets/images/auth/img_logo.png'
 import imgLogin from '../../assets/images/auth/img_login.png'
 import { GoogleButton } from '../../styles/CssStyled'
-import { fetchData } from '../../components/FetchData'
-import { AuthUrl } from '../../services/ApiUrls'
+import { fetchData, fetchRawData } from '../../components/FetchData'
+import { AuthUrl, AuthEmailUrl } from '../../services/ApiUrls'
 import '../../styles/style.css'
 
 declare global {
@@ -21,6 +21,40 @@ export default function Login () {
   const navigate = useNavigate()
   const [token, setToken] = useState(false)
 
+  const [emailValue, setEmailValue] = useState('')
+  const [passwordValue, setPasswordValue] = useState('')
+
+  const handleEmailChange = (event: any) => {
+    setEmailValue(event.target.value)
+  }
+  
+  const handlePasswordChange = (event: any) => {
+    setPasswordValue(event.target.value)
+  }
+  
+  const head = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  }
+  
+  const handleLogin = (event: any) => {
+    fetchRawData(`${AuthEmailUrl}/`, 'POST', JSON.stringify({ email: emailValue, password: passwordValue }), head)
+        .then((res: any) => {
+          if (!res.ok) {
+            throw Error('Incorrect password or user not found') 
+          }
+          return res.json()
+        })
+        .then((res: any) => {
+          localStorage.setItem('Token', 'Bearer ' + res.access_token)
+          setToken(true)
+        })
+        .catch((error: any) => {
+          console.error('Error:', error)
+          alert(error)
+        })
+  }
+
   useEffect(() => {
     if (localStorage.getItem('Token')) {
       // navigate('/organization')
@@ -30,14 +64,8 @@ export default function Login () {
 
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
-      console.log('HERE HERE ' + tokenResponse.access_token)
       const apiToken = { token: tokenResponse.access_token }
-      // const formData = new FormData()
-      // formData.append('token', tokenResponse.access_token)
-      const head = {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      }
+
       fetchData(`${AuthUrl}/`, 'POST', JSON.stringify(apiToken), head)
         .then((res: any) => {
           localStorage.setItem('Token', `Bearer ${res.access_token}`)
@@ -105,6 +133,8 @@ export default function Login () {
                     boxShadow: '0 0 10px #000000',
                     borderColor: 'primary.main'
                   }}
+                  value={emailValue}
+                  onChange={handleEmailChange}
                   type="text"
                   placeholder="Email"
                   className="input"
@@ -120,6 +150,8 @@ export default function Login () {
                   boxShadow: '0 0 10px #000000',
                   borderColor: 'primary.main'
                 }}
+                value={passwordValue}
+                onChange={handlePasswordChange}
                   type="password"
                   placeholder="Password"
                   className="input mt-4"
@@ -127,6 +159,7 @@ export default function Login () {
               </div>
               <div>
                 <button
+                  onClick={handleLogin}
                   style={{ 
                     marginTop: '25px',
                     width: '80%',

@@ -20,3 +20,11 @@ export function fetchData (url: any, method: any, data = '', header: any) {
     body: data
   }).then((response) => response.json())
 }
+
+export function fetchRawData (url: any, method: any, data = '', header: any) {
+  return fetch(`${SERVER}${url}`, {
+    method,
+    headers: header,
+    body: data
+  }).then((response) => response)
+}
