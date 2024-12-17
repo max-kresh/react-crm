@@ -65,7 +65,18 @@ export default function Login () {
           alignItems="center"
           sx={{ height: '100%', overflow: 'hidden' }}
         >
-          <Grid item>
+          <Grid item sx={{ 
+              mt: 2,
+              border: '3px solid',
+              padding: '30px',
+              borderRadius: '10px',
+              boxShadow: '0 0 10px #000000',
+              borderColor: 'primary.main',
+              background: 'linear-gradient(to top, #4980FF, #ffffff)',
+              width: '50%',
+              textAlign: 'center',
+              justifyItems: 'center'
+               }}>
             <Grid sx={{ mt: 2 }}>
               <img
                 src={imgLogo}
@@ -76,7 +87,71 @@ export default function Login () {
             <Typography variant="h5" style={{ fontWeight: 'bolder' }}>
               Sign In
             </Typography>
+            <Grid>
+              <Typography style={{ 
+                fontStyle: 'italic',
+                justifyContent: 'center',
+                marginTop: '10px'
+                }} variant="body2">
+                Sign in with your email
+              </Typography>
+              <div>
+                <input
+                  style={{ 
+                    marginTop: '15px',
+                    border: '1px solid',
+                    padding: '10px',
+                    borderRadius: '10px',
+                    boxShadow: '0 0 10px #000000',
+                    borderColor: 'primary.main'
+                  }}
+                  type="text"
+                  placeholder="Email"
+                  className="input"
+                />
+              </div>
+              <div >
+                <input
+                style={{ 
+                  marginTop: '15px',
+                  border: '1px solid',
+                  padding: '10px',
+                  borderRadius: '10px',
+                  boxShadow: '0 0 10px #000000',
+                  borderColor: 'primary.main'
+                }}
+                  type="password"
+                  placeholder="Password"
+                  className="input mt-4"
+                />
+              </div>
+              <div>
+                <button
+                  style={{ 
+                    marginTop: '25px',
+                    width: '80%',
+                    border: '1px solid black',
+                    padding: '10px',
+                    borderRadius: '10px',
+                    boxShadow: '0 0 10px #000000',
+                    borderColor: 'primary.main',
+                    backgroundColor: 'blue',
+                    color: 'white'
+                  }}
+                >
+                  Login
+                </button>
+              </div>
+            </Grid>
             <Grid item sx={{ mt: 4 }}>
+            <Typography style={{ 
+                fontStyle: 'italic',
+                justifyContent: 'center',
+                marginTop: '15px',
+                marginBottom: '10px'
+                }} variant="body2">
+                Or
+              </Typography>
               {/* <GoogleLogin
                                 onSuccess={credentialResponse => {
                                     console.log(credentialResponse);
@@ -91,7 +166,7 @@ export default function Login () {
               <GoogleButton
                 variant="outlined"
                 onClick={() => login()}
-                sx={{ fontSize: '12px', fontWeight: 500 }}
+                sx={{ fontSize: '12px', fontWeight: 500, border: '1px solid black', boxShadow: '0 0 10px rgba(0,0,0)' }}
               >
                 Sign in with Google
                 <img
