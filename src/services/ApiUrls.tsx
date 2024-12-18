@@ -28,4 +28,5 @@ export const UsersUrl = 'users'
 export const UserUrl = 'user'
 // PROFILE
 export const ProfileUrl = 'profile'
-//
+// SETTING
+export const AppSettingsUrl = 'app-settings'
