@@ -5,6 +5,7 @@ export const RegisterUrl = 'auth/register'
 export const ForgotPasswordUrl = 'auth/forgot-password'
 
 export const AuthUrl = 'auth/google'
+export const AuthEmailUrl = 'auth/email'
 // org
 export const OrgUrl = 'org'
 // export const OrgUrl = 'auth/create-org'

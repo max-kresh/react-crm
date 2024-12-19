@@ -6,8 +6,8 @@ import imgGoogle from '../../assets/images/auth/google.svg'
 import imgLogo from '../../assets/images/auth/img_logo.png'
 import imgLogin from '../../assets/images/auth/img_login.png'
 import { GoogleButton } from '../../styles/CssStyled'
-import { fetchData } from '../../components/FetchData'
-import { AuthUrl } from '../../services/ApiUrls'
+import { fetchData, fetchRawData } from '../../components/FetchData'
+import { AuthUrl, AuthEmailUrl } from '../../services/ApiUrls'
 import '../../styles/style.css'
 
 declare global {
@@ -21,6 +21,40 @@ export default function Login () {
   const navigate = useNavigate()
   const [token, setToken] = useState(false)
 
+  const [emailValue, setEmailValue] = useState('')
+  const [passwordValue, setPasswordValue] = useState('')
+
+  const handleEmailChange = (event: any) => {
+    setEmailValue(event.target.value)
+  }
+  
+  const handlePasswordChange = (event: any) => {
+    setPasswordValue(event.target.value)
+  }
+  
+  const head = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json'
+  }
+  
+  const handleLogin = (event: any) => {
+    fetchRawData(`${AuthEmailUrl}/`, 'POST', JSON.stringify({ email: emailValue, password: passwordValue }), head)
+        .then((res: any) => {
+          if (!res.ok) {
+            throw Error('Incorrect password or user not found') 
+          }
+          return res.json()
+        })
+        .then((res: any) => {
+          localStorage.setItem('Token', 'Bearer ' + res.access_token)
+          setToken(true)
+        })
+        .catch((error: any) => {
+          console.error('Error:', error)
+          alert(error)
+        })
+  }
+
   useEffect(() => {
     if (localStorage.getItem('Token')) {
       // navigate('/organization')
@@ -30,14 +64,8 @@ export default function Login () {
 
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
-      console.log('HERE HERE ' + tokenResponse.access_token)
       const apiToken = { token: tokenResponse.access_token }
-      // const formData = new FormData()
-      // formData.append('token', tokenResponse.access_token)
-      const head = {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      }
+
       fetchData(`${AuthUrl}/`, 'POST', JSON.stringify(apiToken), head)
         .then((res: any) => {
           localStorage.setItem('Token', `Bearer ${res.access_token}`)
@@ -65,7 +93,18 @@ export default function Login () {
           alignItems="center"
           sx={{ height: '100%', overflow: 'hidden' }}
         >
-          <Grid item>
+          <Grid item sx={{ 
+              mt: 2,
+              border: '3px solid',
+              padding: '30px',
+              borderRadius: '10px',
+              boxShadow: '0 0 10px #000000',
+              borderColor: 'primary.main',
+              background: 'linear-gradient(to top, #4980FF, #ffffff)',
+              width: '50%',
+              textAlign: 'center',
+              justifyItems: 'center'
+               }}>
             <Grid sx={{ mt: 2 }}>
               <img
                 src={imgLogo}
@@ -76,7 +115,76 @@ export default function Login () {
             <Typography variant="h5" style={{ fontWeight: 'bolder' }}>
               Sign In
             </Typography>
+            <Grid>
+              <Typography style={{ 
+                fontStyle: 'italic',
+                justifyContent: 'center',
+                marginTop: '10px'
+                }} variant="body2">
+                Sign in with your email
+              </Typography>
+              <div>
+                <input
+                  style={{ 
+                    marginTop: '15px',
+                    border: '1px solid',
+                    padding: '10px',
+                    borderRadius: '10px',
+                    boxShadow: '0 0 10px #000000',
+                    borderColor: 'primary.main'
+                  }}
+                  value={emailValue}
+                  onChange={handleEmailChange}
+                  type="text"
+                  placeholder="Email"
+                  className="input"
+                />
+              </div>
+              <div >
+                <input
+                style={{ 
+                  marginTop: '15px',
+                  border: '1px solid',
+                  padding: '10px',
+                  borderRadius: '10px',
+                  boxShadow: '0 0 10px #000000',
+                  borderColor: 'primary.main'
+                }}
+                value={passwordValue}
+                onChange={handlePasswordChange}
+                  type="password"
+                  placeholder="Password"
+                  className="input mt-4"
+                />
+              </div>
+              <div>
+                <button
+                  onClick={handleLogin}
+                  style={{ 
+                    marginTop: '25px',
+                    width: '80%',
+                    border: '1px solid black',
+                    padding: '10px',
+                    borderRadius: '10px',
+                    boxShadow: '0 0 10px #000000',
+                    borderColor: 'primary.main',
+                    backgroundColor: 'blue',
+                    color: 'white'
+                  }}
+                >
+                  Login
+                </button>
+              </div>
+            </Grid>
             <Grid item sx={{ mt: 4 }}>
+            <Typography style={{ 
+                fontStyle: 'italic',
+                justifyContent: 'center',
+                marginTop: '15px',
+                marginBottom: '10px'
+                }} variant="body2">
+                Or
+              </Typography>
               {/* <GoogleLogin
                                 onSuccess={credentialResponse => {
                                     console.log(credentialResponse);
@@ -91,7 +199,7 @@ export default function Login () {
               <GoogleButton
                 variant="outlined"
                 onClick={() => login()}
-                sx={{ fontSize: '12px', fontWeight: 500 }}
+                sx={{ fontSize: '12px', fontWeight: 500, border: '1px solid black', boxShadow: '0 0 10px rgba(0,0,0)' }}
               >
                 Sign in with Google
                 <img
