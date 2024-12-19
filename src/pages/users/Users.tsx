@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useEffect, useState } from 'react'
+import React, { SyntheticEvent, useDebugValue, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Box,
@@ -36,8 +36,8 @@ import { FiChevronRight } from '@react-icons/all-files/fi/FiChevronRight'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FaAd, FaEdit, FaTrashAlt } from 'react-icons/fa'
-import { fetchData } from '../../components/FetchData'
-import { UsersUrl, UserUrl } from '../../services/ApiUrls'
+import { fetchData, Header } from '../../components/FetchData'
+import { AppSettingsUrl, UsersUrl, UserUrl } from '../../services/ApiUrls'
 import {
   CustomTab,
   CustomToolbar,
@@ -152,6 +152,9 @@ export default function Users () {
   const [inactiveTotalPages, setInactiveTotalPages] = useState<number>(0)
   const [inactiveLoading, setInactiveLoading] = useState(true)
 
+  const [google_login_allowed, set_google_login_allowed] = useState(true)
+  const [googleSelectOpen, setGoogleSelectOpen] = useState(false)
+
   useEffect(() => {
     getUsers()
   }, [
@@ -161,6 +164,22 @@ export default function Users () {
     inactiveRecordsPerPage
   ])
 
+  useEffect(() => {
+    const Header = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    }
+    fetchData(`${AppSettingsUrl}/`, 'GET', null as any, Header)
+    .then((res) => {
+      if (!res.error && res.length > 0) {
+        let settings = res.filter((s: any) => s.name === 'allow_google_login')
+        if (settings.length > 0) {
+          set_google_login_allowed(settings[0].value === 'True')
+        }
+      }
+    })
+  }, [])
+  
   const handleChangeTab = (e: SyntheticEvent, val: any) => {
     setTab(val)
   }
@@ -461,10 +480,29 @@ export default function Users () {
     setIsSelectedId(newIsSelectedId)
   }
   const handleDelete = (id: any) => {
-    console.log(id, 's;ected')
+    console.log(id, 'selected')
   }
   const modalDialog = 'Are You Sure You want to delete this User?'
   const modalTitle = 'Delete User'
+
+  const google_login_options = ['Google Login Enabled', 'Google Login Disabled']
+  const handleGoogleLoginEnable = (e: any) => {
+    const data = {
+      name: 'allow_google_login',
+      value: e.target.value === 'Google Login Enabled' ? 'True' : 'False',
+      type: 'bool'
+    }
+    fetchData(`${AppSettingsUrl}/`, 'PUT', JSON.stringify(data), Header)
+      .then((res: any) => {
+        if (!res.error) {
+            set_google_login_allowed(e.target.value === 'Google Login Enabled')
+            console.log('google login allowed is set on the server')
+        } else {
+            console.log('google login allowed failed on the server')
+        }
+      })
+      .catch(() => {})
+  }
 
   const recordsList = [
     [10, '10 Records per page'],
@@ -501,6 +539,39 @@ export default function Users () {
         <Stack
           sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
         >
+          <Select
+            value={
+              google_login_allowed ? google_login_options[0] : google_login_options[1]
+            }
+            onChange={(e: any) => handleGoogleLoginEnable(e)}
+            open={googleSelectOpen}
+            onOpen={() => setGoogleSelectOpen(true)}
+            onClose={() => setGoogleSelectOpen(false)}
+            className={'custom-select'}
+            onClick={() => setGoogleSelectOpen(!googleSelectOpen)}
+            IconComponent={() => (
+              <div
+                onClick={() => setGoogleSelectOpen(!googleSelectOpen)}
+                className="custom-select-icon"
+              >
+                {googleSelectOpen ? (
+                  <FiChevronUp style={{ marginTop: '12px' }} />
+                ) : (
+                  <FiChevronDown style={{ marginTop: '12px' }} />
+                )}
+              </div>
+            )}
+            sx={{
+              '& .MuiSelect-select': { overflow: 'visible !important' }
+            }}
+          >
+            <MenuItem key={'Google_Login_Enabled'} value={'Google Login Enabled'}>
+                  Google Login Enabled
+            </MenuItem>
+            <MenuItem key={'Google_Login_Disabled'} value={'Google Login Disabled'}>
+                  Google Login Disabled
+            </MenuItem>
+          </Select>
           <Select
             value={
               tab === 'active' ? activeRecordsPerPage : inactiveRecordsPerPage

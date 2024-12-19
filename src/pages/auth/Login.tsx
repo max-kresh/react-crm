@@ -7,7 +7,8 @@ import imgLogo from '../../assets/images/auth/img_logo.png'
 import imgLogin from '../../assets/images/auth/img_login.png'
 import { GoogleButton } from '../../styles/CssStyled'
 import { fetchData, fetchRawData } from '../../components/FetchData'
-import { AuthUrl, AuthEmailUrl } from '../../services/ApiUrls'
+import { AuthUrl, AuthEmailUrl, AppSettingsUrl } from '../../services/ApiUrls'
+
 import '../../styles/style.css'
 
 declare global {
@@ -20,6 +21,7 @@ declare global {
 export default function Login () {
   const navigate = useNavigate()
   const [token, setToken] = useState(false)
+  const [google_login_allowed, set_google_login_allowed] = useState(true)
 
   const [emailValue, setEmailValue] = useState('')
   const [passwordValue, setPasswordValue] = useState('')
@@ -61,6 +63,23 @@ export default function Login () {
       navigate('/app')
     }
   }, [token])
+
+  useEffect(() => {
+    const Header = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    }
+    fetchData(`${AppSettingsUrl}/`, 'GET', null as any, Header)
+    .then((res) => {
+      if (!res.error && res.length > 0) {
+        let settings = res.filter((s: any) => s.name === 'allow_google_login')
+        if (settings.length > 0) {
+          console.log(settings[0].value)
+          set_google_login_allowed(settings[0].value === 'True')
+        }
+      }
+    })
+  }, [])
 
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
@@ -183,7 +202,7 @@ export default function Login () {
                 marginTop: '15px',
                 marginBottom: '10px'
                 }} variant="body2">
-                Or
+                {google_login_allowed && <p>Or</p>} 
               </Typography>
               {/* <GoogleLogin
                                 onSuccess={credentialResponse => {
@@ -195,7 +214,7 @@ export default function Login () {
                                 }}
                             />
                             <Button onClick={signout}>logout</Button> */}
-
+              {google_login_allowed && 
               <GoogleButton
                 variant="outlined"
                 onClick={() => login()}
@@ -207,7 +226,7 @@ export default function Login () {
                   alt="google"
                   style={{ width: '17px', marginLeft: '5px' }}
                 />
-              </GoogleButton>
+              </GoogleButton>}
               {/* <Grid item sx={{ mt: 2, alignItems: 'center', alignContent: 'center' }}>
                                 <Grid item sx={{ mt: 1, ml: 6 }}>
                                     <div className='authentication_wrapper'>
