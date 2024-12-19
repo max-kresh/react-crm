@@ -36,7 +36,7 @@ import { FiChevronRight } from '@react-icons/all-files/fi/FiChevronRight'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FaAd, FaEdit, FaTrashAlt } from 'react-icons/fa'
-import { fetchData, Header } from '../../components/FetchData'
+import { fetchData, fetchRawData, Header } from '../../components/FetchData'
 import { AppSettingsUrl, UsersUrl, UserUrl } from '../../services/ApiUrls'
 import {
   CustomTab,
@@ -492,9 +492,9 @@ export default function Users () {
       value: e.target.value === google_login_options[0] ? 'True' : 'False'
       // type: 'bool'
     }
-    fetchData(`${AppSettingsUrl}/`, 'PUT', JSON.stringify(data), Header)
+    fetchRawData(`${AppSettingsUrl}/`, 'PUT', JSON.stringify(data), Header)
       .then((res: any) => {
-        if (!res.error) {
+        if (res.ok) {
             set_google_login_allowed(e.target.value === 'Google Login Enabled')
             console.log('google login allowed is set on the server')
         } else {
