@@ -489,8 +489,8 @@ export default function Users () {
   const handleGoogleLoginEnable = (e: any) => {
     const data = {
       name: 'allow_google_login',
-      value: e.target.value === 'Google Login Enabled' ? 'True' : 'False',
-      type: 'bool'
+      value: e.target.value === google_login_options[0] ? 'True' : 'False'
+      // type: 'bool'
     }
     fetchData(`${AppSettingsUrl}/`, 'PUT', JSON.stringify(data), Header)
       .then((res: any) => {
@@ -498,6 +498,7 @@ export default function Users () {
             set_google_login_allowed(e.target.value === 'Google Login Enabled')
             console.log('google login allowed is set on the server')
         } else {
+            set_google_login_allowed(google_login_allowed)
             console.log('google login allowed failed on the server')
         }
       })
