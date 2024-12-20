@@ -7,6 +7,7 @@ import {
   useLocation
 } from 'react-router-dom'
 import Login from './pages/auth/Login'
+import ActivateUser from './pages/auth/ActivateUser'
 import { Home } from './pages/home/Home'
 
 function App () {
@@ -23,6 +24,7 @@ function App () {
           {/* <Route path='*' element={isLoggedIn ? <Home /> : <Login />} /> */}
           <Route path="*" element={<Home />} />
           <Route path="/app" element={<Home />} />
+          <Route path="/auth/activate-user/:uid/:user_token/:user_token_delta" element={<ActivateUser />} />
           <Route path="/login" element={<Login />} />
           {/* <Route path="/" element={<Navigate to="/contacts" replace />} /> */}
           {/* <Route
