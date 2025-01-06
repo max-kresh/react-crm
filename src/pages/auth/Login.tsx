@@ -87,11 +87,16 @@ export default function Login () {
 
       fetchData(`${AuthUrl}/`, 'POST', JSON.stringify(apiToken), head)
         .then((res: any) => {
-          localStorage.setItem('Token', `Bearer ${res.access_token}`)
-          setToken(true)
+          if (res.error) {
+            throw Error(res.message)
+          } else {
+            localStorage.setItem('Token', `Bearer ${res.access_token}`)
+            setToken(true)          
+          }
         })
         .catch((error: any) => {
           console.error('Error:', error)
+          alert(error)
         })
     }
   })
