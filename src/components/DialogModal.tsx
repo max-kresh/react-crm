@@ -34,7 +34,7 @@ export const DialogModal = (props: any) => {
           Cancel
         </Button>
         <Button
-          // onClick={() => props.onDelete(props.lead.id)}
+          onClick={() => onClose()}
           style={{
             textTransform: 'capitalize',
             backgroundColor: '#3E79F7',
