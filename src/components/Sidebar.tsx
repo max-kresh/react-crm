@@ -26,7 +26,8 @@ import {
   FaSignOutAlt,
   FaTachometerAlt,
   FaUserFriends,
-  FaUsers
+  FaUsers,
+  FaWrench
 } from 'react-icons/fa'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { fetchData, Header1 } from './FetchData'
@@ -46,6 +47,7 @@ import ContactDetails from '../pages/contacts/ContactDetails'
 import Users from '../pages/users/Users'
 import Opportunities from '../pages/opportunities/Opportunities'
 import Cases from '../pages/cases/Cases'
+import Settings from '../pages/settings/Settings'
 import { AddLeads } from '../pages/leads/AddLeads'
 import Accounts from '../pages/accounts/Accounts'
 import { AddAccount } from '../pages/accounts/AddAccount'
@@ -121,6 +123,8 @@ export default function Sidebar (props: any) {
       setScreen('users')
     } else if (location.pathname.split('/')[2] === 'cases') {
       setScreen('cases')
+    } else if (location.pathname.split('/')[2] === 'cases') {
+      setScreen('settings')
     }
   }
 
@@ -148,7 +152,8 @@ export default function Sidebar (props: any) {
     'accounts',
     'companies',
     'users',
-    'cases'
+    'cases',
+    'settings'
   ]
   const navIcons = (text: any, screen: any): React.ReactNode => {
     switch (text) {
@@ -191,6 +196,12 @@ export default function Sidebar (props: any) {
           <FaBriefcase fill="#3e79f7" />
         ) : (
           <FaBriefcase />
+        )
+      case 'settings':
+        return screen === 'settings' ? (
+          <FaWrench fill="#3e79f7" />
+        ) : (
+          <FaWrench />
         )
       default:
         return <FaDiceD6 fill="#3e79f7" />
@@ -452,6 +463,7 @@ export default function Sidebar (props: any) {
                 element={<EditOpportunity />}
               />
               <Route path="/app/cases" element={<Cases />} />
+              <Route path="/app/settings" element={<Settings />} />
               <Route path="/app/cases/add-case" element={<AddCase />} />
               <Route path="/app/cases/edit-case" element={<EditCase />} />
               <Route path="/app/cases/case-details" element={<CaseDetails />} />
