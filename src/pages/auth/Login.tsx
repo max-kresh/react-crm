@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Grid, Stack, Typography } from '@mui/material'
 import { useGoogleLogin } from '@react-oauth/google'
 import { useNavigate } from 'react-router-dom'
@@ -8,6 +8,7 @@ import imgLogin from '../../assets/images/auth/img_login.png'
 import { GoogleButton } from '../../styles/CssStyled'
 import { fetchData, fetchRawData } from '../../components/FetchData'
 import { AuthUrl, AuthEmailUrl, AppSettingsUrl } from '../../services/ApiUrls'
+import { UserContext } from '../../context/UserContext'
 
 import '../../styles/style.css'
 
@@ -38,6 +39,8 @@ export default function Login () {
     Accept: 'application/json',
     'Content-Type': 'application/json'
   }
+
+  const userCtx = useContext(UserContext)
   
   const handleLogin = (event: any) => {
     fetchRawData(`${AuthEmailUrl}/`, 'POST', JSON.stringify({ email: emailValue, password: passwordValue }), head)
@@ -49,6 +52,8 @@ export default function Login () {
         })
         .then((res: any) => {
           localStorage.setItem('Token', 'Bearer ' + res.access_token)
+          localStorage.setItem('User', JSON.stringify({ email: res.username, role: res.role }))
+          userCtx.setUser(res.username, res.role)
           setToken(true)
         })
         .catch((error: any) => {
