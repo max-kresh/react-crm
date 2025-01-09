@@ -41,6 +41,7 @@ import {
 } from '../../styles/CssStyled'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
+import { Constants } from '../../utils/Constants'
 
 type FormErrors = {
   email?: string[]
@@ -112,7 +113,7 @@ export function AddUsers () {
   const [userErrors, setUserErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
     email: '',
-    role: 'ADMIN',
+    role: Constants.ADMIN,
     phone: '',
     alternate_phone: '',
     address_line: '',
@@ -187,7 +188,7 @@ export function AddUsers () {
   const resetForm = () => {
     setFormData({
       email: '',
-      role: 'ADMIN',
+      role: Constants.ADMIN,
       phone: '',
       alternate_phone: '',
       address_line: '',
@@ -268,7 +269,7 @@ export function AddUsers () {
                         <FormControl sx={{ width: '70%' }}>
                           <Select
                             name="role"
-                            value={formData.role}
+                            value={Constants.USER}
                             open={roleSelectOpen}
                             onClick={() => setRoleSelectOpen(!roleSelectOpen)}
                             IconComponent={() => (
@@ -289,7 +290,11 @@ export function AddUsers () {
                             onChange={handleChange}
                             error={!!errors?.role?.[0]}
                           >
-                            {['ADMIN', 'USER'].map((option) => (
+                            {[
+                              Constants.ADMIN, 
+                              Constants.SALES_MANAGER, 
+                              Constants.SALES_REPRESENTATIVE, 
+                              Constants.USER].map((option) => (
                               <MenuItem key={option} value={option}>
                                 {option}
                               </MenuItem>
@@ -307,6 +312,7 @@ export function AddUsers () {
                             name="phone"
                             id="outlined-error-helper-text"
                             value={formData.phone}
+                            placeholder='+911663780012'
                             onChange={handleChange}
                             required
                             style={{ width: '70%' }}
