@@ -113,7 +113,7 @@ export function AddUsers () {
   const [userErrors, setUserErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
     email: '',
-    role: Constants.ADMIN,
+    role: Constants.USER,
     phone: '',
     alternate_phone: '',
     address_line: '',
