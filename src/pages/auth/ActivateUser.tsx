@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import { Grid, Stack, Typography } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom'
 import imgLogo from '../../assets/images/auth/img_logo.png'
@@ -6,6 +6,7 @@ import imgLogin from '../../assets/images/auth/img_login.png'
 import { fetchRawData } from '../../components/FetchData'
 import { ActivateUserUrl } from '../../services/ApiUrls'
 import '../../styles/style.css'
+import { UserContext } from '../../context/UserContext'
 
 declare global {
   interface Window {
@@ -30,6 +31,8 @@ export default function ActivateUser () {
   const handlePasswordRepeatChange = (event: any) => {
     setPasswordRepeatValue(event.target.value)
   }
+
+  const userCtx = useContext(UserContext)
   
   const head = {
     Accept: 'application/json',
@@ -41,6 +44,8 @@ export default function ActivateUser () {
       alert('Passwords do not match!')
       return
     }
+    // clear any data related to user role
+    userCtx.setUser({ email: '', role: '' })
     fetchRawData(`${ActivateUserUrl}/`, 'POST', JSON.stringify({ uid, user_token, user_token_delta, password: passwordValue }), head)
         .then((res: any) => {
           if (!res.ok) {

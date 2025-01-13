@@ -36,6 +36,7 @@ import { AntSwitch } from '../../styles/CssStyled'
 import { AppSettingsUrl } from '../../services/ApiUrls'
 import { fetchData, fetchRawData, Header } from '../../components/FetchData'
 import { DialogModal } from '../../components/DialogModal'
+import { Constants } from '../../utils/Constants'
 
 function Settings () {
   const [modalTitle, setModalTitle] = useState('')
@@ -76,9 +77,9 @@ function Settings () {
     setLoginWithoutInvitationAllowed(e.target.checked)
   }
   const handleSaveSettings = (e: any) => {
-      setBooleanSetting('allow_google_login', googleLoginAllowed ? 'True' : 'False')
+      setBooleanSetting(Constants.ALLOW_GOOGLE_LOGIN, googleLoginAllowed ? 'True' : 'False')
       setShowSuccess(true)
-      setBooleanSetting('allow_login_without_invitation', loginWithoutInvitationAllowed ? 'True' : 'False')
+      setBooleanSetting(Constants.ALLOW_LOGIN_WITHOUT_INVITATION, loginWithoutInvitationAllowed ? 'True' : 'False')
   }
   useEffect(() => {
     const Header = {
@@ -87,8 +88,8 @@ function Settings () {
     }
     fetchData(`${AppSettingsUrl}/`, 'GET', null as any, Header)
     .then((res) => {
-        setGoogleLoginAllowed(getBooleanSetting(res, 'allow_google_login') === 'True')
-        setLoginWithoutInvitationAllowed(getBooleanSetting(res, 'allow_login_without_invitation') === 'True')
+        setGoogleLoginAllowed(getBooleanSetting(res, Constants.ALLOW_GOOGLE_LOGIN) === 'True')
+        setLoginWithoutInvitationAllowed(getBooleanSetting(res, Constants.ALLOW_LOGIN_WITHOUT_INVITATION) === 'True')
     })
   }, [])
   return (

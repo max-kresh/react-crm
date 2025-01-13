@@ -28,6 +28,7 @@ import { AntSwitch, RequiredTextField } from '../../styles/CssStyled'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 import '../../styles/style.css'
+import { Constants } from '../../utils/Constants'
 
 type FormErrors = {
   email?: string[]
@@ -74,7 +75,7 @@ export function EditUser () {
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [formData, setFormData] = useState<FormData>({
     email: '',
-    role: 'ADMIN',
+    role: Constants.ADMIN,
     phone: '',
     alternate_phone: '',
     address_line: '',
@@ -213,7 +214,7 @@ export function EditUser () {
   const resetForm = () => {
     setFormData({
       email: '',
-      role: 'ADMIN',
+      role: Constants.ADMIN,
       phone: '',
       alternate_phone: '',
       address_line: '',
@@ -299,7 +300,7 @@ export function EditUser () {
                         <FormControl sx={{ width: '70%' }}>
                           <Select
                             name="role"
-                            value={formData.role}
+                            value={Constants.USER}
                             open={roleSelectOpen}
                             onClick={() => setRoleSelectOpen(!roleSelectOpen)}
                             IconComponent={() => (
@@ -320,7 +321,12 @@ export function EditUser () {
                             onChange={handleChange}
                             error={!!errors?.role?.[0]}
                           >
-                            {['ADMIN', 'USER'].map((option) => (
+                            {[
+                                Constants.ADMIN, 
+                                Constants.SALES_MANAGER,
+                                Constants.SALES_REPRESENTATIVE,
+                                Constants.SALES_REPRESENTATIVE
+                              ].map((option) => (
                               <MenuItem key={option} value={option}>
                                 {option}
                               </MenuItem>

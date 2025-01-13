@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import {
   AppBar,
   Avatar,
@@ -66,6 +66,8 @@ import logo from '../assets/images/auth/img_logo.png'
 import { StyledListItemButton, StyledListItemText } from '../styles/CssStyled'
 // import MyContext, { MyContextData } from '../context/Context';
 import MyContext from '../context/Context'
+import { UserContext } from '../context/UserContext'
+import { Constants } from '../utils/Constants'
 
 // declare global {
 //     interface Window {
@@ -88,6 +90,8 @@ export default function Sidebar (props: any) {
   useEffect(() => {
     toggleScreen()
   }, [navigate])
+
+  const userCtx = useContext(UserContext)
 
   // useEffect(() => {
   // navigate('/leads')
@@ -144,17 +148,27 @@ export default function Sidebar (props: any) {
         console.error('Error:', error)
       })
   }
-
-  const navList = [
-    'leads',
-    'contacts',
-    'opportunities',
-    'accounts',
-    'companies',
-    'users',
-    'cases',
-    'settings'
-  ]
+  // TODO This array must be revised according to user roles
+  const createSidebarList = () => {
+    const list = [
+      'leads',
+      'contacts',
+      'opportunities',
+      'accounts',
+      'companies',
+      'cases'
+    ]
+    console.log('************User email: ', userCtx.user.email)
+    if ([Constants.ADMIN, Constants.SALES_MANAGER].includes(userCtx.user.role)) {
+      list.push('users')
+    }
+    if (userCtx.user.role === Constants.ADMIN) {
+      list.push('settings')
+    }
+    return list
+  }
+  const navList = createSidebarList()
+  
   const navIcons = (text: any, screen: any): React.ReactNode => {
     switch (text) {
       case 'leads':
