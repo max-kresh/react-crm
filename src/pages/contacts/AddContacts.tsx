@@ -198,6 +198,7 @@ function AddContacts () {
       address_line: formData.address_line,
       street: formData.street,
       city: formData.city,
+      postcode: formData.postcode,
       state: formData.state,
       description: formData.description,
       linked_in_url: formData.linked_in_url,
