@@ -139,7 +139,7 @@ export default function ContactDetails () {
           language: contactDetails?.language,
           do_not_call: contactDetails?.do_not_call,
           department: contactDetails?.department,
-          address: addressDetails?.address_line,
+          address_line: addressDetails?.address_line,
           street: addressDetails?.street,
           city: addressDetails?.city,
           state: addressDetails?.state,
@@ -301,7 +301,7 @@ export default function ContactDetails () {
                 </div>
                 <div style={{ width: '32%' }}>
                   <div className="title2">Organization Name</div>
-                  <div className="title3">{org?.name || '----'}</div>
+                  <div className="title3">{contactDetails?.organization || '----'}</div>
                 </div>
               </div>
               <div
@@ -465,7 +465,7 @@ export default function ContactDetails () {
                   }}
                 >
                   <div style={{ width: '32%' }}>
-                    <div className="title2">Pincode</div>
+                    <div className="title2">Postcode</div>
                     <div className="title3">
                       {addressDetails?.postcode || '----'}
                     </div>
