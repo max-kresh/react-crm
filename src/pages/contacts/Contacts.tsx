@@ -91,6 +91,12 @@ const headCells: readonly HeadCell[] = [
     label: 'Phone Number'
   },
   {
+    id: 'category',
+    numeric: false,
+    disablePadding: false,
+    label: 'Category'
+  },
+  {
     id: '',
     numeric: true,
     disablePadding: false,
@@ -415,6 +421,11 @@ export default function Contacts () {
                                   ? item.mobile_number
                                   : '---'}
                               </TableCell>
+                              <TableCell className="tableCell">
+                                {item.category
+                                  ? item.category
+                                  : '---'}
+                              </TableCell>                              
                               {/* <StyledTableCell align='left'>
                                                 <AntSwitch checked={item.do_not_call} inputProps={{ 'aria-label': 'ant design' }} />
                                             </StyledTableCell> */}
