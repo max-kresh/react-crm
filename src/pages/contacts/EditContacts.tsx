@@ -231,6 +231,21 @@ function EditContact () {
           // resetForm()
         }
         if (res.error) {
+          let errorStr = '' 
+          try {
+              Object.values(res.contact_errors).forEach((item) => {
+                if (Array.isArray(item)) {
+                  item.forEach((err) => {
+                    if (typeof err === 'string') {
+                      errorStr += `${err}\n` 
+                    }
+                  })
+                }
+              })
+              alert(errorStr)
+          } catch (error) {
+            console.error('An error occurred while processing errors:', error)
+          }
           setError(true)
           setErrors(res?.errors?.contact_errors)
         }
