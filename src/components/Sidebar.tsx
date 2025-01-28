@@ -83,6 +83,7 @@ export default function Sidebar (props: any) {
   const [headerWidth, setHeaderWidth] = useState(drawerWidth)
   const [userDetail, setUserDetail] = useState('')
   const [organizationModal, setOrganizationModal] = useState(false)
+  const [isDrawerHidden, setIsDrawerHidden] = useState(false)
   const organizationModalClose = () => {
     setOrganizationModal(false)
   }
@@ -168,7 +169,7 @@ export default function Sidebar (props: any) {
     return list
   }
   const navList = createSidebarList()
-  
+
   const navIcons = (text: any, screen: any): React.ReactNode => {
     switch (text) {
       case 'leads':
@@ -277,7 +278,10 @@ export default function Sidebar (props: any) {
               )}
               <IconButton
                 sx={{ ml: '-10px' }}
-                onClick={() => setDrawerWidth(drawerWidth === 60 ? 200 : 60)}
+                onClick={() => {
+                  setDrawerWidth(drawerWidth === 60 ? 200 : 60)
+                  setIsDrawerHidden(!isDrawerHidden)
+                }}
               >
                 <FaBars style={{ height: '20px' }} />
               </IconButton>
@@ -372,7 +376,8 @@ export default function Sidebar (props: any) {
           variant='permanent'
           sx={{
             width: drawerWidth,
-            flexShrink: 0
+            flexShrink: 0,
+            display: isDrawerHidden ? 'none' : 'block'
           }}
         >
           <Box>
