@@ -37,12 +37,12 @@ export function UserContextProvider ({ children }: any) {
 
     return (
         <UserContext.Provider value={{ 
-                user: user, 
+                user,
                 setUser: handleUserChange,
-                isAdmin: isAdmin,
-                isSalesManager: isSalesManager,
-                isSalesRep: isSalesRep,
-                isUser: isUser 
+                isAdmin,
+                isSalesManager,
+                isSalesRep,
+                isUser
             }}>
             {children}
         </UserContext.Provider>
