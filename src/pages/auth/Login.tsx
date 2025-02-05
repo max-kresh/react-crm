@@ -52,8 +52,7 @@ export default function Login () {
         })
         .then((res: any) => {
           localStorage.setItem('Token', 'Bearer ' + res.access_token)
-          localStorage.setItem('User', JSON.stringify({ email: res.username, role: res.role }))
-          userCtx.setUser(res.username, res.role)
+          userCtx.setUser({ email: res.username, role: res.role })
           setToken(true)
         })
         .catch((error: any) => {

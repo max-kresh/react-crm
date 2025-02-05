@@ -237,6 +237,8 @@ export default function Sidebar (props: any) {
   const id = open ? 'simple-popover' : undefined
   // console.log(screen, 'sidebar');
   const context = { drawerWidth, screen }
+
+  const user_tooltip = `User: ${userCtx.getEmail()}\nOrg : ${userCtx.getOrganization()}\nRole: ${userCtx.getRole()}`
   return (
     <>
       <Box>
@@ -306,6 +308,8 @@ export default function Sidebar (props: any) {
               <Avatar
                 // src='hj'
                 sx={{ height: '27px', width: '27px' }}
+                // title={`${userCtx.getEmail()}\n${userCtx.getOrganization()}`}
+                title={user_tooltip}
               />
             </IconButton>
             <Popover

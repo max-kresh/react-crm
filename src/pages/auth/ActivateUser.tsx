@@ -45,7 +45,7 @@ export default function ActivateUser () {
       return
     }
     // clear any data related to user role
-    userCtx.setUser({ email: '', role: '' })
+    userCtx.setUser({ email: '', role: '', organization: '' })
     fetchRawData(`${ActivateUserUrl}/`, 'POST', JSON.stringify({ uid, user_token, user_token_delta, password: passwordValue }), head)
         .then((res: any) => {
           if (!res.ok) {

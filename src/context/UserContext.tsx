@@ -4,19 +4,30 @@ import { Constants } from '../utils/Constants'
 
 export const UserContext = createContext<any>({
     user: {},
-    setUser: (email: string, role: string) => {},
+    setUser: (email: string, role: string, organization: string) => {},
     isAdmin: () => {},
     isSalesManager: () => {},
     isSalesRep: () => {},
-    isUser: () => {}
+    isUser: () => {},
+    getRole: () => {},
+    getEmail: () => {},
+    getOrganization: () => {}
 })
 
 export function UserContextProvider ({ children }: any) {
-    const [user, setUser] = useState<any>(JSON.parse(localStorage.getItem('User') ?? `{"email": "NONE", "ROLE":"${Constants.USER}"}`))
+    const [user, setUser] = useState<any>(
+        JSON.parse(localStorage.getItem('User') ?? 
+        `{"email": "NONE", "role":"${Constants.USER}"}, "organization": "NONE"`))
     
-    function handleUserChange (email: string, role: string) {
-        console.log('setting user', email, role)
-        setUser({ email, role }) 
+    function handleUserChange ({ ...args }) {
+        setUser((prev: any) => ({ ...prev, ...args })) 
+        const old = localStorage.getItem('User')
+        let user_obj = {}
+        if (old) {
+            user_obj = JSON.parse(old)
+        }
+        // localStorage.setItem('User', JSON.stringify({ email: email, role: (selected_org as any).role }))
+        localStorage.setItem('User', JSON.stringify({ ...user_obj, ...args }))
     }
 
     function isAdmin () {
@@ -35,6 +46,18 @@ export function UserContextProvider ({ children }: any) {
         return user.role === Constants.USER
     }
 
+    function getRole () {
+        return user.role
+    }
+
+    function getEmail () {
+        return user.email
+    }
+
+    function getOrganization () {
+        return user.organization
+    }
+
     return (
         <UserContext.Provider value={{ 
                 user,
@@ -42,7 +65,10 @@ export function UserContextProvider ({ children }: any) {
                 isAdmin,
                 isSalesManager,
                 isSalesRep,
-                isUser
+                isUser,
+                getRole,
+                getEmail,
+                getOrganization
             }}>
             {children}
         </UserContext.Provider>

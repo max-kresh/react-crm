@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Box,
@@ -18,6 +18,8 @@ import {
   StyledListItemButton,
   StyledListItemText
 } from '../../styles/CssStyled'
+import { json } from 'stream/consumers'
+import { UserContext } from '../../context/UserContext'
 
 interface Item {
   org: {
@@ -35,6 +37,8 @@ export default function OrganizationModal (props: any) {
   const [error, setError] = useState('')
 
   const buttonRef = useRef<HTMLButtonElement>(null)
+
+  const userCtx = useContext(UserContext)
 
   useEffect(() => {
     getOrganization()
@@ -86,11 +90,25 @@ export default function OrganizationModal (props: any) {
     setNewOrganization('')
   }
   const selectedOrganization = (id: any) => {
-    // if(localStorage.getItem('org')){
-    //     localStorage.setItem('org', id)
-    //     handleClose()
-    // }else{
     localStorage.setItem('org', id)
+    const selected_org = organization.filter(prof => prof.org.id === id)[0]
+
+    // Write user role into the local storage
+    const current_entry = localStorage.getItem('User')
+    // Email is stored in the localhost when the login process ends.
+    // Read it first and add role and store back.
+    let email = 'UNKNOWN'
+    if (current_entry) {
+      email = (JSON.parse(current_entry) as any).email
+    }
+    
+    userCtx.setUser(
+      {
+        email: email, 
+        role: (selected_org as any).role, 
+        organization: (selected_org as any).org.name
+      })
+
     // navigate('/')
     onHandleClose()
     if (localStorage.getItem('org')) {
@@ -108,9 +126,9 @@ export default function OrganizationModal (props: any) {
       <Dialog
         open={open}
         onClose={onHandleClose}
-        // BackdropProps={{
-        //     onClick: handleBackdropClick,
-        //   }}
+      // BackdropProps={{
+      //     onClick: handleBackdropClick,
+      //   }}
       >
         <Box sx={{ width: '400px' }}>
           {localStorage.getItem('org') ? (
