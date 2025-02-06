@@ -16,8 +16,8 @@ export const UserContext = createContext<any>({
 
 export function UserContextProvider ({ children }: any) {
     const [user, setUser] = useState<any>(
-        JSON.parse(localStorage.getItem('User') ?? 
-        `{"email": "NONE", "role":"${Constants.USER}"}, "organization": "NONE"`))
+        JSON.parse(localStorage.getItem('User')?.trim() ?? 
+        `{"email": "NONE", "role":"${Constants.USER}", "organization": "NONE"}`))
     
     function handleUserChange ({ ...args }) {
         setUser((prev: any) => ({ ...prev, ...args })) 
