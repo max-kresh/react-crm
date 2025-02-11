@@ -5,11 +5,12 @@ import {
   AccordionSummary,
   Typography,
   Box,
-  Divider
+  Divider,
+  Button
 } from '@mui/material'
 
 import React, { useEffect, useState } from 'react'
-import { FaArrowDown } from 'react-icons/fa'
+import { FaArrowDown, FaTimesCircle, FaCheckCircle } from 'react-icons/fa'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { CompanyUrl } from '../../services/ApiUrls'
 import { CustomAppBar } from '../../components/CustomAppBar'
@@ -144,6 +145,55 @@ function EditCompany () {
                         />
                       </div>
                     </div>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mt: 1.5
+                      }}
+                    >
+                      <Button
+                        className="header-button"
+                        onClick={() => {}}
+                        size="small"
+                        variant="contained"
+                        startIcon={
+                          <FaTimesCircle
+                            style={{
+                              fill: 'white',
+                              width: '16px',
+                              marginLeft: '2px'
+                            }}
+                          />
+                        }
+                        sx={{
+                          backgroundColor: '#2b5075',
+                          ':hover': { backgroundColor: '#1e3750' }
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        className="header-button"
+                        onClick={handleSubmit}
+                        variant="contained"
+                        size="small"
+                        startIcon={
+                          <FaCheckCircle
+                            style={{
+                              fill: 'white',
+                              width: '16px',
+                              marginLeft: '2px'
+                            }}
+                          />
+                        }
+                        sx={{ ml: 1 }}
+                      >
+                        Save
+                      </Button>
+                    </Box>
                   </Box>
                 </AccordionDetails>
               </Accordion>
