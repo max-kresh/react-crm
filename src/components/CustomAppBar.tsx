@@ -32,7 +32,7 @@ export function CustomAppBar (props: any) {
         //  position: 'fixed',
         top: '64px',
         left: sharedData.drawerWidth === 200 ? '200px' : '60px',
-        width: '-webkit-fill-available'
+        width: 'fill-available'
       }}
       position="fixed"
     >

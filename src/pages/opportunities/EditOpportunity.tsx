@@ -993,12 +993,7 @@ export function EditOpportunity () {
                       </Button>
                       <Button
                         className="header-button"
-                        onClick={() =>
-                          setFormData({
-                            ...formData,
-                            description: quillRef.current.firstChild.innerHTML
-                          })
-                        }
+                        onClick={handleSubmit}
                         variant="contained"
                         size="small"
                         startIcon={
