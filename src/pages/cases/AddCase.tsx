@@ -771,7 +771,7 @@ export function AddCase () {
                   >
                     <Button
                       className="header-button"
-                      onClick={resetQuillToInitialState}
+                      onClick={onCancel}
                       size="small"
                       variant="contained"
                       startIcon={

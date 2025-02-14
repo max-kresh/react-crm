@@ -887,7 +887,7 @@ export function AddAccount () {
                     >
                       <Button
                         className="header-button"
-                        onClick={() => {}}
+                        onClick={onCancel}
                         size="small"
                         variant="contained"
                         startIcon={
