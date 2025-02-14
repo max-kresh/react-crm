@@ -691,7 +691,7 @@ function EditContact () {
                     >
                       <Button
                         className="header-button"
-                        onClick={emptyDescription}
+                        onClick={onCancel}
                         size="small"
                         variant="contained"
                         startIcon={

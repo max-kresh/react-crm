@@ -156,7 +156,7 @@ function EditCompany () {
                     >
                       <Button
                         className="header-button"
-                        onClick={() => {}}
+                        onClick={onCancel}
                         size="small"
                         variant="contained"
                         startIcon={

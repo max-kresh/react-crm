@@ -831,7 +831,7 @@ export function EditCase () {
                   >
                     <Button
                       className="header-button"
-                      onClick={emptyDescription}
+                      onClick={onCancel}
                       size="small"
                       variant="contained"
                       startIcon={
