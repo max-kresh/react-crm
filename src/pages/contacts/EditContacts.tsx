@@ -231,13 +231,13 @@ function EditContact () {
           // resetForm()
         }
         if (res.error) {
-          let errorStr = '' 
+          let errorStr = ''
           try {
               Object.values(res.contact_errors).forEach((item) => {
                 if (Array.isArray(item)) {
                   item.forEach((err) => {
                     if (typeof err === 'string') {
-                      errorStr += `${err}\n` 
+                      errorStr += `${err}\n`
                     }
                   })
                 }
@@ -436,7 +436,7 @@ function EditContact () {
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Mobile Number</div>
-                        <Tooltip title="Number must starts with +91">
+                        <Tooltip title="Enter a valid mobile number">
                           <RequiredTextField
                             name="mobile_number"
                             value={formData.mobile_number}
@@ -455,7 +455,7 @@ function EditContact () {
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Secondary Number</div>
-                        <Tooltip title="Number must starts with +91">
+                        <Tooltip title="Enter a valid mobile number">
                           <RequiredTextField
                             required
                             name="secondary_number"

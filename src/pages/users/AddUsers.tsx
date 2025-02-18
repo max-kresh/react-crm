@@ -291,9 +291,9 @@ export function AddUsers () {
                             error={!!errors?.role?.[0]}
                           >
                             {[
-                              Constants.ADMIN, 
-                              Constants.SALES_MANAGER, 
-                              Constants.SALES_REPRESENTATIVE, 
+                              Constants.ADMIN,
+                              Constants.SALES_MANAGER,
+                              Constants.SALES_REPRESENTATIVE,
                               Constants.USER].map((option) => (
                               <MenuItem key={option} value={option}>
                                 {option}
@@ -307,7 +307,7 @@ export function AddUsers () {
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Phone Number</div>
-                        <Tooltip title="Number must starts with +91">
+                        <Tooltip title="Enter a valid mobile number">
                           <RequiredTextField
                             name="phone"
                             id="outlined-error-helper-text"
@@ -331,7 +331,7 @@ export function AddUsers () {
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Alternate Phone</div>
-                        <Tooltip title="Number must starts with +91">
+                        <Tooltip title="Enter a valid mobile number">
                           <RequiredTextField
                             required
                             name="alternate_phone"
@@ -660,7 +660,7 @@ export function AddUsers () {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -701,7 +701,7 @@ export function AddUsers () {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                             <div className='fieldSubContainer'>
@@ -722,7 +722,7 @@ export function AddUsers () {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -745,7 +745,7 @@ export function AddUsers () {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                             <div className='fieldSubContainer'>
@@ -766,7 +766,7 @@ export function AddUsers () {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -789,7 +789,7 @@ export function AddUsers () {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                             <div className='fieldSubContainer'>
@@ -810,7 +810,7 @@ export function AddUsers () {
                           <MenuItem key={option[1]} value={option[0]}>
                             {option[0]}
                           </MenuItem>
-                        ))} 
+                        ))}
                                                 </TextField>
                                             </div>
                                         </div>
@@ -840,7 +840,7 @@ export function AddUsers () {
                                                     name='description'
                                                     minRows={8}
                                                     // defaultValue={state.editData && state.editData.description ? state.editData.description : ''}
-                                                    // onChange={onChange} 
+                                                    // onChange={onChange}
                                                     style={{ width: '70%', padding: '5px' }}
                                                     placeholder='Add Description'
                                                 />
