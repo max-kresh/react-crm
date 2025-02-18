@@ -128,7 +128,7 @@ export default function Sidebar (props: any) {
       setScreen('users')
     } else if (location.pathname.split('/')[2] === 'cases') {
       setScreen('cases')
-    } else if (location.pathname.split('/')[2] === 'cases') {
+    } else if (location.pathname.split('/')[2] === 'settings') {
       setScreen('settings')
     }
   }
