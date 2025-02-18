@@ -322,7 +322,7 @@ export function EditUser () {
                             error={!!errors?.role?.[0]}
                           >
                             {[
-                                Constants.ADMIN, 
+                                Constants.ADMIN,
                                 Constants.SALES_MANAGER,
                                 Constants.SALES_REPRESENTATIVE,
                                 Constants.SALES_REPRESENTATIVE
@@ -339,7 +339,7 @@ export function EditUser () {
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Phone Number</div>
-                        <Tooltip title="Number must starts with +91">
+                        <Tooltip title="Enter a valid mobile number">
                           <RequiredTextField
                             name="phone"
                             value={formData.phone}
@@ -361,7 +361,7 @@ export function EditUser () {
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Alternate Phone</div>
-                        <Tooltip title="Number must starts with +91">
+                        <Tooltip title="Enter a valid mobile number">
                           <RequiredTextField
                             required
                             name="alternate_phone"

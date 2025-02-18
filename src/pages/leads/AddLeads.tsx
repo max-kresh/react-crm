@@ -942,7 +942,7 @@ export function AddLeads () {
                           aria-label='minimum height'
                           name='lost_reason'
                           minRows={2}
-                          // onChange={onChange} 
+                          // onChange={onChange}
                           style={{ width: '80%' }}
                         />
                       </div>
@@ -1023,7 +1023,7 @@ export function AddLeads () {
                       </div>
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Phone Number</div>
-                        <Tooltip title="Number must starts with +91">
+                        <Tooltip title="Enter a valid mobile number">
                           <TextField
                             name="phone"
                             value={formData.phone}
