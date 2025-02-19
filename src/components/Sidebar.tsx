@@ -30,7 +30,7 @@ import {
   FaWrench
 } from 'react-icons/fa'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
-import { fetchData, Header1 } from './FetchData'
+import { fetchData, compileHeader } from './FetchData'
 import { ProfileUrl } from '../services/ApiUrls'
 import OrganizationModal from '../pages/organization/OrganizationModal'
 import Company from '../pages/company/Company'
@@ -138,7 +138,7 @@ export default function Sidebar (props: any) {
   // }, [])
 
   const userProfile = () => {
-    fetchData(`${ProfileUrl}/`, 'GET', null as any, Header1)
+    fetchData(`${ProfileUrl}/`, 'GET', null as any, compileHeader())
       .then((res: any) => {
         // console.log(res, 'user')
         if (res?.user_obj) {

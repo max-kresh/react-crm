@@ -1,16 +1,12 @@
 import { SERVER } from '../services/ApiUrls'
 
-export const Header = {
-  Accept: 'application/json',
-  'Content-Type': 'application/json',
-  Authorization: localStorage.getItem('Token'),
-  org: localStorage.getItem('org')
-}
-
-export const Header1 = {
-  Accept: 'application/json',
-  'Content-Type': 'application/json',
-  Authorization: localStorage.getItem('Token')
+export function compileHeader () { 
+  return {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+    Authorization: localStorage.getItem('Token'),
+    org: localStorage.getItem('org')
+  }
 }
 
 export function fetchData (url: any, method: any, data = '', header: any) {
@@ -19,7 +15,8 @@ export function fetchData (url: any, method: any, data = '', header: any) {
     headers: header,
     body: data
   }).then((response) => {
-    if (response.status === 403) {
+    // if (response.status > 299) alert('Status1: ' + response.status)
+    if (response.status === 401) {
       logout_and_navigate_to_login()
       return null
     } 
@@ -33,7 +30,8 @@ export function fetchRawData (url: any, method: any, data = '', header: any) {
     headers: header,
     body: data
   }).then((response) => {
-    if (response.status === 403) {
+    // if (response.status > 299) alert('Status2: ' + response.status)
+    if (response.status === 401) {
       logout_and_navigate_to_login()
       return null
     } 

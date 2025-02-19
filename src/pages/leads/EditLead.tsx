@@ -23,7 +23,7 @@ import {
 import { useQuill } from 'react-quilljs'
 import 'quill/dist/quill.snow.css'
 import { LeadUrl } from '../../services/ApiUrls'
-import { fetchData, Header } from '../../components/FetchData'
+import { fetchData, compileHeader } from '../../components/FetchData'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import {
   FaArrowDown,
@@ -346,7 +346,7 @@ export function EditLead () {
       skype_ID: formData.skype_ID
     }
     // console.log(data, 'edit')
-    fetchData(`${LeadUrl}/${state?.id}/`, 'PUT', JSON.stringify(data), Header)
+    fetchData(`${LeadUrl}/${state?.id}/`, 'PUT', JSON.stringify(data), compileHeader())
       .then((res: any) => {
         // console.log('Form data:', res);
         if (!res.error) {

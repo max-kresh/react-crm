@@ -3,7 +3,7 @@ import { Card, Box } from '@mui/material'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { CompanyUrl, ContactUrl } from '../../services/ApiUrls'
-import { fetchData, Header } from '../../components/FetchData'
+import { fetchData, compileHeader } from '../../components/FetchData'
 
 type response = {
   name: string
@@ -19,13 +19,7 @@ export default function CompanyDetails () {
   }, [state?.companyId?.id])
 
   const getCompanyDetail = (id: any) => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
-    fetchData(`${CompanyUrl}/${id}`, 'GET', null as any, Header).then((res) => {
+    fetchData(`${CompanyUrl}/${id}`, 'GET', null as any, compileHeader()).then((res) => {
       console.log(res, 'res')
       if (!res.error) {
         setCompanyDetails(res?.data)
