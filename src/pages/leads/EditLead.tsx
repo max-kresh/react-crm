@@ -45,6 +45,7 @@ import {
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 import '../../styles/style.css'
+import { COUNTRIES } from '../../utils/Constants'
 
 // const useStyles = makeStyles({
 //   btnIcon: {
@@ -1296,8 +1297,7 @@ export function EditLead () {
                             onChange={handleChange}
                             error={!!errors?.country?.[0]}
                           >
-                            {state?.countries?.length &&
-                              state?.countries.map((option: any) => (
+                            {COUNTRIES.map((option: any) => (
                                 <MenuItem key={option[0]} value={option[0]}>
                                   {option[1]}
                                 </MenuItem>
@@ -1307,56 +1307,6 @@ export function EditLead () {
                             {errors?.country?.[0] ? errors?.country[0] : ''}
                           </FormHelperText>
                         </FormControl>
-                        {/* <FormControl error={!!errors?.country?.[0]} sx={{ width: '70%' }}>
-                          <Autocomplete
-                            // ref={autocompleteRef}
-                            // freeSolo
-                            value={selectedCountry}
-                            options={state.countries || []}
-                            getOptionLabel={(option: any) => option[1]}
-                            onChange={(e: any, value: any) => handleChange2('country', value)}
-                            size='small'
-                            renderTags={(value, getTagProps) =>
-                              value.map((option, index) => (
-                                <Chip
-                                  deleteIcon={<FaTimes style={{ width: '9px' }} />}
-                                  sx={{
-                                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                                    height: '18px'
-
-                                  }}
-                                  variant='outlined'
-                                  label={option[1]}
-                                  {...getTagProps({ index })}
-                                />
-                              ))
-                            }
-                            popupIcon={<IconButton
-                              disableFocusRipple
-                              disableRipple
-                              sx={{
-                                width: '45px', height: '40px',
-                                borderRadius: '0px',
-                                backgroundColor: '#d3d3d34a'
-                              }}><FaArrowDown style={{ width: '15px' }} /></IconButton>}
-                            renderInput={(params) => (
-                              <TextField {...params}
-                                // placeholder='Add co'
-                                InputProps={{
-                                  ...params.InputProps,
-                                   sx: {
-                                                                        '& .MuiAutocomplete-popupIndicator': { '&:hover': { backgroundColor: 'white' } },
-                                                                        '& .MuiAutocomplete-endAdornment': {
-                                                                            mt: '-8px',
-                                                                            mr: '-8px',
-                                                                        }
-                                                                    }
-                                }}
-                              />
-                            )}
-                          />
-                          <FormHelperText>{errors?.country?.[0] || ''}</FormHelperText>
-                        </FormControl> */}
                       </div>
                     </div>
                   </Box>

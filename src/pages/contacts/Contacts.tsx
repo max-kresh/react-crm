@@ -113,7 +113,6 @@ export default function Contacts () {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [contactList, setContactList] = useState([])
-  const [countries, setCountries] = useState([])
 
   const [deleteRowModal, setDeleteRowModal] = useState(false)
 
@@ -173,7 +172,6 @@ export default function Contacts () {
             // console.log(data.contact_obj_list, 'contact')
             // if (initial) {
             setContactList(data.contact_obj_list)
-            setCountries(data?.countries)
             // setTotalPages(data?.contacts_count)
             setTotalPages(Math.ceil(data?.contacts_count / recordsPerPage))
             setLoading(false)
@@ -228,14 +226,14 @@ export default function Contacts () {
 
   const onAddContact = () => {
     if (!loading) {
-      navigate('/app/contacts/add-contacts', { state: { countries } })
+      navigate('/app/contacts/add-contacts')
     }
     // navigate('/contacts/add-contacts?page=add-contacts')
   }
 
   const contactHandle = (contactId: any) => {
     navigate('/app/contacts/contact-details', {
-      state: { contactId, detail: true, countries }
+      state: { contactId, detail: true }
     })
   }
 

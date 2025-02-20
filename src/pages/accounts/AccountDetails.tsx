@@ -142,16 +142,6 @@ export const AccountDetails = (props: any) => {
           setLeads(res?.leads)
           setTags(res?.tags)
           setTeams(res?.teams)
-          // setAttachments(res?.attachments)
-          // setTags(res?.tags)
-          // setCountries(res?.countries)
-          // setIndustries(res?.industries)
-          // setStatus(res?.status)
-          // setSource(res?.source)
-          // setUsers(res?.users)
-          // setContacts(res?.contacts)
-          // setTeams(res?.teams)
-          // setComments(res?.comments)
         }
       })
       .catch((err) => {

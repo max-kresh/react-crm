@@ -31,6 +31,7 @@ import {
 } from '../../styles/CssStyled'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
+import { COUNTRIES } from '../../utils/Constants'
 
 type FormErrors = {
   name?: string[]
@@ -916,8 +917,7 @@ export function EditAccount () {
                             onChange={handleChange}
                             error={!!errors?.billing_country?.[0]}
                           >
-                            {state?.countries?.length &&
-                              state?.countries.map((option: any) => (
+                            {COUNTRIES.map((option: any) => (
                                 <MenuItem key={option[0]} value={option[0]}>
                                   {option[1]}
                                 </MenuItem>

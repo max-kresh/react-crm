@@ -150,8 +150,7 @@ export default function ContactDetails () {
           facebook_url: contactDetails?.facebook_url,
           twitter_username: contactDetails?.twitter_username
         },
-        id: state?.contactId?.id,
-        countries: state?.countries
+        id: state?.contactId?.id
       }
     })
   }

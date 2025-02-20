@@ -97,7 +97,6 @@ export const CaseDetails = (props: any) => {
   >([])
   const [attachments, setAttachments] = useState([])
   const [tags, setTags] = useState([])
-  const [countries, setCountries] = useState<string[][]>([])
   const [contacts, setContacts] = useState([])
   const [teams, setTeams] = useState([])
   const [comments, setComments] = useState([])
@@ -144,24 +143,7 @@ export const CaseDetails = (props: any) => {
         </Snackbar>
       })
   }
-  // const accountCountry = (country: string) => {
-  //     let countryName: string[] | undefined;
-  //     for (countryName of countries) {
-  //         if (Array.isArray(countryName) && countryName.includes(country)) {
-  //             const ele = countryName;
-  //             break;
-  //         }
-  //     }
-  //     return countryName?.[1]
-  // }
   const editHandle = () => {
-    // let country: string[] | undefined;
-    // for (country of countries) {
-    //     if (Array.isArray(country) && country.includes(caseDetails?.country || '')) {
-    //         const firstElement = country[0];
-    //         break;
-    //     }
-    // }
     navigate('/app/cases/edit-case', {
       state: {
         value: {

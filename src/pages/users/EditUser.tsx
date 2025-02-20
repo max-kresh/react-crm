@@ -28,7 +28,7 @@ import { AntSwitch, RequiredTextField } from '../../styles/CssStyled'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 import '../../styles/style.css'
-import { Constants } from '../../utils/Constants'
+import { Constants, COUNTRIES } from '../../utils/Constants'
 
 type FormErrors = {
   email?: string[]
@@ -598,8 +598,7 @@ export function EditUser () {
                             onChange={handleChange}
                             error={!!profileErrors?.country?.[0]}
                           >
-                            {state?.countries?.length &&
-                              state?.countries.map((option: any) => (
+                            {COUNTRIES.map((option: any) => (
                                 <MenuItem key={option[0]} value={option[0]}>
                                   {option[1]}
                                 </MenuItem>
