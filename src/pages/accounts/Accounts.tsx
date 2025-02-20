@@ -190,7 +190,6 @@ export default function Accounts () {
   const [companies, setCompanies] = useState([])
   const [tags, setTags] = useState([])
   const [users, setUsers] = useState([])
-  const [countries, setCountries] = useState([])
   const [industries, setIndustries] = useState([])
   const [leads, setLeads] = useState([])
   const [teams, setTeams] = useState([])
@@ -258,7 +257,6 @@ export default function Accounts () {
           setIndustries(res?.industries)
           setUsers(res?.users)
           setStatus(res?.status)
-          setCountries(res?.countries)
           setLeads(res?.leads)
           setTags(res?.tags)
           setTeams(res?.teams)
@@ -279,7 +277,6 @@ export default function Accounts () {
         status: status || [],
         tags: tags || [],
         users: users || [],
-        countries: countries || [],
         teams: teams || [],
         leads: leads || []
       }
@@ -368,7 +365,6 @@ export default function Accounts () {
           status: status || [],
           tags: tags || [],
           users: users || [],
-          countries: countries || [],
           teams: teams || [],
           leads: leads || []
         }

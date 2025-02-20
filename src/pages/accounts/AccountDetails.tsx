@@ -20,6 +20,7 @@ import { FaPlus, FaStar } from 'react-icons/fa'
 import FormateTime from '../../components/FormateTime'
 import { Label } from '../../components/Label'
 import { AntSwitch } from '../../styles/CssStyled'
+import { COUNTRIES } from '../../utils/Constants'
 
 export const formatDate = (dateString: any) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -107,7 +108,6 @@ export const AccountDetails = (props: any) => {
   const [selectedCountry, setSelectedCountry] = useState([])
   const [attachments, setAttachments] = useState([])
   const [tags, setTags] = useState([])
-  const [countries, setCountries] = useState<string[][]>([])
   const [source, setSource] = useState([])
   const [status, setStatus] = useState([])
   const [industries, setIndustries] = useState([])
@@ -139,7 +139,6 @@ export const AccountDetails = (props: any) => {
           setIndustries(res?.industries)
           setUsers(res?.users)
           setStatus(res?.status)
-          setCountries(res?.countries)
           setLeads(res?.leads)
           setTags(res?.tags)
           setTeams(res?.teams)
@@ -174,7 +173,7 @@ export const AccountDetails = (props: any) => {
   }
   const accountCountry = (country: string) => {
     let countryName: string[] | undefined
-    for (countryName of countries) {
+    for (countryName of COUNTRIES) {
       if (Array.isArray(countryName) && countryName.includes(country)) {
         const ele = countryName
         break
@@ -185,7 +184,7 @@ export const AccountDetails = (props: any) => {
   const editHandle = () => {
     // navigate('/contacts/edit-contacts', { state: { value: contactDetails, address: newAddress } })
     let country: string[] | undefined
-    for (country of countries) {
+    for (country of COUNTRIES) {
       if (
         Array.isArray(country) &&
         country.includes(accountDetails?.country || '')
@@ -221,7 +220,6 @@ export const AccountDetails = (props: any) => {
         status: state?.status || [],
         tags: state?.tags || [],
         users: state?.users || [],
-        countries: state?.countries || [],
         teams: state?.teams || [],
         leads: state?.leads || []
       }
