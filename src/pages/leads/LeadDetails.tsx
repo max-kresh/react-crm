@@ -45,6 +45,7 @@ import {
 import FormateTime from '../../components/FormateTime'
 import { formatFileSize } from '../../components/FormatSize'
 import '../../styles/style.css'
+import { COUNTRIES } from '../../utils/Constants'
 
 export const formatDate = (dateString: any) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -118,7 +119,6 @@ function LeadDetails (props: any) {
   const [attachments, setAttachments] = useState<string[]>([])
   const [attachmentList, setAttachmentList] = useState<File[]>([])
   const [tags, setTags] = useState([])
-  const [countries, setCountries] = useState<string[][]>([])
   const [source, setSource] = useState([])
   const [status, setStatus] = useState([])
   const [industries, setIndustries] = useState([])
@@ -151,7 +151,6 @@ function LeadDetails (props: any) {
           setUsers(res?.users)
           setAttachments(res?.attachments)
           setTags(res?.tags)
-          setCountries(res?.countries)
           setIndustries(res?.industries)
           setStatus(res?.status)
           setSource(res?.source)
@@ -226,7 +225,7 @@ function LeadDetails (props: any) {
   const editHandle = () => {
     // navigate('/contacts/edit-contacts', { state: { value: contactDetails, address: newAddress } })
     let country: string[] | undefined
-    for (country of countries) {
+    for (country of COUNTRIES) {
       if (
         Array.isArray(country) &&
         country.includes(leadDetails?.country || '')
@@ -271,7 +270,6 @@ function LeadDetails (props: any) {
         },
         id: state?.leadId,
         tags,
-        countries,
         source,
         status,
         industries,
@@ -344,7 +342,6 @@ function LeadDetails (props: any) {
   const module = 'Leads'
   const crntPage = 'Lead Details'
   const backBtn = 'Back To Leads'
-  // console.log(tags, countries, source, status, industries, users, contacts, 'leaddetail')
   return (
     <Box sx={{ mt: '60px' }}>
       <div>

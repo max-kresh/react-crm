@@ -40,6 +40,7 @@ import {
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 import '../../styles/style.css'
+import { CURRENCY_CODES } from '../../utils/Constants'
 
 type FormErrors = {
   name?: string[]
@@ -396,8 +397,7 @@ export function AddOpportunity () {
                             onChange={handleChange}
                             error={!!errors?.currency?.[0]}
                           >
-                            {state?.currency?.length &&
-                              state?.currency.map((option: any) => (
+                            {CURRENCY_CODES.map((option: any) => (
                                 <MenuItem key={option[0]} value={option[0]}>
                                   {option[1]}
                                 </MenuItem>

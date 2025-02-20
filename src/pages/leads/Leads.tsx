@@ -149,7 +149,6 @@ export default function Leads (props: any) {
   const [companies, setCompanies] = useState([])
   const [tags, setTags] = useState([])
   const [users, setUsers] = useState([])
-  const [countries, setCountries] = useState([])
   const [industries, setIndustries] = useState([])
 
   const [selectOpen, setSelectOpen] = useState(false)
@@ -219,7 +218,6 @@ export default function Leads (props: any) {
           setCompanies(res?.companies)
           setTags(res?.tags)
           setUsers(res?.users)
-          setCountries(res?.countries)
           setIndustries(res?.industries)
           setLoading(false)
           // setLeadsList();
@@ -286,7 +284,6 @@ export default function Leads (props: any) {
           companies: companies || [],
           tags: tags || [],
           users: users || [],
-          countries: countries || [],
           industries: industries || []
           // status: leads.status, source: leads.source, industry: leads.industries, users: leads.users, tags: leads.tags, contacts: leads.contacts
         }
@@ -305,7 +302,6 @@ export default function Leads (props: any) {
         companies: companies || [],
         tags: tags || [],
         users: users || [],
-        countries: countries || [],
         industries: industries || []
       }
     })

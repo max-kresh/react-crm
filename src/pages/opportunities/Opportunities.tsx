@@ -134,7 +134,6 @@ export default function Opportunities (props: any) {
   const [stage, setStage] = useState([])
   const [teams, setTeams] = useState([])
   const [users, setUsers] = useState([])
-  const [countries, setCountries] = useState([])
 
   const [deleteRowModal, setDeleteRowModal] = useState(false)
 
@@ -181,7 +180,6 @@ export default function Opportunities (props: any) {
             setTags(res?.tags)
             setTeams(res?.teams)
             setUsers(res?.users)
-            setCountries(res?.countries)
             setLoading(false)
         })
     } catch (error) {
@@ -205,8 +203,7 @@ export default function Opportunities (props: any) {
           account: account || [],
           stage: stage || [],
           users: users || [],
-          teams: teams || [],
-          countries: countries || []
+          teams: teams || []
         }
       })
     }
@@ -235,8 +232,7 @@ export default function Opportunities (props: any) {
         account: account || [],
         stage: stage || [],
         users: users || [],
-        teams: teams || [],
-        countries: countries || []
+        teams: teams || []
       }
     })
   }

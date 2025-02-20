@@ -18,6 +18,7 @@ import { CustomAppBar } from '../../components/CustomAppBar'
 import { FaPlus, FaStar } from 'react-icons/fa'
 import FormateTime from '../../components/FormateTime'
 import { Label } from '../../components/Label'
+import { COUNTRIES } from '../../utils/Constants'
 
 export const formatDate = (dateString: any) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -116,7 +117,6 @@ export const OpportunityDetails = (props: any) => {
   const [selectedCountry, setSelectedCountry] = useState([])
   const [attachments, setAttachments] = useState([])
   const [tags, setTags] = useState([])
-  const [countries, setCountries] = useState<string[][]>([])
   const [source, setSource] = useState([])
   const [status, setStatus] = useState([])
   const [industries, setIndustries] = useState([])
@@ -145,24 +145,6 @@ export const OpportunityDetails = (props: any) => {
         if (!res.error) {
           setOpportunityDetails(res?.opportunity_obj)
           setUsers(res?.users)
-          // setContacts(res?.contacts)
-          // setIndustries(res?.industries)
-          // setUsers(res?.users)
-          // setStatus(res?.status)
-          // setCountries(res?.countries)
-          // setLeads(res?.leads)
-          // setTags(res?.tags)
-          // setTeams(res?.teams)
-          // setAttachments(res?.attachments)
-          // setTags(res?.tags)
-          // setCountries(res?.countries)
-          // setIndustries(res?.industries)
-          // setStatus(res?.status)
-          // setSource(res?.source)
-          // setUsers(res?.users)
-          // setContacts(res?.contacts)
-          // setTeams(res?.teams)
-          // setComments(res?.comments)
         }
       })
       .catch((err) => {
@@ -184,7 +166,7 @@ export const OpportunityDetails = (props: any) => {
   }
   const accountCountry = (country: string) => {
     let countryName: string[] | undefined
-    for (countryName of countries) {
+    for (countryName of COUNTRIES) {
       if (Array.isArray(countryName) && countryName.includes(country)) {
         const ele = countryName
         break
@@ -195,7 +177,7 @@ export const OpportunityDetails = (props: any) => {
   const editHandle = () => {
     // navigate('/contacts/edit-contacts', { state: { value: contactDetails, address: newAddress } })
     let country: string[] | undefined
-    for (country of countries) {
+    for (country of COUNTRIES) {
       if (
         Array.isArray(country) &&
         country.includes(opportunityDetails?.country || '')
@@ -230,8 +212,7 @@ export const OpportunityDetails = (props: any) => {
         account: state?.account || [],
         stage: state?.stage || [],
         users: state?.users || [],
-        teams: state?.teams || [],
-        countries: state?.countries || []
+        teams: state?.teams || []
       }
     })
   }
