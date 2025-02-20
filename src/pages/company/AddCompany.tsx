@@ -13,7 +13,7 @@ import { FaArrowDown, FaTimesCircle, FaCheckCircle } from 'react-icons/fa'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { CompaniesUrl, CompanyUrl, ContactUrl } from '../../services/ApiUrls'
 import { CustomAppBar } from '../../components/CustomAppBar'
-import { fetchData, Header } from '../../components/FetchData'
+import { fetchData, compileHeader } from '../../components/FetchData'
 import {
   AntSwitch,
   CustomSelectField,
@@ -46,15 +46,9 @@ function AddCompany () {
   }
 
   const submitForm = () => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
     // console.log('Form data:', data);
     const data = { name: formData.name }
-    fetchData(`${CompaniesUrl}`, 'POST', JSON.stringify(data), Header)
+    fetchData(`${CompaniesUrl}`, 'POST', JSON.stringify(data), compileHeader())
       .then((res: any) => {
         // console.log('Form data:', res);
         if (!res.error) {

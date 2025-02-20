@@ -19,7 +19,7 @@ import { useQuill } from 'react-quilljs'
 import 'quill/dist/quill.snow.css'
 import { ContactUrl } from '../../services/ApiUrls'
 import { CustomAppBar } from '../../components/CustomAppBar'
-import { fetchData, Header } from '../../components/FetchData'
+import { fetchData, compileHeader } from '../../components/FetchData'
 import {
   AntSwitch,
   CustomSelectField,
@@ -184,12 +184,6 @@ function EditContact () {
   }
 
   const submitForm = () => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
     // console.log('Form data:', data);
     const data = {
       salutation: formData.salutation,
@@ -220,7 +214,7 @@ function EditContact () {
       `${ContactUrl}/${state?.id}/`,
       'PUT',
       JSON.stringify(data),
-      Header
+      compileHeader()
     )
       .then((res: any) => {
         console.log('Form data:', res)
