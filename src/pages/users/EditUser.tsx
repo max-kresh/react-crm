@@ -300,7 +300,7 @@ export function EditUser () {
                         <FormControl sx={{ width: '70%' }}>
                           <Select
                             name="role"
-                            value={Constants.USER}
+                            value={formData.role}
                             open={roleSelectOpen}
                             onClick={() => setRoleSelectOpen(!roleSelectOpen)}
                             IconComponent={() => (
@@ -325,7 +325,7 @@ export function EditUser () {
                                 Constants.ADMIN,
                                 Constants.SALES_MANAGER,
                                 Constants.SALES_REPRESENTATIVE,
-                                Constants.SALES_REPRESENTATIVE
+                                Constants.USER
                               ].map((option) => (
                               <MenuItem key={option} value={option}>
                                 {option}
