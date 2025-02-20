@@ -25,7 +25,7 @@ import {
 
 import '../../styles/style.css'
 import { UsersUrl } from '../../services/ApiUrls'
-import { fetchData, Header } from '../../components/FetchData'
+import { fetchData, compileHeader } from '../../components/FetchData'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import {
   FaArrowAltCircleDown,
@@ -140,12 +140,6 @@ export function AddUsers () {
   }
 
   const submitForm = () => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
     // console.log('Form data:', data);
 
     const data = {
@@ -165,7 +159,7 @@ export function AddUsers () {
       is_organization_admin: formData.is_organization_admin
     }
 
-    fetchData(`${UsersUrl}/`, 'POST', JSON.stringify(data), Header)
+    fetchData(`${UsersUrl}/`, 'POST', JSON.stringify(data), compileHeader())
       .then((res: any) => {
         console.log('Form data:', res)
         if (!res.error) {

@@ -34,7 +34,7 @@ import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FaCheckCircle } from 'react-icons/fa'
 import { AntSwitch } from '../../styles/CssStyled'
 import { AppSettingsUrl } from '../../services/ApiUrls'
-import { fetchData, fetchRawData, Header } from '../../components/FetchData'
+import { fetchData, compileHeader } from '../../components/FetchData'
 import { DialogModal } from '../../components/DialogModal'
 import { Constants } from '../../utils/Constants'
 
@@ -54,7 +54,7 @@ function Settings () {
   }
   const setBooleanSetting = (name: string, value: string) => {
     const data = { name, value }
-    fetchData(`${AppSettingsUrl}/`, 'PUT', JSON.stringify(data), Header)
+    fetchData(`${AppSettingsUrl}/`, 'PUT', JSON.stringify(data), compileHeader())
        .then((res: any) => {
           if (res.error) {
             throw Error(res.errors)
@@ -82,11 +82,7 @@ function Settings () {
       setBooleanSetting(Constants.ALLOW_LOGIN_WITHOUT_INVITATION, loginWithoutInvitationAllowed ? 'True' : 'False')
   }
   useEffect(() => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    }
-    fetchData(`${AppSettingsUrl}/`, 'GET', null as any, Header)
+    fetchData(`${AppSettingsUrl}/`, 'GET', null as any, compileHeader())
     .then((res) => {
         setGoogleLoginAllowed(getBooleanSetting(res, Constants.ALLOW_GOOGLE_LOGIN) === 'True')
         setLoginWithoutInvitationAllowed(getBooleanSetting(res, Constants.ALLOW_LOGIN_WITHOUT_INVITATION) === 'True')

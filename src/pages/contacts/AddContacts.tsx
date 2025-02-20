@@ -19,7 +19,7 @@ import { useQuill } from 'react-quilljs'
 import 'quill/dist/quill.snow.css'
 import { ContactUrl } from '../../services/ApiUrls'
 import { CustomAppBar } from '../../components/CustomAppBar'
-import { fetchData, Header } from '../../components/FetchData'
+import { fetchData, compileHeader } from '../../components/FetchData'
 import { AntSwitch, RequiredTextField } from '../../styles/CssStyled'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
@@ -175,12 +175,6 @@ function AddContacts () {
   }
 
   const submitForm = () => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
     // console.log(formData.description, 'des')
     const data = {
       salutation: formData.salutation,
@@ -206,7 +200,7 @@ function AddContacts () {
       facebook_url: formData.facebook_url,
       twitter_username: formData.twitter_username
     }
-    fetchData(`${ContactUrl}/`, 'POST', JSON.stringify(data), Header)
+    fetchData(`${ContactUrl}/`, 'POST', JSON.stringify(data), compileHeader())
       .then((res: any) => {
         // console.log('Form data:', res);
         if (!res.error) {

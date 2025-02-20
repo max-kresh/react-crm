@@ -22,7 +22,7 @@ import { CustomAppBar } from '../../components/CustomAppBar'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { AntSwitch } from '../../styles/CssStyled'
 import { ContactUrl, UserUrl } from '../../services/ApiUrls'
-import { fetchData, Header } from '../../components/FetchData'
+import { fetchData, compileHeader } from '../../components/FetchData'
 
 type response = {
   user_details: {
@@ -70,13 +70,7 @@ export default function UserDetails () {
   // }, [state.contactId.id])
 
   const getUserDetail = (id: any) => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
-    fetchData(`${UserUrl}/${id}/`, 'GET', null as any, Header).then((res) => {
+    fetchData(`${UserUrl}/${id}/`, 'GET', null as any, compileHeader()).then((res) => {
       console.log(res, 'res')
       if (!res.error) {
         setUserDetails(res?.data?.profile_obj)

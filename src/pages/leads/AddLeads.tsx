@@ -24,7 +24,7 @@ import { useQuill } from 'react-quilljs'
 import 'quill/dist/quill.snow.css'
 import '../../styles/style.css'
 import { LeadUrl } from '../../services/ApiUrls'
-import { fetchData, Header } from '../../components/FetchData'
+import { fetchData, compileHeader } from '../../components/FetchData'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import {
   FaArrowDown,
@@ -288,7 +288,7 @@ export function AddLeads () {
       skype_ID: formData.skype_ID
     }
 
-    fetchData(`${LeadUrl}/`, 'POST', JSON.stringify(data), Header)
+    fetchData(`${LeadUrl}/`, 'POST', JSON.stringify(data), compileHeader())
       .then((res: any) => {
         // console.log('Form data:', res);
         if (!res.error) {

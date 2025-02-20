@@ -36,7 +36,7 @@ import { FiChevronRight } from '@react-icons/all-files/fi/FiChevronRight'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FaAd, FaEdit, FaTrashAlt } from 'react-icons/fa'
-import { fetchData, fetchRawData, Header } from '../../components/FetchData'
+import { fetchData, fetchRawData, compileHeader } from '../../components/FetchData'
 import { AppSettingsUrl, UsersUrl, UserUrl } from '../../services/ApiUrls'
 import {
   CustomTab,
@@ -173,12 +173,6 @@ export default function Users () {
   }
 
   const getUsers = async () => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
     try {
       const activeOffset = (activeCurrentPage - 1) * activeRecordsPerPage
       const inactiveOffset = (inactiveCurrentPage - 1) * inactiveRecordsPerPage
@@ -186,7 +180,7 @@ export default function Users () {
         `${UsersUrl}/?offset=${tab === 'active' ? activeOffset : inactiveOffset}&limit=${tab === 'active' ? activeRecordsPerPage : inactiveRecordsPerPage}`,
         'GET',
         null as any,
-        Header
+        compileHeader()
       )
         // fetchData(`${UsersUrl}/`, 'GET', null as any, Header)
         .then((res: any) => {
@@ -318,13 +312,7 @@ export default function Users () {
   }
 
   const onDelete = (id: any) => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
-    fetchData(`${UsersUrl}/${id}/`, 'delete', null as any, Header)
+    fetchData(`${UsersUrl}/${id}/`, 'delete', null as any, compileHeader())
       .then((data) => {
         if (!data.error) {
           getUsers()
@@ -354,13 +342,7 @@ export default function Users () {
   }
 
   const getUserDetail = (id: any) => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
-    fetchData(`${UserUrl}/${id}/`, 'GET', null as any, Header).then((res) => {
+    fetchData(`${UserUrl}/${id}/`, 'GET', null as any, compileHeader()).then((res) => {
       console.log(res, 'res')
       if (!res.error) {
         const data = res?.data?.profile_obj
@@ -413,13 +395,7 @@ export default function Users () {
     setSelectedId([])
   }
   const DeleteItem = () => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
-    fetchData(`${UserUrl}/${selectedId}/`, 'DELETE', null as any, Header)
+    fetchData(`${UserUrl}/${selectedId}/`, 'DELETE', null as any, compileHeader())
       .then((res: any) => {
         console.log('delete:', res)
         if (!res.error) {

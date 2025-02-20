@@ -32,7 +32,7 @@ import { FiChevronLeft } from '@react-icons/all-files/fi/FiChevronLeft'
 import { FiChevronRight } from '@react-icons/all-files/fi/FiChevronRight'
 import { getComparator, stableSort } from '../../components/Sorting'
 import { Spinner } from '../../components/Spinner'
-import { fetchData, Header } from '../../components/FetchData'
+import { fetchData, compileHeader } from '../../components/FetchData'
 import { ContactUrl } from '../../services/ApiUrls'
 import {
   AntSwitch,
@@ -152,19 +152,13 @@ export default function Contacts () {
   //         .then((data) => { console.log(data, 'data') })
   // }
   const getContacts = async () => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
     try {
       const offset = (currentPage - 1) * recordsPerPage
       await fetchData(
         `${ContactUrl}/?offset=${offset}&limit=${recordsPerPage}`,
         'GET',
         null as any,
-        Header
+        compileHeader()
       )
         // fetchData(`${ContactUrl}/`, 'GET', null as any, Header)
         .then((data) => {
@@ -189,13 +183,7 @@ export default function Contacts () {
   }
 
   const DeleteItem = () => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
-    fetchData(`${ContactUrl}/${selectedId}/`, 'DELETE', null as any, Header)
+    fetchData(`${ContactUrl}/${selectedId}/`, 'DELETE', null as any, compileHeader())
       .then((res: any) => {
         // console.log('delete:', res);
         if (!res.error) {
