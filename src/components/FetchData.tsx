@@ -15,7 +15,6 @@ export function fetchData (url: any, method: any, data = '', header: any) {
     headers: header,
     body: data
   }).then((response) => {
-    // if (response.status > 299) alert('Status1: ' + response.status)
     if (response.status === 401) {
       logout_and_navigate_to_login()
       return null
@@ -30,7 +29,6 @@ export function fetchRawData (url: any, method: any, data = '', header: any) {
     headers: header,
     body: data
   }).then((response) => {
-    // if (response.status > 299) alert('Status2: ' + response.status)
     if (response.status === 401) {
       logout_and_navigate_to_login()
       return null
