@@ -48,6 +48,17 @@ import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 import { COUNTRIES } from '../../utils/Constants'
 
+const tooltips = {
+  amount: 'Potential Revenue Opportunity',
+  website: 'Lead\'s website (if exists)',
+  lead_name: 'Use this field to name the lead based on the opportunity or ' +
+              'business context. This makes it easier to track and manage.',
+  contact_name: 'Link existing contacts related to this lead. You can add ' + 
+                'multiple people from the contact list.',
+  assigned_to: 'Sales managers and admins can assign this lead to any sales representative. ' + 
+                'Sales representatives can only assign leads to themselves.'
+}
+
 // const useStyles = makeStyles({
 //   btnIcon: {
 //     height: '14px',
@@ -388,13 +399,17 @@ export function AddLeads () {
                   >
                     <div className="fieldContainer">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Lead Name</div>
+                        <div 
+                          className="fieldTitle"
+                          title={tooltips.lead_name}
+                        >Lead Name</div>
                         <TextField
                           name="account_name"
                           value={formData.account_name}
                           onChange={handleChange}
                           style={{ width: '70%' }}
                           size="small"
+                          title={tooltips.lead_name}
                           helperText={
                             errors?.account_name?.[0]
                               ? errors?.account_name[0]
@@ -404,7 +419,7 @@ export function AddLeads () {
                         />
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Amount</div>
+                        <div className="fieldTitle" title={tooltips.amount}>Amount</div>
                         <TextField
                           type={'number'}
                           name="opportunity_amount"
@@ -412,6 +427,7 @@ export function AddLeads () {
                           onChange={handleChange}
                           style={{ width: '70%' }}
                           size="small"
+                          title={tooltips.amount}
                           helperText={
                             errors?.opportunity_amount?.[0]
                               ? errors?.opportunity_amount[0]
@@ -423,13 +439,14 @@ export function AddLeads () {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Website</div>
+                        <div className="fieldTitle" title={tooltips.website}>Website</div>
                         <TextField
                           name="website"
                           value={formData.website}
                           onChange={handleChange}
                           style={{ width: '70%' }}
                           size="small"
+                          title={tooltips.website}
                           helperText={
                             errors?.website?.[0] ? errors?.website[0] : ''
                           }
@@ -437,13 +454,14 @@ export function AddLeads () {
                         />
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Contact Name</div>
+                        <div className="fieldTitle" title={tooltips.contact_name}>Contact Name</div>
                         <FormControl
                           error={!!errors?.contacts?.[0]}
                           sx={{ width: '70%' }}
                         >
                           <Autocomplete
                             // ref={autocompleteRef}
+                            title={tooltips.contact_name}
                             multiple
                             value={selectedContacts}
                             limitTags={2}
@@ -512,12 +530,13 @@ export function AddLeads () {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Assign To</div>
+                        <div className="fieldTitle" title={tooltips.assigned_to}>Assigned To</div>
                         <FormControl
                           error={!!errors?.assigned_to?.[0]}
                           sx={{ width: '70%' }}
                         >
                           <Autocomplete
+                            title={tooltips.assigned_to}
                             multiple
                             value={selectedAssignTo}
                             limitTags={2}
@@ -556,7 +575,7 @@ export function AddLeads () {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
-                                placeholder="Add Users"
+                                placeholder="Add Sales Representatives"
                                 InputProps={{
                                   ...params.InputProps,
                                   sx: {
