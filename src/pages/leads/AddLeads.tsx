@@ -404,18 +404,18 @@ export function AddLeads () {
                           title={tooltips.lead_name}
                         >Lead Name</div>
                         <TextField
-                          name="account_name"
-                          value={formData.account_name}
+                          name="title"
+                          value={formData.title}
                           onChange={handleChange}
                           style={{ width: '70%' }}
                           size="small"
                           title={tooltips.lead_name}
                           helperText={
-                            errors?.account_name?.[0]
-                              ? errors?.account_name[0]
+                            errors?.title?.[0]
+                              ? errors?.title[0]
                               : ''
                           }
-                          error={!!errors?.account_name?.[0]}
+                          error={!!errors?.title?.[0]}
                         />
                       </div>
                       <div className="fieldSubContainer">
@@ -1030,15 +1030,15 @@ export function AddLeads () {
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">Job Title</div>
                         <RequiredTextField
-                          name="title"
-                          value={formData.title}
+                          name="account_name"
+                          value={formData.account_name}
                           onChange={handleChange}
                           style={{ width: '70%' }}
                           size="small"
                           helperText={
-                            errors?.title?.[0] ? errors?.title[0] : ''
+                            errors?.account_name?.[0] ? errors?.account_name[0] : ''
                           }
-                          error={!!errors?.title?.[0]}
+                          error={!!errors?.account_name?.[0]}
                         />
                       </div>
                       <div className="fieldSubContainer">
