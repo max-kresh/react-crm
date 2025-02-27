@@ -220,16 +220,7 @@ export default function Leads (props: any) {
           setUsers(res?.users)
           setIndustries(res?.industries)
           setLoading(false)
-          // setLeadsList();
-          // setInitial(false)
         }
-        // else {
-        //     // setContactList(Object.assign([], contacts, [data.contact_obj_list]))
-        //     setContactList(prevContactList => prevContactList.concat(data.contact_obj_list));
-        //     // setContactList(...contactList,data.contact_obj_list)
-        //     setLoading(false)
-        // }
-        // }
       })
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -370,35 +361,7 @@ export default function Leads (props: any) {
     [40, '40 Records per page'],
     [50, '50 Records per page']
   ]
-  const tag = [
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'account',
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'leading',
-    'account',
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'account',
-    'leading'
-  ]
+
   return (
     <Box
       sx={{
@@ -573,7 +536,7 @@ export default function Leads (props: any) {
                           >
                             {item.tags.map((tagData: any, index: any) => (
                               // tag.slice(0, 3).map((tagData: any, index: any) => (
-                              <Label tags={tagData} key={index} />
+                              <Label tags={tagData.name} key={index} />
                             ))}
                             {item.tags.length > 4 ? (
                               <Link sx={{ ml: 1 }}>

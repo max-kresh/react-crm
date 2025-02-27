@@ -56,7 +56,16 @@ const tooltips = {
   contact_name: 'Link existing contacts related to this lead. You can add ' + 
                 'multiple people from the contact list.',
   assigned_to: 'Sales managers and admins can assign this lead to any sales representative. ' + 
-                'Sales representatives can only assign leads to themselves.'
+                'Sales representatives can only assign leads to themselves.',
+  status: 'Assigned – The lead has been assigned to a sales representative, but no action has been taken yet.\n' +
+          'In Process – The lead is actively being worked on by a sales representative\n' +
+          'Converted – The lead has been successfully turned into a customer or client.\n' +
+          'Recycled – The lead was not ready to convert but may be pursued again later.\n' +
+          'Closed – The lead is no longer being pursued.',
+  source: 'Select how this lead was acquired. Tracking lead sources helps analyze which channels bring the most valuable leads.',
+  industry: 'Select the industry this lead belongs to. This helps categorize leads for better tracking, segmentation, and sales strategy.',
+  tags: 'Select or create keywords or labels to categorize and quickly find this lead.'
+  
 }
 
 // const useStyles = makeStyles({
@@ -219,9 +228,21 @@ export function AddLeads () {
       })
       setSelectedAssignTo(val)
     } else if (title === 'tags') {
+      if (val.length > 0 && val[val.length - 1].id === 'ADD_NEW_TAG_PLACEHOLDER') {
+        val.pop()
+        const tagName = prompt('Enter New Tag')
+        const sameValues = state?.tags.filter((tag: any) => tag.name === tagName)
+        if (tagName && selectedTags.filter((tag: any) => tag.name === tagName.trim()).length === 0) {
+          if (sameValues.length === 0) {
+            val.push({ name: tagName.trim() })
+          } else {
+            val.push(sameValues[0])
+          }
+        }
+      }
       setFormData({
         ...formData,
-        assigned_to: val.length > 0 ? val.map((item: any) => item.id) : []
+        tags: val.length > 0 ? val.map((item: any) => item.name) : []
       })
       setSelectedTags(val)
     } else {
@@ -597,9 +618,10 @@ export function AddLeads () {
                         </FormControl>
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Industry</div>
+                        <div className="fieldTitle" title={tooltips.industry}>Industry</div>
                         <FormControl sx={{ width: '70%' }}>
                           <Select
+                            title={tooltips.industry}
                             name="industry"
                             value={formData.industry}
                             open={industrySelectOpen}
@@ -668,9 +690,10 @@ export function AddLeads () {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Status</div>
+                        <div className="fieldTitle" title={tooltips.status}>Status</div>
                         <FormControl sx={{ width: '70%' }}>
                           <Select
+                            title={tooltips.status}
                             name="status"
                             value={formData.status}
                             open={statusSelectOpen}
@@ -725,9 +748,10 @@ export function AddLeads () {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Lead Source</div>
+                        <div className="fieldTitle" title={tooltips.source}>Lead Source</div>
                         <FormControl sx={{ width: '70%' }}>
                           <Select
+                            title={tooltips.source}
                             name="source"
                             value={formData.source}
                             open={sourceSelectOpen}
@@ -822,19 +846,22 @@ export function AddLeads () {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Tags</div>
+                        <div className="fieldTitle" title={tooltips.tags}>Tags</div>
                         <FormControl
                           error={!!errors?.tags?.[0]}
                           sx={{ width: '70%' }}
                         >
                           <Autocomplete
                             // ref={autocompleteRef}
+                            title={tooltips.tags}
                             value={selectedTags}
                             multiple
                             limitTags={5}
-                            options={state?.tags || []}
+                            options={[{ name: 'Create New ...', id: 'ADD_NEW_TAG_PLACEHOLDER' }].concat(state?.tags)}
                             // options={state.contacts ? state.contacts.map((option: any) => option) : ['']}
-                            getOptionLabel={(option: any) => option}
+                            getOptionLabel={(option: any) => 
+                              state?.tags ? option?.name : option
+                            }
                             onChange={(e: any, value: any) =>
                               handleChange2('tags', value)
                             }
@@ -851,7 +878,9 @@ export function AddLeads () {
                                     height: '18px'
                                   }}
                                   variant="outlined"
-                                  label={option}
+                                  label={
+                                    state?.tags ? option?.name : option
+                                  }
                                   {...getTagProps({ index })}
                                 />
                               ))
