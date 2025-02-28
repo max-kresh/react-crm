@@ -64,9 +64,15 @@ const tooltips = {
           'Closed – The lead is no longer being pursued.',
   source: 'Select how this lead was acquired. Tracking lead sources helps analyze which channels bring the most valuable leads.',
   industry: 'Select the industry this lead belongs to. This helps categorize leads for better tracking, segmentation, and sales strategy.',
-  tags: 'Select or create keywords or labels to categorize and quickly find this lead.'
+  tags: 'Add keywords or labels to categorize and quickly find this lead. Use tags like \'VIP\', ' + 
+        '\'Hot Lead\', or \'Follow-up\' for better tracking.',
+  attachment: 'Attach a file for this lead.',
+  probability: 'Enter the likelihood (in percentage) of converting this lead into a customer. This helps in forecasting and ' + 
+              'prioritizing sales efforts.'
   
 }
+
+const NEW_CONTACT_INFO = 'New Contact Info'
 
 // const useStyles = makeStyles({
 //   btnIcon: {
@@ -141,7 +147,7 @@ interface FormData {
   description: string
   teams: string
   assigned_to: string[]
-  contacts: string[]
+  contacts: any
   status: string
   source: string
   address_line: string
@@ -155,6 +161,7 @@ interface FormData {
   probability: number
   industry: string
   skype_ID: string
+  contactsSelect: string
 }
 
 export function AddLeads () {
@@ -173,6 +180,7 @@ export function AddLeads () {
   const [statusSelectOpen, setStatusSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [industrySelectOpen, setIndustrySelectOpen] = useState(false)
+  const [contactsSelectOpen, setContactsSelectOpen] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -198,9 +206,10 @@ export function AddLeads () {
     country: '',
     tags: [],
     company: '',
-    probability: 1,
+    probability: 50,
     industry: 'ADVERTISING',
-    skype_ID: ''
+    skype_ID: '',
+    contactsSelect: NEW_CONTACT_INFO
   })
 
   useEffect(() => {
@@ -216,7 +225,7 @@ export function AddLeads () {
     if (title === 'contacts') {
       setFormData({
         ...formData,
-        contacts: val.length > 0 ? val.map((item: any) => item.id) : []
+        contacts: val.length > 0 ? val : []
       })
       setSelectedContacts(val)
     } else if (title === 'assigned_to') {
@@ -300,7 +309,7 @@ export function AddLeads () {
       description: formData.description,
       teams: formData.teams,
       assigned_to: formData.assigned_to,
-      contacts: formData.contacts,
+      contacts: formData.contacts.map((contact: any) => contact.id),
       status: formData.status,
       source: formData.source,
       address_line: formData.address_line,
@@ -361,7 +370,8 @@ export function AddLeads () {
       company: '',
       probability: 1,
       industry: 'ADVERTISING',
-      skype_ID: ''
+      skype_ID: '',
+      contactsSelect: NEW_CONTACT_INFO
     })
     setErrors({})
     setSelectedContacts([])
@@ -386,6 +396,26 @@ export function AddLeads () {
   const backBtn = 'Back To Leads'
 
   // console.log(state, 'leadsform')
+
+  function handleContactSelect (e: any) {
+    const contact = e.target.value
+    if (contact) {
+      const contactInfo = {
+        first_name: contact.first_name || '',
+        last_name: contact.last_name || '',
+        phone: contact.mobile_number || '',
+        email: contact.primary_email || '',
+        account_name: contact.title || '',
+        address_line: contact.address__address_line || '',
+        street: contact.address__street || '',
+        postcode: contact.address__postcode || '',
+        city: contact.address__city || '',
+        state: contact.address__state || '',
+        country: contact.address__country || ''
+      }
+      setFormData((prev: any) => ({ ...prev, ...contactInfo, contactsSelect: contact }))
+    }
+  }
   return (
     <Box sx={{ mt: '60px' }}>
       <CustomAppBar
@@ -473,7 +503,7 @@ export function AddLeads () {
                         />
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle" title={tooltips.contact_name}>Contact Name</div>
+                        <div className="fieldTitle" title={tooltips.contact_name}>Related Contacts</div>
                         <FormControl
                           error={!!errors?.contacts?.[0]}
                           sx={{ width: '70%' }}
@@ -487,7 +517,8 @@ export function AddLeads () {
                             options={state?.contacts || []}
                             // options={state.contacts ? state.contacts.map((option: any) => option) : ['']}
                             getOptionLabel={(option: any) =>
-                              state?.contacts ? option?.first_name : option
+                              state?.contacts ? `${option?.first_name.length > 0 ? (option?.first_name[0] + '.') : ''} 
+                              ${option?.last_name} (${option?.primary_email})` : option
                             }
                             // value={formData.contacts}
                             // onChange={handleChange}
@@ -509,9 +540,8 @@ export function AddLeads () {
                                   }}
                                   variant="outlined"
                                   label={
-                                    state?.contacts
-                                      ? option?.first_name
-                                      : option
+                                    state?.contacts ? `${option?.first_name.length > 0 ? (option?.first_name[0] + '.') : ''} 
+                                    ${option?.last_name} (${option?.primary_email})` : option
                                   }
                                   {...getTagProps({ index })}
                                 />
@@ -788,9 +818,10 @@ export function AddLeads () {
                         </FormControl>
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Lead Attachment</div>
+                        <div className="fieldTitle" title={tooltips.attachment}>Lead Attachment</div>
                         <TextField
                           name="lead_attachment"
+                          title={tooltips.attachment}
                           value={formData.lead_attachment?.name}
                           InputProps={{
                             endAdornment: (
@@ -913,9 +944,10 @@ export function AddLeads () {
                         </FormControl>
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Probability</div>
+                        <div className="fieldTitle" title={tooltips.probability}>Probability</div>
                         <TextField
                           name="probability"
+                          title={tooltips.probability}
                           value={formData.probability}
                           onChange={handleChange}
                           InputProps={{
@@ -1011,7 +1043,7 @@ export function AddLeads () {
                 <AccordionSummary
                   expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}
                 >
-                  <Typography className="accordion-header">Contact</Typography>
+                  <Typography className="accordion-header">Contact Info</Typography>
                 </AccordionSummary>
                 <Divider className="divider" />
                 <AccordionDetails>
@@ -1021,6 +1053,57 @@ export function AddLeads () {
                     noValidate
                     autoComplete="off"
                   >
+                    {/* SELECT CONTACT INFO FROM RELATED CONTACTS (BEGIN) */}
+                    {formData.contacts?.length > 0 && 
+                    <div className="fieldContainer">
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Use From</div>
+                        <Select
+                            value={formData.contactsSelect}
+                            name='contactsSelect'
+                            open={contactsSelectOpen}
+                            style={{ width: '70%', marginBottom: '1.5rem' }}
+                            className={'select'}
+                            onChange={handleContactSelect}
+                            onClick={() =>
+                              setContactsSelectOpen(!contactsSelectOpen)
+                            }
+                            IconComponent={() => (
+                              <div
+                                onClick={() =>
+                                  setContactsSelectOpen(!contactsSelectOpen)
+                                }
+                                className="select-icon-background"
+                              >
+                                {contactsSelectOpen ? (
+                                  <FiChevronUp className="select-icon" />
+                                ) : (
+                                  <FiChevronDown className="select-icon" />
+                                )}
+                              </div>
+                            )}
+                            MenuProps={{
+                              PaperProps: {
+                                style: {
+                                  height: '200px'
+                                }
+                              }
+                            }}                  
+                          >
+                            <MenuItem key={NEW_CONTACT_INFO} value={NEW_CONTACT_INFO}>
+                              New Contact Info
+                            </MenuItem>
+                            {formData.contacts.map((option: any) => (
+                                  <MenuItem key={option.id} value={option}>
+                                    {`${option?.first_name.length > 0 ? (option?.first_name[0] + '.') : ''} 
+                                    ${option?.last_name} (${option?.primary_email})`}     
+                                  </MenuItem>
+                                ))}
+                          </Select>
+                      </div>
+                      
+                    </div>}
+                    {/* SELECT CONTACT INFO FROM RELATED CONTACTS (END) */}
                     <div className="fieldContainer">
                       <div className="fieldSubContainer">
                         <div className="fieldTitle">First Name</div>
@@ -1197,7 +1280,7 @@ export function AddLeads () {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Pincode</div>
+                        <div className="fieldTitle">Postcode</div>
                         <TextField
                           name="postcode"
                           value={formData.postcode}
