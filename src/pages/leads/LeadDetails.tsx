@@ -465,7 +465,7 @@ function LeadDetails (props: any) {
                 >
                   {leadDetails?.tags?.length
                     ? leadDetails?.tags.map((tagData: any) => (
-                        <Label tags={tagData} />
+                        <Label tags={tagData.name} />
                       ))
                     : ''}
                 </Stack>
@@ -611,9 +611,7 @@ function LeadDetails (props: any) {
                     <div className="title2">Mobile Number</div>
                     <div className="title3">
                       {leadDetails?.phone
-                        ? `${leadDetails?.phone}
-                                                <FaStar style={{ fontSize: '16px', fill: 'yellow' }} /><br />`
-                        : '---'}
+                        ? leadDetails?.phone : '---'}
                     </div>
                   </div>
                   <div style={{ width: '32%' }}>

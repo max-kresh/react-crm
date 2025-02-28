@@ -1,15 +1,21 @@
 import { SERVER } from '../services/ApiUrls'
 
-export function compileHeader () { 
+export function compileHeaderMultipart () { 
   return {
     Accept: 'application/json',
-    'Content-Type': 'application/json',
     Authorization: localStorage.getItem('Token'),
     org: localStorage.getItem('org')
   }
 }
 
-export function fetchData (url: any, method: any, data = '', header: any) {
+export function compileHeader () { 
+  return {
+    ...compileHeaderMultipart(),
+    'Content-Type': 'application/json',
+  }
+}
+
+export function fetchData (url: any, method: any, data: any = '', header: any) {
   return fetch(`${SERVER}${url}`, {
     method,
     headers: header,

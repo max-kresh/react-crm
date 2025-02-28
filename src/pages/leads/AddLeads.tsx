@@ -24,7 +24,7 @@ import { useQuill } from 'react-quilljs'
 import 'quill/dist/quill.snow.css'
 import '../../styles/style.css'
 import { LeadUrl } from '../../services/ApiUrls'
-import { fetchData, compileHeader } from '../../components/FetchData'
+import { fetchData, compileHeaderMultipart } from '../../components/FetchData'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import {
   FaArrowDown,
@@ -135,7 +135,7 @@ interface FormData {
   account_name: string
   phone: string
   email: string
-  lead_attachment: string | null
+  lead_attachment: any | null
   opportunity_amount: string
   website: string
   description: string
@@ -155,7 +155,6 @@ interface FormData {
   probability: number
   industry: string
   skype_ID: string
-  file: string | null
 }
 
 export function AddLeads () {
@@ -201,8 +200,7 @@ export function AddLeads () {
     company: '',
     probability: 1,
     industry: 'ADVERTISING',
-    skype_ID: '',
-    file: null
+    skype_ID: ''
   })
 
   useEffect(() => {
@@ -269,8 +267,7 @@ export function AddLeads () {
     if (file) {
       const reader = new FileReader()
       reader.onload = () => {
-        // setFormData({ ...formData, lead_attachment: reader.result as string });
-        setFormData({ ...formData, file: reader.result as string })
+        setFormData({ ...formData, lead_attachment: file })
       }
       reader.readAsDataURL(file)
     }
@@ -298,7 +295,6 @@ export function AddLeads () {
       phone: formData.phone,
       email: formData.email,
       // lead_attachment: formData.lead_attachment,
-      lead_attachment: formData.file,
       opportunity_amount: formData.opportunity_amount,
       website: formData.website,
       description: formData.description,
@@ -320,9 +316,12 @@ export function AddLeads () {
       skype_ID: formData.skype_ID
     }
 
-    fetchData(`${LeadUrl}/`, 'POST', JSON.stringify(data), compileHeader())
+    const form = new FormData()
+    form.append('form_data', JSON.stringify(data))
+    form.append('lead_attachment', formData.lead_attachment)
+
+    fetchData(`${LeadUrl}/`, 'POST', form, compileHeaderMultipart())
       .then((res: any) => {
-        // console.log('Form data:', res);
         if (!res.error) {
           resetForm()
           navigate('/app/leads')
@@ -362,8 +361,7 @@ export function AddLeads () {
       company: '',
       probability: 1,
       industry: 'ADVERTISING',
-      skype_ID: '',
-      file: null
+      skype_ID: ''
     })
     setErrors({})
     setSelectedContacts([])
@@ -793,7 +791,7 @@ export function AddLeads () {
                         <div className="fieldTitle">Lead Attachment</div>
                         <TextField
                           name="lead_attachment"
-                          value={formData.lead_attachment}
+                          value={formData.lead_attachment?.name}
                           InputProps={{
                             endAdornment: (
                               <InputAdornment position="end">
