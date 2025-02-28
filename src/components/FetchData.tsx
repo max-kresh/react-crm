@@ -11,7 +11,7 @@ export function compileHeaderMultipart () {
 export function compileHeader () { 
   return {
     ...compileHeaderMultipart(),
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json'
   }
 }
 
