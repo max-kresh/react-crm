@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import {
   TextField,
   FormControl,
-  TextareaAutosize,
   AccordionDetails,
   Accordion,
   AccordionSummary,
@@ -27,22 +26,16 @@ import { LeadUrl } from '../../services/ApiUrls'
 import { fetchData, compileHeaderMultipart } from '../../components/FetchData'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import {
-  FaArrowDown,
   FaCheckCircle,
-  FaFileUpload,
-  FaPalette,
   FaPercent,
   FaPlus,
   FaTimes,
   FaTimesCircle,
   FaUpload
 } from 'react-icons/fa'
-import { useForm } from '../../components/UseForm'
 import {
   CustomPopupIcon,
-  CustomSelectField,
-  RequiredTextField,
-  StyledSelect
+  RequiredTextField
 } from '../../styles/CssStyled'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
