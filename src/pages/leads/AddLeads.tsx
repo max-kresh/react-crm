@@ -74,37 +74,6 @@ const tooltips = {
 
 const NEW_CONTACT_INFO = 'New Contact Info'
 
-// const useStyles = makeStyles({
-//   btnIcon: {
-//     height: '14px',
-//     color: '#5B5C63'
-//   },
-//   breadcrumbs: {
-//     color: 'white'
-//   },
-//   fields: {
-//     height: '5px'
-//   },
-//   chipStyle: {
-//     backgroundColor: 'red'
-//   },
-//   icon: {
-//     '&.MuiChip-deleteIcon': {
-//       color: 'darkgray'
-//     }
-//   }
-// })
-
-// const textFieldStyled = makeStyles(() => ({
-//   root: {
-//     borderLeft: '2px solid red',
-//     height: '35px'
-//   },
-//   fieldHeight: {
-//     height: '35px'
-//   }
-// }))
-
 type FormErrors = {
   title?: string[]
   first_name?: string[]
@@ -220,8 +189,6 @@ export function AddLeads () {
   }, [quill])
 
   const handleChange2 = (title: any, val: any) => {
-    // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    // console.log('nd', val)
     if (title === 'contacts') {
       setFormData({
         ...formData,
@@ -258,10 +225,7 @@ export function AddLeads () {
   }
 
   const handleChange = (e: any) => {
-    // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    // console.log('e.target',e)
     const { name, value, files, type, checked, id } = e.target
-    // console.log('auto', val)
     if (type === 'file') {
       setFormData({ ...formData, [name]: e.target.files?.[0] || null })
     } else if (type === 'checkbox') {
@@ -295,7 +259,6 @@ export function AddLeads () {
     submitForm()
   }
   const submitForm = () => {
-    // console.log('Form data:', formData.lead_attachment,'sfs', formData.file);
     const data = {
       title: formData.title,
       first_name: formData.first_name,
@@ -303,7 +266,7 @@ export function AddLeads () {
       account_name: formData.account_name,
       phone: formData.phone,
       email: formData.email,
-      // lead_attachment: formData.lead_attachment,
+      lead_attachment: formData.lead_attachment,
       opportunity_amount: formData.opportunity_amount,
       website: formData.website,
       description: formData.description,
@@ -377,11 +340,6 @@ export function AddLeads () {
     setSelectedContacts([])
     setSelectedAssignTo([])
     setSelectedTags([])
-    // setSelectedCountry([])
-    // if (autocompleteRef.current) {
-    //   console.log(autocompleteRef.current,'ccc')
-    //   autocompleteRef.current.defaultValue([]);
-    // }
   }
   const onCancel = () => {
     resetForm()
@@ -394,8 +352,6 @@ export function AddLeads () {
   const module = 'Leads'
   const crntPage = 'Add Leads'
   const backBtn = 'Back To Leads'
-
-  // console.log(state, 'leadsform')
 
   function handleContactSelect (e: any) {
     const contact = e.target.value
@@ -515,17 +471,13 @@ export function AddLeads () {
                             value={selectedContacts}
                             limitTags={2}
                             options={state?.contacts || []}
-                            // options={state.contacts ? state.contacts.map((option: any) => option) : ['']}
                             getOptionLabel={(option: any) =>
                               state?.contacts ? `${option?.first_name.length > 0 ? (option?.first_name[0] + '.') : ''} 
                               ${option?.last_name} (${option?.primary_email})` : option
                             }
-                            // value={formData.contacts}
-                            // onChange={handleChange}
                             onChange={(e: any, value: any) =>
                               handleChange2('contacts', value)
                             }
-                            // style={{ width: '80%' }}
                             size="small"
                             filterSelectedOptions
                             renderTags={(value: any, getTagProps: any) =>
@@ -693,27 +645,6 @@ export function AddLeads () {
                             {errors?.industry?.[0] ? errors?.industry[0] : ''}
                           </FormHelperText>
                         </FormControl>
-                        {/* <CustomSelectField
-                          name='industry'
-                          select
-                          value={formData.industry}
-                          InputProps={{
-                            style: {
-                              height: '40px',
-                              maxHeight: '40px'
-                            }
-                          }}
-                          onChange={handleChange}
-                          sx={{ width: '70%' }}
-                          helperText={errors?.industry?.[0] ? errors?.industry[0] : ''}
-                          error={!!errors?.industry?.[0]}
-                        >
-                          {state?.industries?.length && state?.industries.map((option: any) => (
-                            <MenuItem key={option[0]} value={option[1]}>
-                              {option[1]}
-                            </MenuItem>
-                          ))}
-                        </CustomSelectField> */}
                       </div>
                     </div>
                     <div className="fieldContainer2">
@@ -846,7 +777,6 @@ export function AddLeads () {
                                       type="file"
                                       name="account_attachment"
                                       onChange={(e: any) => {
-                                        //  handleChange(e);
                                         handleFileChange(e)
                                       }}
                                     />
@@ -881,13 +811,11 @@ export function AddLeads () {
                           sx={{ width: '70%' }}
                         >
                           <Autocomplete
-                            // ref={autocompleteRef}
                             title={tooltips.tags}
                             value={selectedTags}
                             multiple
                             limitTags={5}
                             options={[{ name: 'Create New ...', id: 'ADD_NEW_TAG_PLACEHOLDER' }].concat(state?.tags)}
-                            // options={state.contacts ? state.contacts.map((option: any) => option) : ['']}
                             getOptionLabel={(option: any) => 
                               state?.tags ? option?.name : option
                             }
@@ -979,53 +907,6 @@ export function AddLeads () {
                         />
                       </div>
                     </div>
-                    {/* <div className='fieldContainer2'>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'> Close Date</div>
-                        <TextField
-                          name='account_name'
-                          type='date'
-                          value={formData.account_name}
-                          onChange={handleChange}
-                          style={{ width: '70%' }}
-                          size='small'
-                          helperText={errors?.account_name?.[0] ? errors?.account_name[0] : ''}
-                          error={!!errors?.account_name?.[0]}
-                        />
-                      </div>
-                    </div> */}
-                    {/* <div className='fieldContainer2'>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Pipeline</div>
-                        <TextField
-                          error={!!(msg === 'pipeline' || msg === 'required')}
-                          name='pipeline'
-                          id='outlined-error-helper-text'
-                          // InputProps={{
-                          //   classes: {
-                          //     root: textFieldClasses.fieldHeight
-                          //   }
-                          // }}
-                          onChange={onChange} style={{ width: '80%' }}
-                          size='small'
-                          helperText={
-                            (error && msg === 'pipeline') || msg === 'required'
-                              ? error
-                              : ''
-                          }
-                        />
-                      </div>
-                      <div className='fieldSubContainer'>
-                        <div className='fieldTitle'>Lost Reason </div>
-                        <TextareaAutosize
-                          aria-label='minimum height'
-                          name='lost_reason'
-                          minRows={2}
-                          // onChange={onChange}
-                          style={{ width: '80%' }}
-                        />
-                      </div>
-                    </div> */}
                   </Box>
                 </AccordionDetails>
               </Accordion>
@@ -1173,8 +1054,6 @@ export function AddLeads () {
                       style={{ marginLeft: '5%', marginTop: '19px' }}
                     >
                       <div className="fieldTitle">Email Address</div>
-                      {/* <div style={{ width: '40%', display: 'flex', flexDirection: 'row', marginTop: '19px', marginLeft: '6.6%' }}>
-                      <div style={{ marginRight: '10px', fontSize: '13px', width: '22%', textAlign: 'right', fontWeight: 'bold' }}>Email Address</div> */}
                       <TextField
                         name="email"
                         type="email"
@@ -1215,12 +1094,7 @@ export function AddLeads () {
                   >
                     <div className="fieldContainer">
                       <div className="fieldSubContainer">
-                        <div
-                          className="fieldTitle"
-                          // style={{ marginRight: '10px', fontSize: '13px', width: '22%', textAlign: 'right', fontWeight: 'bold' }}
-                        >
-                          Address Lane
-                        </div>
+                        <div className="fieldTitle">Address Lane</div>
                         <TextField
                           name="address_line"
                           value={formData.address_line}
