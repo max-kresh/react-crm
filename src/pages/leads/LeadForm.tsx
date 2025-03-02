@@ -139,8 +139,7 @@ export function LeadForm ({ state, method }: StateProps) {
   const autocompleteRef = useRef<any>(null)
   const [error, setError] = useState(false)
   const [selectedContacts, setSelectedContacts] = useState<any[]>(state?.value?.contacts || [])
-  const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>(
-    state?.value?.assigned_to?.map((user: any) => ({ user__email: user.user_details.email })) || [])
+  const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>(state?.value?.assigned_to || [])
   const [selectedTags, setSelectedTags] = useState<any[]>(state?.value?.tags || [])
   const [selectedCountry, setSelectedCountry] = useState<any[]>([])
   const [sourceSelectOpen, setSourceSelectOpen] = useState(false)
@@ -400,6 +399,7 @@ export function LeadForm ({ state, method }: StateProps) {
       setFormData((prev: any) => ({ ...prev, ...contactInfo, contactsSelect: contact }))
     }
   }
+
   return (
     <Box sx={{ mt: '60px' }}>
       <CustomAppBar
@@ -498,7 +498,8 @@ export function LeadForm ({ state, method }: StateProps) {
                             multiple
                             value={selectedContacts}
                             limitTags={2}
-                            options={state?.contacts || []}
+                            options={state?.contacts.filter((contact: any) => 
+                              !selectedContacts.find((s_contact: any) => s_contact.id === contact.id)) || []}
                             getOptionLabel={(option: any) =>
                               state?.contacts ? `${option?.first_name.length > 0 ? (option?.first_name[0] + '.') : ''} 
                               ${option?.last_name} (${option?.primary_email})` : option
@@ -569,9 +570,11 @@ export function LeadForm ({ state, method }: StateProps) {
                             multiple
                             value={selectedAssignTo}
                             limitTags={2}
-                            options={state?.users || []}
+                            options={state?.users?.filter((user: any) => 
+                              !selectedAssignTo.find((s_user: any) => s_user.id === user.id)) || []}
                             getOptionLabel={(option: any) =>
-                              state?.users ? option?.user__email : option
+                              method === 'POST' ? (state?.users ? option?.user__email : option)  
+                                : (state?.users ? option?.user_details?.email : option)
                             }
                             onChange={(e: any, value: any) =>
                               handleChange2('assigned_to', value)
@@ -590,7 +593,8 @@ export function LeadForm ({ state, method }: StateProps) {
                                   }}
                                   variant="outlined"
                                   label={
-                                    state?.users ? option?.user__email : option
+                                    method === 'POST' ? (state?.users ? option?.user__email : option)  
+                                      : (state?.users ? option?.user_details?.email : option)
                                   }
                                   {...getTagProps({ index })}
                                 />
@@ -845,7 +849,9 @@ export function LeadForm ({ state, method }: StateProps) {
                             value={selectedTags}
                             multiple
                             limitTags={5}
-                            options={[{ name: 'Create New ...', id: 'ADD_NEW_TAG_PLACEHOLDER' }].concat(state?.tags)}
+                            options={[{ name: 'Create New ...', id: 'ADD_NEW_TAG_PLACEHOLDER' }].concat(
+                              state?.tags?.filter((tag: any) => !selectedTags.find((s_tag: any) => 
+                                s_tag.id === tag.id)))}
                             getOptionLabel={(option: any) => 
                               state?.tags ? option?.name : option
                             }
