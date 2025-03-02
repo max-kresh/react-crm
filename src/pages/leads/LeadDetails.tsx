@@ -122,6 +122,7 @@ function LeadDetails (props: any) {
   const [source, setSource] = useState([])
   const [status, setStatus] = useState([])
   const [industries, setIndustries] = useState([])
+  const [companies, setCompanies] = useState([])
   const [contacts, setContacts] = useState([])
   const [users, setUsers] = useState([])
   const [teams, setTeams] = useState([])
@@ -152,6 +153,7 @@ function LeadDetails (props: any) {
           setAttachments(res?.attachments)
           setTags(res?.tags)
           setIndustries(res?.industries)
+          setCompanies(res?.companies)
           setStatus(res?.status)
           setSource(res?.source)
           setUsers(res?.users)
@@ -276,7 +278,8 @@ function LeadDetails (props: any) {
         users,
         contacts,
         teams,
-        comments
+        comments,
+        companies
       }
     })
   }
