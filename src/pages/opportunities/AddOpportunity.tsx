@@ -59,6 +59,7 @@ type FormErrors = {
   tags?: string[]
   opportunity_attachment?: string[]
   file?: string[]
+  lead?: string[]
 }
 
 interface FormData {
@@ -78,6 +79,7 @@ interface FormData {
   tags: string[]
   opportunity_attachment: string | null
   file: string | null
+  lead: string | null
 }
 
 export function AddOpportunity () {
@@ -93,11 +95,12 @@ export function AddOpportunity () {
   const [selectedTags, setSelectedTags] = useState<any[]>([])
   const [selectedTeams, setSelectedTeams] = useState<any[]>([])
   const [selectedCountry, setSelectedCountry] = useState<any[]>([])
-  const [leadSelectOpen, setLeadSelectOpen] = useState(false)
+  const [leadSourceSelectOpen, setLeadSourceSelectOpen] = useState(false)
   const [currencySelectOpen, setCurrencySelectOpen] = useState(false)
   const [stageSelectOpen, setStageSelectOpen] = useState(false)
   const [contactSelectOpen, setContactSelectOpen] = useState(false)
   const [accountSelectOpen, setAccountSelectOpen] = useState(false)
+  const [leadSelectOpen, setLeadSelectOpen] = useState(false)
 
   const [errors, setErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
@@ -116,7 +119,8 @@ export function AddOpportunity () {
     due_date: '',
     tags: [],
     opportunity_attachment: null,
-    file: null
+    file: null,
+    lead: ''
   })
 
   useEffect(() => {
@@ -220,7 +224,8 @@ export function AddOpportunity () {
       contact_name: formData.contacts,
       due_date: formData.due_date,
       tags: formData.tags,
-      opportunity_attachment: formData.file
+      opportunity_attachment: formData.file,
+      lead: formData.lead
     }
 
     fetchData(`${OpportunityUrl}/`, 'POST', JSON.stringify(data), Header)
@@ -254,7 +259,8 @@ export function AddOpportunity () {
       due_date: '',
       tags: [],
       opportunity_attachment: null,
-      file: null
+      file: null,
+      lead: ''
     })
     setErrors({})
     setSelectedContacts([])
@@ -501,12 +507,12 @@ export function AddOpportunity () {
                           <Select
                             name="lead_source"
                             value={formData.lead_source}
-                            open={leadSelectOpen}
-                            onClick={() => setLeadSelectOpen(!leadSelectOpen)}
+                            open={leadSourceSelectOpen}
+                            onClick={() => setLeadSourceSelectOpen(!leadSourceSelectOpen)}
                             IconComponent={() => (
                               <div
                                 onClick={() =>
-                                  setLeadSelectOpen(!leadSelectOpen)
+                                  setLeadSourceSelectOpen(!leadSourceSelectOpen)
                                 }
                                 className="select-icon-background"
                               >
@@ -831,7 +837,44 @@ export function AddOpportunity () {
                           </FormHelperText>
                         </FormControl>
                       </div>
-                      <div className="fieldSubContainer"></div>
+                      <div className="fieldSubContainer">
+                      <div className="fieldTitle">Lead</div>
+                        <FormControl sx={{ width: '70%' }}>
+                          <Select
+                            name="lead"
+                            value={formData.lead}
+                            open={leadSelectOpen}
+                            onClick={() => setLeadSelectOpen(!leadSelectOpen)}
+                            IconComponent={() => (
+                              <div
+                                onClick={() =>
+                                  setLeadSelectOpen(!leadSelectOpen)
+                                }
+                                className="select-icon-background"
+                              >
+                                {leadSelectOpen ? (
+                                  <FiChevronUp className="select-icon" />
+                                ) : (
+                                  <FiChevronDown className="select-icon" />
+                                )}
+                              </div>
+                            )}
+                            className={'select'}
+                            onChange={handleChange}
+                            error={!!errors?.lead?.[0]}
+                          >
+                            {state?.leads?.length &&
+                              state?.leads.map((option: any) => (
+                                <MenuItem key={option?.id} value={option?.id}>
+                                  {option?.title}
+                                </MenuItem>
+                              ))}
+                          </Select>
+                          <FormHelperText className="helperText">
+                            {errors?.lead?.[0] || ''}
+                          </FormHelperText>
+                        </FormControl>
+                      </div>
                     </div>
                   </Box>
                 </AccordionDetails>
