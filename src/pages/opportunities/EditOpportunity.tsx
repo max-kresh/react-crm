@@ -59,6 +59,7 @@ type FormErrors = {
   opportunity_attachment?: string[]
   file?: string[]
   contact_name?: string[]
+  lead?: string[]
 }
 interface FormData {
   name: string
@@ -76,7 +77,8 @@ interface FormData {
   tags: string[]
   opportunity_attachment: string | null
   file: string | null
-  contact_name: string
+  contact_name: string | null
+  lead: string | null
 }
 
 export function EditOpportunity () {
@@ -97,6 +99,7 @@ export function EditOpportunity () {
   const [selectedTeams, setSelectedTeams] = useState<any[]>([])
   const [selectedCountry, setSelectedCountry] = useState<any[]>([])
   const [leadSelectOpen, setLeadSelectOpen] = useState(false)
+  const [leadSourceSelectOpen, setLeadSourceSelectOpen] = useState(false)
   const [statusSelectOpen, setStatusSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [contactSelectOpen, setContactSelectOpen] = useState(false)
@@ -120,7 +123,8 @@ export function EditOpportunity () {
     tags: [],
     opportunity_attachment: null,
     file: null,
-    contact_name: ''
+    contact_name: '',
+    lead: ''
   })
 
   useEffect(() => {
@@ -268,7 +272,8 @@ export function EditOpportunity () {
       due_date: formData.due_date,
       tags: formData.tags,
       // opportunity_attachment: formData.opportunity_attachment,
-      opportunity_attachment: formData.file
+      opportunity_attachment: formData.file,
+      lead: formData.lead
     }
 
     fetchData(
@@ -307,7 +312,8 @@ export function EditOpportunity () {
       due_date: '',
       tags: [],
       opportunity_attachment: null,
-      file: null
+      file: null,
+      lead: ''
     })
     setErrors({})
     setSelectedContacts([])
@@ -321,12 +327,10 @@ export function EditOpportunity () {
   }
 
   const module = 'Opportunities'
-  const crntPage = 'Add Opportunities'
+  const crntPage = 'Edit Opportunity'
   const backBtn = state?.edit
     ? 'Back To Opportunities'
     : 'Back To OpportunityDetails'
-
-  console.log(state, 'opportunityedit')
   return (
     <Box sx={{ mt: '60px' }}>
       <CustomAppBar
@@ -599,16 +603,16 @@ export function EditOpportunity () {
                           <Select
                             name="lead_source"
                             value={formData.lead_source}
-                            open={leadSelectOpen}
-                            onClick={() => setLeadSelectOpen(!leadSelectOpen)}
+                            open={leadSourceSelectOpen}
+                            onClick={() => setLeadSourceSelectOpen(!leadSourceSelectOpen)}
                             IconComponent={() => (
                               <div
                                 onClick={() =>
-                                  setLeadSelectOpen(!leadSelectOpen)
+                                  setLeadSourceSelectOpen(!leadSourceSelectOpen)
                                 }
                                 className="select-icon-background"
                               >
-                                {leadSelectOpen ? (
+                                {leadSourceSelectOpen ? (
                                   <FiChevronUp className="select-icon" />
                                 ) : (
                                   <FiChevronDown className="select-icon" />
@@ -931,7 +935,44 @@ export function EditOpportunity () {
                           </FormHelperText>
                         </FormControl>
                       </div>
-                      <div className="fieldSubContainer"></div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Lead</div>
+                        <FormControl sx={{ width: '70%' }}>
+                          <Select
+                            name="lead"
+                            value={formData.lead}
+                            open={leadSelectOpen}
+                            onClick={() => setLeadSelectOpen(!leadSelectOpen)}
+                            IconComponent={() => (
+                              <div
+                                onClick={() =>
+                                  setLeadSelectOpen(!leadSelectOpen)
+                                }
+                                className="select-icon-background"
+                              >
+                                {leadSelectOpen ? (
+                                  <FiChevronUp className="select-icon" />
+                                ) : (
+                                  <FiChevronDown className="select-icon" />
+                                )}
+                              </div>
+                            )}
+                            className={'select'}
+                            onChange={handleChange}
+                            error={!!errors?.lead?.[0]}
+                          >
+                            {state?.leads?.length &&
+                              state?.leads.map((option: any) => (
+                                <MenuItem key={option?.id} value={option?.id}>
+                                  {option?.title}
+                                </MenuItem>
+                              ))}
+                          </Select>
+                          <FormHelperText className="helperText">
+                            {errors?.lead?.[0] || ''}
+                          </FormHelperText>
+                        </FormControl>
+                      </div>                
                     </div>
                   </Box>
                 </AccordionDetails>

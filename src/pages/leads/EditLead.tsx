@@ -778,7 +778,7 @@ export function EditLead () {
                           >
                             {state?.status?.length &&
                               state?.status.map((option: any) => (
-                                <MenuItem key={option[0]} value={option[1]}>
+                                <MenuItem key={option[0]} value={option[0]}>
                                   {option[1]}
                                 </MenuItem>
                               ))}
