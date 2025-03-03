@@ -66,6 +66,7 @@ const tooltips = {
 }
 
 const NEW_CONTACT_INFO = 'New Contact Info'
+const ADD_NEW_TAG_ID_PLACEHOLDER = 'ADD_NEW_TAG_PLACEHOLDER'
 
 type FormErrors = {
   title?: string[]
@@ -206,11 +207,11 @@ export function LeadForm ({ state, method }: StateProps) {
     } else if (title === 'assigned_to') {
       setFormData({
         ...formData,
-        assigned_to: val.length > 0 ? val.map((item: any) => item.id) : []
+        assigned_to: val.length > 0 ? val : [] // val.map((item: any) => item.id) : []
       })
       setSelectedAssignTo(val)
     } else if (title === 'tags') {
-      if (val.length > 0 && val[val.length - 1].id === 'ADD_NEW_TAG_PLACEHOLDER') {
+      if (val.length > 0 && val[val.length - 1].id === ADD_NEW_TAG_ID_PLACEHOLDER) {
         val.pop()
         const tagName = prompt('Enter New Tag')
         const sameValues = state?.tags.filter((tag: any) => tag.name === tagName)
@@ -224,7 +225,7 @@ export function LeadForm ({ state, method }: StateProps) {
       }
       setFormData({
         ...formData,
-        tags: val.length > 0 ? val.map((item: any) => item.name) : []
+        tags: val.length > 0 ? val : []
       })
       setSelectedTags(val)
     } else {
@@ -288,7 +289,7 @@ export function LeadForm ({ state, method }: StateProps) {
       website: formData.website,
       description: quill.getText(),
       teams: formData.teams,
-      assigned_to: formData.assigned_to,
+      assigned_to: formData.assigned_to.map((user: any) => user.id),
       contacts: formData.contacts.map((contact: any) => contact.id),
       status: formData.status,
       source: formData.source,
@@ -298,7 +299,7 @@ export function LeadForm ({ state, method }: StateProps) {
       state: formData.state,
       postcode: formData.postcode,
       country: formData.country,
-      tags: formData.tags,
+      tags: formData.tags.map((tag: any) => tag.name),
       company: formData.company,
       probability: formData.probability,
       industry: formData.industry,
@@ -309,10 +310,8 @@ export function LeadForm ({ state, method }: StateProps) {
     form.append('form_data', JSON.stringify(data))
     form.append('lead_attachment', formData.lead_attachment)
 
-    // const method = state?.id ? 'PUT' : 'POST'
-    const apiUrl = state?.id ? `${LeadUrl}/${state?.id}/` : `${LeadUrl}/`
+    const apiUrl = method === 'PUT' ? `${LeadUrl}/${state?.id}/` : `${LeadUrl}/`
 
-    // fetchData(`${LeadUrl}/${state?.id}/`, 'PUT', JSON.stringify(data), compileHeader())
     fetchData(apiUrl, method, form, compileHeaderMultipart())
       .then((res: any) => {
         if (!res.error) {
@@ -322,6 +321,7 @@ export function LeadForm ({ state, method }: StateProps) {
         if (res.error) {
           setError(true)
           setErrors(res?.errors)
+          console.log(`${method} request to ${apiUrl} failed: `, res.errors)
         }
       })
       .catch(() => {})
@@ -573,8 +573,8 @@ export function LeadForm ({ state, method }: StateProps) {
                             options={state?.users?.filter((user: any) => 
                               !selectedAssignTo.find((s_user: any) => s_user.id === user.id)) || []}
                             getOptionLabel={(option: any) =>
-                              method === 'POST' ? (state?.users ? option?.user__email : option)  
-                                : (state?.users ? option?.user_details?.email : option)
+                              method === 'POST' ? (state?.users ? option?.user__email : '')  
+                                : (state?.users ? option?.user_details?.email : '')
                             }
                             onChange={(e: any, value: any) =>
                               handleChange2('assigned_to', value)
@@ -785,9 +785,7 @@ export function LeadForm ({ state, method }: StateProps) {
                         <TextField
                           name="lead_attachment"
                           title={tooltips.attachment}
-                          // value={method === 'POST' ? formData.lead_attachment?.name : formData.lead_attachment?.[0].file_name}
-                          value={method === 'POST' ? formData.lead_attachment?.name  
-                            : (formData.lead_attachment.map((a: any) => a.file_name))}
+                          value={formData.lead_attachment?.name}
                           InputProps={{
                             endAdornment: (
                               <InputAdornment position="end">
@@ -849,7 +847,7 @@ export function LeadForm ({ state, method }: StateProps) {
                             value={selectedTags}
                             multiple
                             limitTags={5}
-                            options={[{ name: 'Create New ...', id: 'ADD_NEW_TAG_PLACEHOLDER' }].concat(
+                            options={[{ name: 'Create New ...', id: ADD_NEW_TAG_ID_PLACEHOLDER }].concat(
                               state?.tags?.filter((tag: any) => !selectedTags.find((s_tag: any) => 
                                 s_tag.id === tag.id)))}
                             getOptionLabel={(option: any) => 
