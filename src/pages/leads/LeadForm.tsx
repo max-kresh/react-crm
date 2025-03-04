@@ -64,7 +64,8 @@ const tooltips = {
               'prioritizing sales efforts.',
   displayName: 'Enter an alternative name for the point of contact. This name will be used to identify the ' + 
               'contact within this lead, instead of their first and last name. You can also use fist name and last name.',
-  contactsSelect: 'Use one of the contacts linked to this lead as point of contact.'
+  contactsSelect: 'Use one of the contacts linked to this lead as point of contact.',
+  organization: 'Name of the organization(s) this lead is related to'
   
 }
 
@@ -99,6 +100,7 @@ type FormErrors = {
   industry?: string[]
   skype_ID?: string[]
   file?: string[]
+  organization?: string[]
 }
 interface FormData {
   title: string
@@ -308,7 +310,8 @@ export function LeadForm ({ state, method }: StateProps) {
       company: formData.company,
       probability: formData.probability,
       industry: formData.industry,
-      skype_ID: formData.skype_ID
+      skype_ID: formData.skype_ID,
+      organization: formData.organization
     }
 
     const form = new FormData()
@@ -458,21 +461,20 @@ export function LeadForm ({ state, method }: StateProps) {
                         />
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle" title={tooltips.amount}>Amount</div>
+                        <div className="fieldTitle" title={tooltips.organization}>Organization</div>
                         <TextField
-                          type={'number'}
-                          name="opportunity_amount"
-                          value={formData.opportunity_amount}
+                          name="organization"
+                          value={formData.organization}
                           onChange={handleChange}
                           style={{ width: '70%' }}
                           size="small"
-                          title={tooltips.amount}
+                          title={tooltips.organization}
                           helperText={
-                            errors?.opportunity_amount?.[0]
-                              ? errors?.opportunity_amount[0]
+                            errors?.organization?.[0]
+                              ? errors?.organization[0]
                               : ''
                           }
-                          error={!!errors?.opportunity_amount?.[0]}
+                          error={!!errors?.organization?.[0]}
                         />
                       </div>
                     </div>
@@ -493,75 +495,22 @@ export function LeadForm ({ state, method }: StateProps) {
                         />
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle" title={tooltips.contact_name}>Related Contacts</div>
-                        <FormControl
-                          error={!!errors?.contacts?.[0]}
-                          sx={{ width: '70%' }}
-                        >
-                          <Autocomplete
-                            // ref={autocompleteRef}
-                            title={tooltips.contact_name}
-                            multiple
-                            value={selectedContacts}
-                            limitTags={2}
-                            options={state?.contacts.filter((contact: any) => 
-                              !selectedContacts.find((s_contact: any) => s_contact.id === contact.id)) || []}
-                            getOptionLabel={(option: any) =>
-                              state?.contacts ? `${option?.first_name.length > 0 ? (option?.first_name[0] + '.') : ''} 
-                              ${option?.last_name} (${option?.primary_email})` : option
-                            }
-                            onChange={(e: any, value: any) =>
-                              handleChange2('contacts', value)
-                            }
-                            size="small"
-                            filterSelectedOptions
-                            renderTags={(value: any, getTagProps: any) =>
-                              value.map((option: any, index: any) => (
-                                <Chip
-                                  deleteIcon={
-                                    <FaTimes style={{ width: '9px' }} />
-                                  }
-                                  sx={{
-                                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                                    height: '18px'
-                                  }}
-                                  variant="outlined"
-                                  label={
-                                    state?.contacts ? `${option?.first_name.length > 0 ? (option?.first_name[0] + '.') : ''} 
-                                    ${option?.last_name} (${option?.primary_email})` : option
-                                  }
-                                  {...getTagProps({ index })}
-                                />
-                              ))
-                            }
-                            popupIcon={
-                              <CustomPopupIcon>
-                                <FaPlus className="input-plus-icon" />
-                              </CustomPopupIcon>
-                            }
-                            renderInput={(params: any) => (
-                              <TextField
-                                {...params}
-                                placeholder="Add Contacts"
-                                InputProps={{
-                                  ...params.InputProps,
-                                  sx: {
-                                    '& .MuiAutocomplete-popupIndicator': {
-                                      '&:hover': { backgroundColor: 'white' }
-                                    },
-                                    '& .MuiAutocomplete-endAdornment': {
-                                      mt: '-8px',
-                                      mr: '-8px'
-                                    }
-                                  }
-                                }}
-                              />
-                            )}
-                          />
-                          <FormHelperText>
-                            {errors?.contacts?.[0] || ''}
-                          </FormHelperText>
-                        </FormControl>
+                        <div className="fieldTitle" title={tooltips.amount}>Potential Revenue</div>
+                        <TextField
+                          type={'number'}
+                          name="opportunity_amount"
+                          value={formData.opportunity_amount}
+                          onChange={handleChange}
+                          style={{ width: '70%' }}
+                          size="small"
+                          title={tooltips.amount}
+                          helperText={
+                            errors?.opportunity_amount?.[0]
+                              ? errors?.opportunity_amount[0]
+                              : ''
+                          }
+                          error={!!errors?.opportunity_amount?.[0]}
+                        />
                       </div>
                     </div>
                     <div className="fieldContainer2">
@@ -728,7 +677,7 @@ export function LeadForm ({ state, method }: StateProps) {
                           </FormHelperText>
                         </FormControl>
                       </div>
-                      <div className="fieldSubContainer">
+                      {/* <div className="fieldSubContainer">
                         <div className="fieldTitle">SkypeID</div>
                         <TextField
                           name="skype_ID"
@@ -741,6 +690,77 @@ export function LeadForm ({ state, method }: StateProps) {
                           }
                           error={!!errors?.skype_ID?.[0]}
                         />
+                      </div> */}
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle" title={tooltips.contact_name}>Related Contacts</div>
+                        <FormControl
+                          error={!!errors?.contacts?.[0]}
+                          sx={{ width: '70%' }}
+                        >
+                          <Autocomplete
+                            // ref={autocompleteRef}
+                            title={tooltips.contact_name}
+                            multiple
+                            value={selectedContacts}
+                            limitTags={2}
+                            options={state?.contacts.filter((contact: any) => 
+                              !selectedContacts.find((s_contact: any) => s_contact.id === contact.id)) || []}
+                            getOptionLabel={(option: any) =>
+                              state?.contacts ? `${option?.first_name.length > 0 ? (option?.first_name[0] + '.') : ''} 
+                              ${option?.last_name} (${option?.primary_email})` : option
+                            }
+                            onChange={(e: any, value: any) =>
+                              handleChange2('contacts', value)
+                            }
+                            size="small"
+                            filterSelectedOptions
+                            renderTags={(value: any, getTagProps: any) =>
+                              value.map((option: any, index: any) => (
+                                <Chip
+                                  deleteIcon={
+                                    <FaTimes style={{ width: '9px' }} />
+                                  }
+                                  sx={{
+                                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                                    height: '18px'
+                                  }}
+                                  variant="outlined"
+                                  label={
+                                    state?.contacts ? `${option?.first_name.length > 0 ? (option?.first_name[0] + '.') : ''} 
+                                    ${option?.last_name} (${option?.primary_email})` : option
+                                  }
+                                  {...getTagProps({ index })}
+                                />
+                              ))
+                            }
+                            popupIcon={
+                              <CustomPopupIcon>
+                                <FaPlus className="input-plus-icon" />
+                              </CustomPopupIcon>
+                            }
+                            renderInput={(params: any) => (
+                              <TextField
+                                {...params}
+                                placeholder="Add Contacts"
+                                InputProps={{
+                                  ...params.InputProps,
+                                  sx: {
+                                    '& .MuiAutocomplete-popupIndicator': {
+                                      '&:hover': { backgroundColor: 'white' }
+                                    },
+                                    '& .MuiAutocomplete-endAdornment': {
+                                      mt: '-8px',
+                                      mr: '-8px'
+                                    }
+                                  }
+                                }}
+                              />
+                            )}
+                          />
+                          <FormHelperText>
+                            {errors?.contacts?.[0] || ''}
+                          </FormHelperText>
+                        </FormControl>
                       </div>
                     </div>
                     <div className="fieldContainer2">

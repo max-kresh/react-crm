@@ -482,36 +482,14 @@ function LeadDetails (props: any) {
                 }}
               >
                 <div style={{ width: '32%' }}>
-                  <div className="title2">Expected close date</div>
-                  <div className="title3">
-                    {leadDetails?.close_date || '---'}
-                  </div>
-                </div>
-                <div style={{ width: '32%' }}>
-                  <div className="title2">Point of Contact</div>
-                  <div className="title3">{leadDetails?.account_name}</div>
-                </div>
-                <div style={{ width: '32%' }}>
-                  <div className="title2">Organization Name</div>
+                  <div className="title2">Organization</div>
                   <div className="title3">
                     {leadDetails?.organization || '---'}
                   </div>
                 </div>
-              </div>
-              <div className="detailList">
                 <div style={{ width: '32%' }}>
-                  <div className="title2">Created from site</div>
-                  <div className="title3">
-                    {/* {lead.pipeline ? lead.pipeline : '------'} */}
-                    {/* {leadDetails?.created_from_site} */}
-                    <AntSwitch checked={leadDetails?.created_from_site} />
-                  </div>
-                </div>
-                <div style={{ width: '32%' }}>
-                  <div className="title2">Probability</div>
-                  <div className="title3">
-                    {leadDetails?.probability || '---'}
-                  </div>
+                  <div className="title2">Industry</div>
+                  <div className="title3">{leadDetails?.industry || '---'}</div>
                 </div>
                 <div style={{ width: '32%' }}>
                   <div className="title2">website</div>
@@ -523,13 +501,46 @@ function LeadDetails (props: any) {
                     )}
                   </div>
                 </div>
+                {/* <div style={{ width: '32%' }}>
+                  <div className="title2">Expected Close Date</div>
+                  <div className="title3">
+                    {leadDetails?.close_date || '---'}
+                  </div>
+                </div> */}
               </div>
               <div className="detailList">
                 <div style={{ width: '32%' }}>
-                  <div className="title2">Industry</div>
-                  <div className="title3">{leadDetails?.industry || '---'}</div>
+                  <div className="title2">Potential Revenue</div>
+                  <div className="title3">
+                    {leadDetails?.opportunity_amount || '---'}
+                  </div>
                 </div>
                 <div style={{ width: '32%' }}>
+                  <div className="title2">Probability</div>
+                  <div className="title3">
+                    {leadDetails?.probability || '---'}
+                  </div>
+                </div>
+                <div style={{ width: '32%' }}>
+                  <div className="title2">Created from site</div>
+                  <div className="title3">
+                    {/* {lead.pipeline ? lead.pipeline : '------'} */}
+                    {/* {leadDetails?.created_from_site} */}
+                    <AntSwitch checked={leadDetails?.created_from_site} />
+                  </div>
+                </div>
+              </div>
+              <div className="detailList">
+                <div style={{ width: '32%' }}>
+                <div className="title2">Assigned To</div>
+                {/* {leadDetails?.assigned_to?.map((user: any) => )} */}
+                  <div className="title3">
+                    {leadDetails?.skype_ID ? (
+                      <Link>{leadDetails?.skype_ID}</Link>
+                    ) : (
+                      '---'
+                    )}
+                  </div>
                   <div className="title2">SkypeID</div>
                   <div className="title3">
                     {leadDetails?.skype_ID ? (
@@ -577,6 +588,10 @@ function LeadDetails (props: any) {
                     marginTop: '10px'
                   }}
                 >
+                  <div style={{ width: '32%' }}>
+                    <div className="title2">Display Name</div>
+                    <div className="title3">{leadDetails?.account_name}</div>
+                  </div>
                   <div style={{ width: '32%' }}>
                     <div className="title2">First Name</div>
                     <div className="title3">
