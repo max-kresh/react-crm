@@ -61,7 +61,10 @@ const tooltips = {
         '\'Hot Lead\', or \'Follow-up\' for better tracking.',
   attachment: 'Attach a file for this lead.',
   probability: 'Enter the likelihood (in percentage) of converting this lead into a customer. This helps in forecasting and ' + 
-              'prioritizing sales efforts.'
+              'prioritizing sales efforts.',
+  displayName: 'Enter an alternative name for the point of contact. This name will be used to identify the ' + 
+              'contact within this lead, instead of their first and last name. You can also use fist name and last name.',
+  contactsSelect: 'Use one of the contacts linked to this lead as point of contact.'
   
 }
 
@@ -125,6 +128,7 @@ interface FormData {
   industry: string
   skype_ID: string
   contactsSelect: string
+  organization: string
 }
 
 interface StateProps {
@@ -186,7 +190,8 @@ export function LeadForm ({ state, method }: StateProps) {
     probability: state?.value?.probability || 50,
     industry: state?.value?.industry || 'ADVERTISING',
     skype_ID: state?.value?.skype_ID || '',
-    contactsSelect: selectedContact ?? NEW_CONTACT_INFO
+    contactsSelect: selectedContact ?? NEW_CONTACT_INFO,
+    organization: state?.value?.organization
   })
 
   useEffect(() => {
@@ -355,7 +360,8 @@ export function LeadForm ({ state, method }: StateProps) {
       probability: 1,
       industry: 'ADVERTISING',
       skype_ID: '',
-      contactsSelect: NEW_CONTACT_INFO
+      contactsSelect: NEW_CONTACT_INFO,
+      organization: ''
     })
     setErrors({})
     setSelectedContacts([])
@@ -958,7 +964,7 @@ export function LeadForm ({ state, method }: StateProps) {
                 <AccordionSummary
                   expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}
                 >
-                  <Typography className="accordion-header">Contact Info</Typography>
+                  <Typography className="accordion-header">Point of Contact</Typography>
                 </AccordionSummary>
                 <Divider className="divider" />
                 <AccordionDetails>
@@ -972,10 +978,10 @@ export function LeadForm ({ state, method }: StateProps) {
                     {formData.contacts?.length > 0 && 
                     <div className="fieldContainer">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Use From</div>
+                        <div className="fieldTitle" title={tooltips.contactsSelect}>Use From</div>
                         <Select
                             value={formData.contactsSelect}
-                            
+                            title={tooltips.contactsSelect}
                             name='contactsSelect'
                             open={contactsSelectOpen}
                             style={{ width: '70%', marginBottom: '1.5rem' }}
@@ -1054,9 +1060,10 @@ export function LeadForm ({ state, method }: StateProps) {
                     </div>
                     <div className="fieldContainer2">
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Job Title</div>
+                        <div className="fieldTitle" title={tooltips.displayName}>Display Name</div>
                         <RequiredTextField
                           name="account_name"
+                          title={tooltips.displayName}
                           value={formData.account_name}
                           onChange={handleChange}
                           style={{ width: '70%' }}
@@ -1117,7 +1124,7 @@ export function LeadForm ({ state, method }: StateProps) {
                 <AccordionSummary
                   expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}
                 >
-                  <Typography className="accordion-header">Address</Typography>
+                  <Typography className="accordion-header">Point of Contact Address</Typography>
                 </AccordionSummary>
                 <Divider className="divider" />
                 <AccordionDetails>

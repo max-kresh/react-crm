@@ -488,7 +488,7 @@ function LeadDetails (props: any) {
                   </div>
                 </div>
                 <div style={{ width: '32%' }}>
-                  <div className="title2">Account Name</div>
+                  <div className="title2">Point of Contact</div>
                   <div className="title3">{leadDetails?.account_name}</div>
                 </div>
                 <div style={{ width: '32%' }}>
