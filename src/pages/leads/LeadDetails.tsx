@@ -82,8 +82,8 @@ type response = {
   website: string
   description: string | ''
   teams: string
-  assigned_to: string
-  contacts: string
+  assigned_to: any
+  contacts: any
   status: string
   source: string
   address_line: string
@@ -532,31 +532,40 @@ function LeadDetails (props: any) {
               </div>
               <div className="detailList">
                 <div style={{ width: '32%' }}>
-                <div className="title2">Assigned To</div>
-                {/* {leadDetails?.assigned_to?.map((user: any) => )} */}
+                  <div className="title2">Assigned To</div>
+                  {leadDetails?.assigned_to?.map((user: any) => 
+                    <div key={user.id} className="title3">
+                      {user.user_details.email}
+                    </div>
+                  )}
+                </div>
+                <div style={{ width: '32%' }}>
+                  <div className="title2">Related Contacts</div>
+                  {leadDetails?.contacts?.map((user: any) => 
+                    <div key={user.id} className="title3">
+                      {`${user.first_name.length > 0  
+                        ? (user.first_name.charAt(0) + '.') : ''} ${user.last_name} (${user.primary_email})`}
+                    </div>
+                  )}
+                </div>
+                <div style={{ width: '32%' }}>
+                  <div className="title2">Status</div>
                   <div className="title3">
-                    {leadDetails?.skype_ID ? (
-                      <Link>{leadDetails?.skype_ID}</Link>
-                    ) : (
-                      '---'
-                    )}
+                    {leadDetails?.status.charAt(0).toUpperCase().concat(leadDetails?.status.substring(1)) || '---'}
                   </div>
+                </div>
+                {/* <div style={{ width: '32%' }}>
                   <div className="title2">SkypeID</div>
                   <div className="title3">
                     {leadDetails?.skype_ID ? (
-                      <Link>{leadDetails?.skype_ID}</Link>
-                    ) : (
-                      '---'
-                    )}
+                        <Link>{leadDetails?.skype_ID}</Link>
+                      ) : (
+                        '---'
+                      )}
                   </div>
-                </div>
-                <div style={{ width: '32%' }}>
-                  <div style={{ fontSize: '16px', fontWeight: 600 }}>
-                    &nbsp;
-                  </div>
-                  <div style={{ fontSize: '16px', color: 'gray' }}>&nbsp;</div>
-                </div>
+                </div> */}
               </div>
+              
               {/* </div> */}
               {/* Contact details */}
               <div style={{ marginTop: '2%' }}>
@@ -604,10 +613,10 @@ function LeadDetails (props: any) {
                       {leadDetails?.last_name || '---'}
                     </div>
                   </div>
-                  <div style={{ width: '32%' }}>
+                  {/* <div style={{ width: '32%' }}>
                     <div className="title2">Job Title</div>
                     <div className="title3">{leadDetails?.title || '---'}</div>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="detailList">
                   <div style={{ width: '32%' }}>
