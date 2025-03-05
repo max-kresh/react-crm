@@ -31,8 +31,8 @@ import {
 } from 'react-icons/fa'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { LeadUrl } from '../../services/ApiUrls'
-import { fetchData } from '../../components/FetchData'
+import { LeadUrl, SERVER } from '../../services/ApiUrls'
+import { compileHeaderMultipart, fetchData } from '../../components/FetchData'
 import { Label } from '../../components/Label'
 import {
   AntSwitch,
@@ -116,8 +116,7 @@ function LeadDetails (props: any) {
       }
     }>
   >([])
-  const [attachments, setAttachments] = useState<string[]>([])
-  const [attachmentList, setAttachmentList] = useState<File[]>([])
+  const [attachments, setAttachments] = useState<object[]>([])
   const [tags, setTags] = useState([])
   const [source, setSource] = useState([])
   const [status, setStatus] = useState([])
@@ -219,7 +218,7 @@ function LeadDetails (props: any) {
   const resetForm = () => {
     setNote('')
     setInputValue('')
-    setAttachmentList([])
+    setAttachments([])
     setAttachedFiles([])
     setAttachments([])
   }
@@ -297,22 +296,27 @@ function LeadDetails (props: any) {
       setAttachedFiles((prevFiles: any) => [...prevFiles, ...Array.from(files)])
     }
   }
-  const addAttachments = (e: any) => {
-    // console.log(e.target.files?.[0], 'e');
-    const files = e.target.files
-    if (files) {
-      const reader = new FileReader()
-      reader.onload = () => {
-        setAttachments((attachments: string[]) => [
-          ...(attachments || []),
-          reader.result as string
-        ])
-      }
-      reader.readAsDataURL(files[0])
+
+  const sendAttachment = async (attachments: any, id: any) => {
+    const form = new FormData()
+    for (const attachment of attachments) {
+      form.append('lead_attachment', attachment)
     }
-    if (files) {
-      const filesArray = Array.from(files)
-      setAttachmentList((prevFiles: any) => [...prevFiles, ...filesArray])
+    fetchData(`${LeadUrl}/attachment/${id}/`, 'POST', form, compileHeaderMultipart())
+        .then((res: any) => {
+          if (!res.error) {
+            setAttachments((prev: any) => [...prev, ...res.attachments])
+          } else {
+            alert('An error occurred while uploading the file(s)')
+          }
+        })
+        .catch(() => { console.log('An error occurred while uploading the file(s)') })
+  }
+
+  const addAttachments = (e: any) => {
+    const files = e.target.files
+    if (files && files.length > 0) {
+      sendAttachment(files, leadDetails?.id)
     }
   }
 
@@ -327,15 +331,15 @@ function LeadDetails (props: any) {
   const handleCloseFile = () => {
     setAnchorEl(null)
   }
-
+  // TODO implement
   const deleteFile = () => {
-    setAttachmentList((prevItems) =>
-      prevItems.filter((item, i) => i !== selectedFile)
-    )
-    setAttachments((prevItems) =>
-      prevItems.filter((item, i) => i !== selectedFile)
-    )
-    handleCloseFile()
+  //   setNewAttachments((prevItems) =>
+  //     prevItems.filter((item, i) => i !== selectedFile)
+  //   )
+  //   setAttachments((prevItems) =>
+  //     prevItems.filter((item, i) => i !== selectedFile)
+  //   )
+  //   handleCloseFile()
   }
 
   const open = Boolean(anchorEl)
@@ -495,7 +499,9 @@ function LeadDetails (props: any) {
                   <div className="title2">website</div>
                   <div className="title3">
                     {leadDetails?.website ? (
-                      <Link>{leadDetails?.website}</Link>
+                      <Link href={leadDetails?.website} target="_blank" rel="noopener noreferrer">
+                        {leadDetails?.website}
+                      </Link>
                     ) : (
                       '---'
                     )}
@@ -818,6 +824,7 @@ function LeadDetails (props: any) {
                 >
                   <input
                     type="file"
+                    multiple
                     style={{ display: 'none' }}
                     onChange={(e: any) => addAttachments(e)}
                   />
@@ -836,66 +843,26 @@ function LeadDetails (props: any) {
                 {/* {lead && lead.lead_attachment} */}
                 <Box
                   sx={{
-                    display: 'flex',
-                    justifyContent: 'flex-start',
-                    alignItems: 'flex-start',
-                    flexWrap: 'wrap',
-                    alignContent: 'flex-start'
+                    display: 'block'
+                    // display: 'flex',
+                    // justifyContent: 'flex-start',
+                    // alignItems: 'flex-start',
+                    // flexWrap: 'wrap',
+                    // alignContent: 'flex-start'
                   }}
                 >
-                  {attachmentList?.length
-                    ? attachmentList.map((pic: any, i: any) => (
-                        <Box
-                          key={i}
-                          sx={{
-                            width: '45%',
-                            height: '35%',
-                            border: '0.5px solid #ccc',
-                            borderRadius: '3px',
-                            overflow: 'hidden',
-                            alignSelf: 'auto',
-                            flexShrink: 1,
-                            mr: 2.5,
-                            mb: 2
-                          }}
-                        >
-                          <img
-                            src={URL.createObjectURL(pic)}
-                            alt={pic?.name}
-                            style={{ width: '100%', height: '50%' }}
-                          />
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'flex-start'
-                            }}
-                          >
-                            <Box sx={{ ml: 1 }}>
-                              <Typography sx={{ overflow: 'hidden' }}>
-                                {pic?.name}
-                              </Typography>
-                              <br />
-                              <Typography sx={{ color: 'gray' }}>
-                                {formatFileSize(pic?.size)}
-                              </Typography>
-                            </Box>
-                            <IconButton
-                              onClick={(e: any) => handleClickFile(e, i)}
-                            >
-                              <FaEllipsisV />
-                            </IconButton>
-                          </Box>
-                        </Box>
+                  {attachments?.length
+                    ? attachments.map((pic: any, i: any) => (
+                      <div className="title2">
+                        <Link 
+                          href={`${SERVER}${pic.file_path}`}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                        >{pic.file_name}</Link>
+                      </div>
                       ))
-                    : ''}
-                  {/* {attachments?.length ? attachments.map((pic: any, i: any) => <img src={pic} />) : ''} */}
+                    : ''} 
                 </Box>
-                {/* {attachments?.length ? attachments.map((pic: any, i: any) =>
-                                    <Box key={i} sx={{ width: '100px', height: '100px', border: '0.5px solid gray', borderRadius: '5px' }}>
-                                        <img src={pic} alt={pic} />
-                                    </Box>
-                                ) : ''} */}
               </div>
             </Box>
             <Box
