@@ -1,10 +1,8 @@
-import React, { ChangeEvent, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  Card,
   Link,
   Button,
   Avatar,
-  Divider,
   TextField,
   Box,
   MenuItem,
@@ -37,13 +35,11 @@ import { Label } from '../../components/Label'
 import {
   AntSwitch,
   CustomInputBoxWrapper,
-  CustomSelectField,
   CustomSelectField1,
   StyledListItemButton,
   StyledListItemText
 } from '../../styles/CssStyled'
 import FormateTime from '../../components/FormateTime'
-import { formatFileSize } from '../../components/FormatSize'
 import '../../styles/style.css'
 import { COUNTRIES } from '../../utils/Constants'
 
@@ -225,7 +221,6 @@ function LeadDetails (props: any) {
   }
 
   const editHandle = () => {
-    // navigate('/contacts/edit-contacts', { state: { value: contactDetails, address: newAddress } })
     let country: string[] | undefined
     for (country of COUNTRIES) {
       if (
@@ -333,6 +328,9 @@ function LeadDetails (props: any) {
     }
   }
 
+  // TODO implement
+  const handleDeleteCommentFile = () => {}
+
   const handleClickFile = (
     event: React.MouseEvent<HTMLButtonElement>,
     pic: any
@@ -344,20 +342,9 @@ function LeadDetails (props: any) {
   const handleCloseFile = () => {
     setAnchorEl(null)
   }
-  // TODO implement
-  const deleteFile = () => {
-  //   setNewAttachments((prevItems) =>
-  //     prevItems.filter((item, i) => i !== selectedFile)
-  //   )
-  //   setAttachments((prevItems) =>
-  //     prevItems.filter((item, i) => i !== selectedFile)
-  //   )
-  //   handleCloseFile()
-  }
 
   const open = Boolean(anchorEl)
   const id = open ? 'simple-popover' : undefined
-  // console.log(attachedFiles, 'dsfsd', attachmentList, 'aaaaa', attachments);
 
   const module = 'Leads'
   const crntPage = 'Lead Details'
@@ -449,7 +436,6 @@ function LeadDetails (props: any) {
               >
                 <div className="title2">
                   {leadDetails?.title}
-                  {/* {console.log(users?.length && users.length,'lll')} */}
                   <Stack
                     sx={{
                       display: 'flex',
@@ -458,11 +444,6 @@ function LeadDetails (props: any) {
                       mt: 1
                     }}
                   >
-                    {/* {
-                                                lead.assigned_to && lead.assigned_to.map((assignItem) => (
-                                                    assignItem.user_details.profile_pic
-                                                        ? */}
-
                     {usersDetails?.length
                       ? usersDetails.map((val: any, i: any) => (
                           <Avatar
@@ -520,12 +501,6 @@ function LeadDetails (props: any) {
                     )}
                   </div>
                 </div>
-                {/* <div style={{ width: '32%' }}>
-                  <div className="title2">Expected Close Date</div>
-                  <div className="title3">
-                    {leadDetails?.close_date || '---'}
-                  </div>
-                </div> */}
               </div>
               <div className="detailList">
                 <div style={{ width: '32%' }}>
@@ -543,8 +518,6 @@ function LeadDetails (props: any) {
                 <div style={{ width: '32%' }}>
                   <div className="title2">Created from site</div>
                   <div className="title3">
-                    {/* {lead.pipeline ? lead.pipeline : '------'} */}
-                    {/* {leadDetails?.created_from_site} */}
                     <AntSwitch checked={leadDetails?.created_from_site} />
                   </div>
                 </div>
@@ -573,20 +546,7 @@ function LeadDetails (props: any) {
                     {leadDetails?.status.charAt(0).toUpperCase().concat(leadDetails?.status.substring(1)) || '---'}
                   </div>
                 </div>
-                {/* <div style={{ width: '32%' }}>
-                  <div className="title2">SkypeID</div>
-                  <div className="title3">
-                    {leadDetails?.skype_ID ? (
-                        <Link>{leadDetails?.skype_ID}</Link>
-                      ) : (
-                        '---'
-                      )}
-                  </div>
-                </div> */}
               </div>
-              
-              {/* </div> */}
-              {/* Contact details */}
               <div style={{ marginTop: '2%' }}>
                 <div
                   style={{
@@ -632,10 +592,6 @@ function LeadDetails (props: any) {
                       {leadDetails?.last_name || '---'}
                     </div>
                   </div>
-                  {/* <div style={{ width: '32%' }}>
-                    <div className="title2">Job Title</div>
-                    <div className="title3">{leadDetails?.title || '---'}</div>
-                  </div> */}
                 </div>
                 <div className="detailList">
                   <div style={{ width: '32%' }}>
@@ -751,7 +707,6 @@ function LeadDetails (props: any) {
                     Description
                   </div>
                 </div>
-                {/* <p style={{ fontSize: '16px', color: 'gray', padding: '15px' }}> */}
                 <Box sx={{ p: '15px' }}>
                   {leadDetails?.description ? (
                     <div
@@ -763,7 +718,6 @@ function LeadDetails (props: any) {
                     '---'
                   )}
                 </Box>
-                {/* </p> */}
               </div>
               <div style={{ marginTop: '2%' }}>
                 <div
@@ -789,8 +743,6 @@ function LeadDetails (props: any) {
                     marginTop: '5%'
                   }}
                 >
-                  {/* {lead && lead.description} */}
-                  {/* fhj */}
                 </p>
               </div>
             </Box>
@@ -853,15 +805,9 @@ function LeadDetails (props: any) {
                   overflowY: 'scroll'
                 }}
               >
-                {/* {lead && lead.lead_attachment} */}
                 <Box
                   sx={{
                     display: 'block'
-                    // display: 'flex',
-                    // justifyContent: 'flex-start',
-                    // alignItems: 'flex-start',
-                    // flexWrap: 'wrap',
-                    // alignContent: 'flex-start'
                   }}
                 >
                   {attachments?.length
@@ -945,8 +891,6 @@ function LeadDetails (props: any) {
                   }}
                   onChange={(e: any) => setCommentList(e.target.value)}
                   sx={{ width: '27%' }}
-                  // helperText={errors?.industry?.[0] ? errors?.industry[0] : ''}
-                  // error={!!errors?.industry?.[0]}
                 >
                   {['Recent Last', 'Recent Last'].map((option: any) => (
                     <MenuItem key={option} value={option}>
@@ -1024,42 +968,7 @@ function LeadDetails (props: any) {
                       </ListItem>
                     ))
                   : ''}
-              </List>
-              {/* <div style={{ padding: '10px', marginTop: '15px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <div style={{ display: 'flex', flexDirection: 'row', marginTop: '5%' }}>
-                                    <div>
-                                        <Avatar
-                                            src='/broken-image.jpg'
-                                            style={{
-                                                height: '30px',
-                                                width: '30px'
-                                            }}
-                                        />
-                                    </div>
-                                    <div style={{ fontSize: '16px', marginLeft: '10px', marginRight: '10px', textAlign: 'justify' }}>
-                                        Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{ padding: '10px' }}>Attachments</div> */}
-              {/* <div style={{ paddingLeft: '10px', paddingBottom: '10px', paddingRight: '10px', width: '100%', marginBottom: '10px' }}>
-                                <div style={{
-                                    border: '1px solid gray',
-                                    padding: '10px',
-                                    // paddingBottom: '10px',
-                                    borderRadius: '5px',
-                                    // paddingLeft: '5px',
-                                    marginRight: '20px'
-                                }}
-                                >
-                                    <TextField
-                                        fullWidth
-                                        label='Add Note'
-                                        id='fullWidth'
-                                        InputProps={{ disableUnderline: true }}
-                                    />
-                                </div>
-                            </div> */}
+              </List>            
               <div style={{ padding: '20px', marginBottom: '10px' }}>
                 <TextField
                   label="Add Note"
@@ -1068,15 +977,11 @@ function LeadDetails (props: any) {
                   onChange={(e: any) => setNote(e.target.value)}
                   InputProps={{ style: { borderRadius: '10px' } }}
                   sx={{ mb: '30px', width: '100%', borderRadius: '10px' }}
-                  // InputProps={{ disableUnderline: true }}
                 />
                 <CustomInputBoxWrapper
                   aria-label="qwe"
-                  // className='CustomInputBoxWrapper'
                   contentEditable="true"
                   onInput={(e: any) => setInputValue(e.currentTarget.innerText)}
-                  // onInput={(e: React.SyntheticEvent<HTMLDivElement>) => setInputValue(e.currentTarget.innerText)}
-                  // onInput={(e) => setInputValue(e.target.innerText)}
                 >
                   {attachedFiles.length > 0 && (
                     <div>
@@ -1153,16 +1058,6 @@ function LeadDetails (props: any) {
                     </Button>
                   </Grid>
                 </Box>
-                {/* {attachedFiles.length > 0 && (
-                                    <div>
-                                        <strong>Attached Files:</strong>
-                                        <ul>
-                                            {attachedFiles.map((file: any, index) => (
-                                                <li key={index}>{file.name}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )} */}
               </div>
             </Box>
           </Box>
@@ -1184,7 +1079,7 @@ function LeadDetails (props: any) {
       >
         <List disablePadding>
           <ListItem disablePadding>
-            <StyledListItemButton onClick={deleteFile}>
+            <StyledListItemButton onClick={handleDeleteCommentFile}>
               <ListItemIcon>
                 {' '}
                 <FaTimes fill="#3e79f7" />
