@@ -25,9 +25,9 @@ import {
   FaEllipsisV,
   FaPaperclip,
   FaPlus,
-  FaRegAddressCard,
   FaStar,
-  FaTimes
+  FaTimes,
+  FaTrashAlt
 } from 'react-icons/fa'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -297,7 +297,7 @@ function LeadDetails (props: any) {
     }
   }
 
-  const sendAttachment = async (attachments: any, id: any) => {
+  const handleSendAttachment = async (attachments: any, id: any) => {
     const form = new FormData()
     for (const attachment of attachments) {
       form.append('lead_attachment', attachment)
@@ -313,10 +313,22 @@ function LeadDetails (props: any) {
         .catch(() => { console.log('An error occurred while uploading the file(s)') })
   }
 
+  const handleDeleteAttachment = async (id: any) => {
+    fetchData(`${LeadUrl}/attachment/${id}/`, 'DELETE', '', compileHeaderMultipart())
+        .then((res: any) => {
+          if (!res.error) {
+            setAttachments((prev: any) => prev.filter((attachment: any) => attachment.id !== id))
+          } else {
+            alert('An error occurred while deleting the file')
+          }
+        })
+        .catch(() => { console.log('An error occurred while uploading the file') })
+  }
+
   const addAttachments = (e: any) => {
     const files = e.target.files
     if (files && files.length > 0) {
-      sendAttachment(files, leadDetails?.id)
+      handleSendAttachment(files, leadDetails?.id)
     }
   }
 
@@ -852,14 +864,41 @@ function LeadDetails (props: any) {
                   }}
                 >
                   {attachments?.length
-                    ? attachments.map((pic: any, i: any) => (
-                      <div className="title2">
-                        <Link 
-                          href={`${SERVER}${pic.file_path}`}
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                        >{pic.file_name}</Link>
-                      </div>
+                    ? attachments.map((file: any, i: any) => (
+                      <Box
+                        title={file.file_name}
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'flex-start',
+                          alignItems: 'flex-start',
+                          alignContent: 'flex-start',
+                          WebkitAlignItems: 'center',
+                          margin: '10px 0',
+                          padding: '2px',
+                          WebkitJustifyContent: 'space-between',
+                          border: '1px solid rgba(240, 240, 240, 0.3)'
+                        }}
+                      >
+                        <div>
+                          <Link 
+                            key={i}
+                            href={`${SERVER}${file.file_path}`}
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >{file.file_name}</Link>
+                        </div>
+                        <div>
+                          <div 
+                            onClick={() => handleDeleteAttachment(file.id)} 
+                            title={`Delete ${file.file_name}`}
+                          >
+                            <FaTrashAlt
+                              style={{ cursor: 'pointer', color: 'gray', margin: '3px' }}
+                            />
+                          </div>                         
+                        </div>
+                        
+                      </Box>
                       ))
                     : ''} 
                 </Box>
