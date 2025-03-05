@@ -31,7 +31,7 @@ import {
 } from 'react-icons/fa'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { LeadUrl, SERVER } from '../../services/ApiUrls'
+import { LeadUrl, SERVER_HOST } from '../../services/ApiUrls'
 import { compileHeaderMultipart, fetchData } from '../../components/FetchData'
 import { Label } from '../../components/Label'
 import {
@@ -147,6 +147,7 @@ function LeadDetails (props: any) {
     fetchData(`${LeadUrl}/${id}/`, 'GET', null as any, Header)
       .then((res) => {
         if (!res.error) {
+          console.log('resss ', res)
           setLeadDetails(res?.lead_obj)
           setUsers(res?.users)
           setAttachments(res?.attachments)
@@ -882,7 +883,7 @@ function LeadDetails (props: any) {
                         <div>
                           <Link 
                             key={i}
-                            href={`${SERVER}${file.file_path}`}
+                            href={`${SERVER_HOST}${file.file_path}`}
                             target="_blank" 
                             rel="noopener noreferrer"
                           >{file.file_name}</Link>
