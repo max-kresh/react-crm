@@ -63,7 +63,8 @@ const tooltips = {
   probability: 'Enter the likelihood (in percentage) of converting this lead into a customer. This helps in forecasting and ' + 
               'prioritizing sales efforts.',
   displayName: 'Enter an alternative name for the point of contact. This name will be used to identify the ' + 
-              'contact within this lead, instead of their first and last name. You can also use fist name and last name.',
+              'contact within this lead, instead of their first and last name. You can also use fist name and last name. ' + 
+              '(It will also be used as account name when this lead is converted to an account)',
   contactsSelect: 'Use one of the contacts linked to this lead as point of contact.',
   organization: 'Name of the organization(s) this lead is related to'
   
@@ -397,7 +398,7 @@ export function LeadForm ({ state, method }: StateProps) {
         last_name: contact.last_name || '',
         phone: contact.mobile_number || '',
         email: contact.primary_email || '',
-        account_name: contact.title || '',
+        account_name: (`${contact.first_name} ${contact.last_name} (${contact.title})`) || '',
         address_line: contact.address__address_line || '',
         street: contact.address__street || '',
         postcode: contact.address__postcode || '',

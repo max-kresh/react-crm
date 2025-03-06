@@ -592,7 +592,7 @@ export default function Leads (props: any) {
                             //   width: '20px'
                             // }}
                           />{' '}
-                          &nbsp;&nbsp;{item?.first_name}&nbsp;{item?.last_name}
+                          &nbsp;&nbsp;{item?.created_by?.email}
                         </div>
                       </Stack>
                     </Box>

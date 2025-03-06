@@ -463,8 +463,7 @@ function LeadDetails (props: any) {
                       alt={leadDetails?.created_by?.email}
                     />
                     &nbsp; &nbsp;
-                    {leadDetails?.first_name}&nbsp;
-                    {leadDetails?.last_name}
+                    {leadDetails?.created_by?.email}&nbsp;
                   </div>
                 </div>
               </div>
@@ -711,7 +710,7 @@ function LeadDetails (props: any) {
                 </div>
                 <div className="detailList">
                   <div style={{ width: '32%' }}>
-                    <div className="title2">Pincode</div>
+                    <div className="title2">Postcode</div>
                     <div className="title3">
                       {leadDetails?.postcode || '---'}
                     </div>
@@ -883,6 +882,7 @@ function LeadDetails (props: any) {
                           >
                             <FaTrashAlt
                               style={{ cursor: 'pointer', color: 'gray', margin: '3px' }}
+                              size={ NOTE_ICON_SIZE }
                             />
                           </div>                         
                         </div>
