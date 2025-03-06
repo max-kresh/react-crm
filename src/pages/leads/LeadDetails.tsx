@@ -20,17 +20,27 @@ import {
   ListItemIcon
 } from '@mui/material'
 import {
+  FaCheck,
+  FaClock,
+  FaCross,
+  FaDoorClosed,
+  FaEdit,
   FaEllipsisV,
+  FaEvernote,
+  FaItunesNote,
   FaPaperclip,
   FaPlus,
+  FaRegStickyNote,
   FaStar,
+  FaStop,
   FaTimes,
-  FaTrashAlt
+  FaTrashAlt,
+  FaUserAlt
 } from 'react-icons/fa'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { LeadUrl, SERVER_HOST } from '../../services/ApiUrls'
-import { compileHeaderMultipart, fetchData } from '../../components/FetchData'
+import { compileHeader, compileHeaderMultipart, fetchData } from '../../components/FetchData'
 import { Label } from '../../components/Label'
 import {
   AntSwitch,
@@ -100,6 +110,9 @@ type response = {
   created_from_site: boolean
   id: string
 }
+
+const NOTE_ICON_SIZE = 13
+
 function LeadDetails (props: any) {
   const { state } = useLocation()
   const navigate = useNavigate()
@@ -176,12 +189,6 @@ function LeadDetails (props: any) {
       })
   }
   const sendComment = () => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
     // const formData = new FormData();
     // formData.append('inputValue', inputValue);
     // attachedFiles.forEach((file, index) => {
@@ -192,21 +199,25 @@ function LeadDetails (props: any) {
     // const data = { comment:  inputValue }
     // const data = { comment: inputValue, attachedFiles }
     const data = { Comment: inputValue || note, lead_attachment: attachments }
+    console.log('sendComment inputValue', inputValue)
+    console.log('sendComment note', note)
+    console.log('sendComment attachments', attachments)
+
     // fetchData(`${LeadUrl}/comment/${state.leadId}/`, 'PUT', JSON.stringify(data), Header)
-    fetchData(
-      `${LeadUrl}/${state.leadId}/`,
-      'POST',
-      JSON.stringify(data),
-      Header
-    )
-      .then((res: any) => {
-        // console.log('Form data:', res);
-        if (!res.error) {
-          resetForm()
-          getLeadDetails(state?.leadId)
-        }
-      })
-      .catch(() => {})
+    // fetchData(
+    //   `${LeadUrl}/${state.leadId}/`,
+    //   'POST',
+    //   JSON.stringify(data),
+    //   compileHeader()
+    // )
+    //   .then((res: any) => {
+    //     // console.log('Form data:', res);
+    //     if (!res.error) {
+    //       resetForm()
+    //       getLeadDetails(state?.leadId)
+    //     }
+    //   })
+    //   .catch(() => {})
   }
 
   const backbtnHandle = () => {
@@ -328,7 +339,22 @@ function LeadDetails (props: any) {
     }
   }
 
-  // TODO implement
+  const handleNotChange = (e: any) => {
+    setNote(e?.target?.value?.substring(0, 255))
+  }
+  const handleSendNote = () => {
+    fetchData(`${LeadUrl}/comment/${leadDetails?.id}/`, 'POST', JSON.stringify({ comment: note }), compileHeader())
+      .then((res: any) => {
+        if (!res?.error) {
+          console.log('res in sendnote', res)
+          setComments(res.comments || [])
+          setNote('')
+        } else {
+          alert('An error occurred while sending the note')
+        }
+      })
+      .catch(() => { console.log('An error occurred while sending the note') })
+  }
   const handleDeleteCommentFile = () => {}
 
   const handleClickFile = (
@@ -600,9 +626,9 @@ function LeadDetails (props: any) {
                       {leadDetails?.email ? (
                         <Link>
                           {leadDetails?.email}
-                          <FaStar
+                          {/* <FaStar
                             style={{ fontSize: '16px', fill: 'yellow' }}
-                          />
+                          /> */}
                         </Link>
                       ) : (
                         '---'
@@ -890,21 +916,52 @@ function LeadDetails (props: any) {
                     }
                   }}
                   onChange={(e: any) => setCommentList(e.target.value)}
-                  sx={{ width: '27%' }}
+                  sx={{ width: '37%' }}
                 >
-                  {['Recent Last', 'Recent Last'].map((option: any) => (
+                  {['Recent First', 'Recent Last'].map((option: any) => (
                     <MenuItem key={option} value={option}>
                       {option}
                     </MenuItem>
                   ))}
                 </CustomSelectField1>
+              </div>              
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                <div style={{ padding: '10px', marginTop: '20px', width: '100%' }}>
+                  <TextField
+                    label="Add Note"
+                    id="fullWidth"
+                    value={note}
+                    multiline
+                    maxRows={20}
+                    onChange={handleNotChange}
+                    InputProps={{ style: { borderRadius: '10px', minHeight: '8rem' } }}
+                    // style={{ height: '175px' }}
+                    sx={{ mb: '15px', width: '100%', borderRadius: '10px' }}
+                  />
+                </div>
+                <div style={{ display: 'flex 9 2', flexDirection: 'column', gap: '10px' }}>
+                  <FaCheck 
+                    fill='green' 
+                    size={ NOTE_ICON_SIZE * 2.2} 
+                    title='Send Note' 
+                    cursor='pointer'
+                    onClick={handleSendNote}
+                  />
+                  <FaTimes 
+                    fill='red' 
+                    size={ NOTE_ICON_SIZE * 2.2} 
+                    title='Clear Note' 
+                    cursor='pointer'
+                  />
+                </div>
               </div>
+              
               <List sx={{ maxWidth: '500px' }}>
-                {comments?.length
+                 {comments?.length
                   ? comments.map((val: any, i: any) => (
                       <ListItem alignItems="flex-start">
                         <ListItemAvatar>
-                          <Avatar alt="testing" src="test" />
+                          <FaRegStickyNote size={30} />
                         </ListItemAvatar>
                         <ListItemText
                           primary={
@@ -912,44 +969,47 @@ function LeadDetails (props: any) {
                               sx={{ display: 'flex', flexDirection: 'column' }}
                             >
                               <Typography>{val.comment}</Typography>
-                              <Avatar
-                                alt="testing"
-                                src="test"
-                                sx={{ mt: 1, mb: 1 }}
-                              />
                             </Stack>
                           }
                           secondary={
                             <React.Fragment>
                               <Stack
                                 sx={{
-                                  mt: 3,
+                                  mt: 1,
                                   display: 'flex',
                                   flexDirection: 'row',
                                   justifyContent: 'space-between',
                                   alignItems: 'flex-start'
                                 }}
                               >
-                                <Typography>
-                                  {val?.lead}
-                                  test &nbsp;-&nbsp;
-                                  {val?.commented_by}
-                                  test &nbsp;-&nbsp;
-                                  <span style={{ textDecoration: 'underline' }}>
-                                    reply
-                                  </span>
+                                <Typography style={{ fontSize: '0.7rem' }}>
+                                  <div style={{ display: 'flex', gap: '5px' }}>
+                                      <FaUserAlt size={ NOTE_ICON_SIZE }/>
+                                      <div>{ val?.commented_by }</div>
+                                  </div>      
                                 </Typography>
                                 <Typography
                                   sx={{
                                     display: 'flex',
                                     flexDirection: 'row',
-                                    alignItems: 'flex-start'
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '0.7rem' 
                                   }}
                                 >
-                                  {FormateTime(val?.commented_on)}
-                                  &nbsp;-&nbsp;test
-                                  {val?.commented_by}
+                                  <div style={{ display: 'flex', gap: '5px' }}>
+                                      <FaClock size={ NOTE_ICON_SIZE }/>
+                                      <div>{FormateTime(val?.commented_on)}</div>
+                                  </div>  
+                                  
                                 </Typography>
+                                <Typography style={{ fontSize: '0.7rem' }}>
+                                  <FaEdit title='Edit' size={ NOTE_ICON_SIZE } style={{ cursor: 'pointer' }}/>        
+                                </Typography>
+                                <Typography style={{ fontSize: '0.7rem' }}>
+                                  <FaTrashAlt title='Delete' size={ NOTE_ICON_SIZE } style={{ cursor: 'pointer' }}/>        
+                                </Typography>
+                                
                               </Stack>
                             </React.Fragment>
                           }
@@ -969,96 +1029,6 @@ function LeadDetails (props: any) {
                     ))
                   : ''}
               </List>            
-              <div style={{ padding: '20px', marginBottom: '10px' }}>
-                <TextField
-                  label="Add Note"
-                  id="fullWidth"
-                  value={note}
-                  onChange={(e: any) => setNote(e.target.value)}
-                  InputProps={{ style: { borderRadius: '10px' } }}
-                  sx={{ mb: '30px', width: '100%', borderRadius: '10px' }}
-                />
-                <CustomInputBoxWrapper
-                  aria-label="qwe"
-                  contentEditable="true"
-                  onInput={(e: any) => setInputValue(e.currentTarget.innerText)}
-                >
-                  {attachedFiles.length > 0 && (
-                    <div>
-                      {attachedFiles.map((file, index) => (
-                        <div key={index}>
-                          <div>{file.name}</div>
-                          <img
-                            src={URL.createObjectURL(file)}
-                            alt={file.name}
-                            style={{
-                              maxWidth: '100%',
-                              maxHeight: '100px',
-                              marginTop: '8px'
-                            }}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CustomInputBoxWrapper>
-                <Box
-                  sx={{
-                    pt: '10px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    border: '1px solid #ccc',
-                    borderTop: 'none',
-                    mt: '-5px',
-                    borderBottomLeftRadius: '8px',
-                    borderBottomRightRadius: '8px',
-                    pb: '10px'
-                  }}
-                >
-                  <Button
-                    component="label"
-                    onClick={handleAttachmentClick}
-                    sx={{ ml: '5px' }}
-                  >
-                    <FaPaperclip style={{ fill: 'gray' }} />
-                  </Button>
-                  <Grid container justifyContent="flex-end">
-                    <Button
-                      variant="contained"
-                      size="small"
-                      color="inherit"
-                      disableFocusRipple
-                      disableRipple
-                      disableTouchRipple
-                      sx={{
-                        backgroundColor: '#808080b5',
-                        borderRadius: '8px',
-                        color: 'white',
-                        textTransform: 'none',
-                        ml: '8px',
-                        '&:hover': { backgroundColor: '#C0C0C0' }
-                      }}
-                      onClick={resetForm}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      sx={{
-                        backgroundColor: '#1976d2',
-                        borderRadius: '8px',
-                        textTransform: 'none',
-                        ml: '8px',
-                        mr: '12px'
-                      }}
-                      onClick={sendComment}
-                    >
-                      Send
-                    </Button>
-                  </Grid>
-                </Box>
-              </div>
             </Box>
           </Box>
         </Box>
