@@ -112,6 +112,7 @@ type response = {
 }
 
 const NOTE_ICON_SIZE = 13
+const COMMENT_SORT_DIRECTIONS = ['Recent Last', 'Recent First']
 
 function LeadDetails (props: any) {
   const { state } = useLocation()
@@ -135,7 +136,7 @@ function LeadDetails (props: any) {
   const [users, setUsers] = useState([])
   const [teams, setTeams] = useState([])
   const [comments, setComments] = useState([])
-  const [commentList, setCommentList] = useState('Recent Last')
+  const [commentSortDirection, setCommentSortDirection] = useState(COMMENT_SORT_DIRECTIONS[0])
   const [note, setNote] = useState('')
   const [selectedFile, setSelectedFile] = useState()
   const [inputValue, setInputValue] = useState<string>('')
@@ -343,10 +344,12 @@ function LeadDetails (props: any) {
     setNote(e?.target?.value?.substring(0, 255))
   }
   const handleSendNote = () => {
-    fetchData(`${LeadUrl}/comment/${leadDetails?.id}/`, 'POST', JSON.stringify({ comment: note }), compileHeader())
+    const data = {
+      comment: note
+    }
+    fetchData(`${LeadUrl}/comment/${leadDetails?.id}/`, 'POST', JSON.stringify(data), compileHeader())
       .then((res: any) => {
         if (!res?.error) {
-          console.log('res in sendnote', res)
           setComments(res.comments || [])
           setNote('')
         } else {
@@ -907,7 +910,7 @@ function LeadDetails (props: any) {
                 <CustomSelectField1
                   name="industry"
                   select
-                  value={commentList}
+                  value={commentSortDirection}
                   InputProps={{
                     style: {
                       height: '32px',
@@ -915,18 +918,26 @@ function LeadDetails (props: any) {
                       borderRadius: '10px'
                     }
                   }}
-                  onChange={(e: any) => setCommentList(e.target.value)}
+                  onChange={(e: any) => setCommentSortDirection(e.target.value)}
                   sx={{ width: '37%' }}
                 >
-                  {['Recent First', 'Recent Last'].map((option: any) => (
+                  {COMMENT_SORT_DIRECTIONS.map((option: any) => (
                     <MenuItem key={option} value={option}>
                       {option}
                     </MenuItem>
                   ))}
                 </CustomSelectField1>
-              </div>              
+              </div>     
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                <div style={{ padding: '10px', marginTop: '20px', width: '100%' }}>
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'flex-end', 
+                  padding: '10px', 
+                  marginTop: '20px', 
+                  width: '100%' 
+                }}
+                >
                   <TextField
                     label="Add Note"
                     id="fullWidth"
@@ -938,6 +949,7 @@ function LeadDetails (props: any) {
                     // style={{ height: '175px' }}
                     sx={{ mb: '15px', width: '100%', borderRadius: '10px' }}
                   />
+                  <div style={{ fontSize: '0.8rem' }}>{`(${note.length}/255)`}</div>
                 </div>
                 <div style={{ display: 'flex 9 2', flexDirection: 'column', gap: '10px' }}>
                   <FaCheck 
@@ -958,7 +970,12 @@ function LeadDetails (props: any) {
               
               <List sx={{ maxWidth: '500px' }}>
                  {comments?.length
-                  ? comments.map((val: any, i: any) => (
+                  ? (comments?.slice().sort((c1: any, c2: any) => 
+                    commentSortDirection === COMMENT_SORT_DIRECTIONS[0] 
+                    ? new Date(c1.commented_on).getTime() - new Date(c2.commented_on).getTime() 
+                    : new Date(c2.commented_on).getTime() - new Date(c1.commented_on).getTime()
+                  ) ?? []) 
+                  .map((val: any, i: any) => (
                       <ListItem alignItems="flex-start">
                         <ListItemAvatar>
                           <FaRegStickyNote size={30} />
@@ -985,7 +1002,7 @@ function LeadDetails (props: any) {
                                 <Typography style={{ fontSize: '0.7rem' }}>
                                   <div style={{ display: 'flex', gap: '5px' }}>
                                       <FaUserAlt size={ NOTE_ICON_SIZE }/>
-                                      <div>{ val?.commented_by }</div>
+                                      <div>{ val?.commented_by_email }</div>
                                   </div>      
                                 </Typography>
                                 <Typography
@@ -1014,7 +1031,7 @@ function LeadDetails (props: any) {
                             </React.Fragment>
                           }
                         />
-                        <Stack
+                        {/* <Stack
                           sx={{
                             display: 'flex',
                             alignItems: 'flex-start',
@@ -1024,7 +1041,7 @@ function LeadDetails (props: any) {
                           <IconButton aria-label="comments">
                             <FaEllipsisV style={{ width: '7px' }} />
                           </IconButton>
-                        </Stack>
+                        </Stack> */}
                       </ListItem>
                     ))
                   : ''}
