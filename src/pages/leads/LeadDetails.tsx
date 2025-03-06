@@ -358,7 +358,18 @@ function LeadDetails (props: any) {
       })
       .catch(() => { console.log('An error occurred while sending the note') })
   }
-  const handleDeleteCommentFile = () => {}
+
+  const handleDeleteNote = (id: any) => {
+    fetchData(`${LeadUrl}/comment/${id}/`, 'DELETE', null, compileHeader())
+      .then((res: any) => {
+        if (!res?.error) {
+          setComments((prev: any) => prev.filter((c: any) => c.id !== id))
+        } else {
+          alert('An error occurred while deleting the note')
+        }
+      })
+      .catch(() => { console.log('An error occurred while deleting the note') })
+  }
 
   const handleClickFile = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -951,19 +962,20 @@ function LeadDetails (props: any) {
                   />
                   <div style={{ fontSize: '0.8rem' }}>{`(${note.length}/255)`}</div>
                 </div>
-                <div style={{ display: 'flex 9 2', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex 9 1', flexDirection: 'column', gap: '10px' }}>
                   <FaCheck 
                     fill='green' 
-                    size={ NOTE_ICON_SIZE * 2.2} 
+                    size={ NOTE_ICON_SIZE * 2.1} 
                     title='Send Note' 
                     cursor='pointer'
                     onClick={handleSendNote}
                   />
                   <FaTimes 
                     fill='red' 
-                    size={ NOTE_ICON_SIZE * 2.2} 
+                    size={ NOTE_ICON_SIZE * 2.1} 
                     title='Clear Note' 
                     cursor='pointer'
+                    onClick={() => setNote('')}
                   />
                 </div>
               </div>
@@ -1021,10 +1033,18 @@ function LeadDetails (props: any) {
                                   
                                 </Typography>
                                 <Typography style={{ fontSize: '0.7rem' }}>
-                                  <FaEdit title='Edit' size={ NOTE_ICON_SIZE } style={{ cursor: 'pointer' }}/>        
+                                  <FaEdit 
+                                    title='Edit' 
+                                    size={ NOTE_ICON_SIZE } 
+                                    style={{ cursor: 'pointer' }}/>        
                                 </Typography>
                                 <Typography style={{ fontSize: '0.7rem' }}>
-                                  <FaTrashAlt title='Delete' size={ NOTE_ICON_SIZE } style={{ cursor: 'pointer' }}/>        
+                                  <FaTrashAlt 
+                                    title='Delete' 
+                                    size={ NOTE_ICON_SIZE } 
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => handleDeleteNote(val.id)}
+                                  />        
                                 </Typography>
                                 
                               </Stack>
@@ -1066,7 +1086,7 @@ function LeadDetails (props: any) {
       >
         <List disablePadding>
           <ListItem disablePadding>
-            <StyledListItemButton onClick={handleDeleteCommentFile}>
+            <StyledListItemButton>
               <ListItemIcon>
                 {' '}
                 <FaTimes fill="#3e79f7" />
