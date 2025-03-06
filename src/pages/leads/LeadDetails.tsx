@@ -135,7 +135,7 @@ function LeadDetails (props: any) {
   const [contacts, setContacts] = useState([])
   const [users, setUsers] = useState([])
   const [teams, setTeams] = useState([])
-  const [comments, setComments] = useState([])
+  const [comments, setComments] = useState<object[]>([])
   const [commentSortDirection, setCommentSortDirection] = useState(COMMENT_SORT_DIRECTIONS[0])
   const [note, setNote] = useState('')
   const [selectedFile, setSelectedFile] = useState()
@@ -343,14 +343,16 @@ function LeadDetails (props: any) {
   const handleNotChange = (e: any) => {
     setNote(e?.target?.value?.substring(0, 255))
   }
+
   const handleSendNote = () => {
+    if (note.trim().length === 0) return
     const data = {
       comment: note
     }
     fetchData(`${LeadUrl}/comment/${leadDetails?.id}/`, 'POST', JSON.stringify(data), compileHeader())
       .then((res: any) => {
         if (!res?.error) {
-          setComments(res.comments || [])
+          setComments((prev: any) => [...prev, res.comment])
           setNote('')
         } else {
           alert('An error occurred while sending the note')
