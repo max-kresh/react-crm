@@ -15,9 +15,8 @@ import {
   Autocomplete,
   FormHelperText,
   IconButton,
-  Tooltip,
-  Divider,
   Select,
+  Divider,
   Button
 } from '@mui/material'
 import { useQuill } from 'react-quilljs'
@@ -73,12 +72,12 @@ interface FormData {
   probability: number
   description: string
   assigned_to: string[]
-  contact_name: string
   contacts: string[]
   due_date: string
   tags: string[]
   opportunity_attachment: string | null
   file: string | null
+  contact_name: string | null
   lead: string | null
 }
 
@@ -86,22 +85,27 @@ export function AddOpportunity () {
   const navigate = useNavigate()
   const { state } = useLocation()
   const { quill, quillRef } = useQuill()
-  const initialContentRef = useRef(null)
+  const initialContentRef = useRef<string | null>(null)
+  const pageContainerRef = useRef<HTMLDivElement | null>(null)
+
+  const [hasInitialFocus, setHasInitialFocus] = useState(false)
 
   const autocompleteRef = useRef<any>(null)
   const [error, setError] = useState(false)
+  const [reset, setReset] = useState(false)
   const [selectedContacts, setSelectedContacts] = useState<any[]>([])
   const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>([])
   const [selectedTags, setSelectedTags] = useState<any[]>([])
   const [selectedTeams, setSelectedTeams] = useState<any[]>([])
   const [selectedCountry, setSelectedCountry] = useState<any[]>([])
+  const [leadSelectOpen, setLeadSelectOpen] = useState(false)
   const [leadSourceSelectOpen, setLeadSourceSelectOpen] = useState(false)
+  const [statusSelectOpen, setStatusSelectOpen] = useState(false)
+  const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [currencySelectOpen, setCurrencySelectOpen] = useState(false)
-  const [stageSelectOpen, setStageSelectOpen] = useState(false)
   const [contactSelectOpen, setContactSelectOpen] = useState(false)
   const [accountSelectOpen, setAccountSelectOpen] = useState(false)
-  const [leadSelectOpen, setLeadSelectOpen] = useState(false)
-
+  const [stageSelectOpen, setStageSelectOpen] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -114,12 +118,12 @@ export function AddOpportunity () {
     probability: 1,
     description: '',
     assigned_to: [],
-    contact_name: '',
     contacts: [],
     due_date: '',
     tags: [],
     opportunity_attachment: null,
     file: null,
+    contact_name: '',
     lead: ''
   })
 
@@ -516,7 +520,7 @@ export function AddOpportunity () {
                                 }
                                 className="select-icon-background"
                               >
-                                {leadSelectOpen ? (
+                                {leadSourceSelectOpen ? (
                                   <FiChevronUp className="select-icon" />
                                 ) : (
                                   <FiChevronDown className="select-icon" />
@@ -838,7 +842,7 @@ export function AddOpportunity () {
                         </FormControl>
                       </div>
                       <div className="fieldSubContainer">
-                      <div className="fieldTitle">Lead</div>
+                        <div className="fieldTitle">Lead</div>
                         <FormControl sx={{ width: '70%' }}>
                           <Select
                             name="lead"

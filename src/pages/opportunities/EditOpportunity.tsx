@@ -26,7 +26,6 @@ import { fetchData } from '../../components/FetchData'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import {
   FaCheckCircle,
-  FaFileUpload,
   FaPlus,
   FaTimes,
   FaTimesCircle,
@@ -53,14 +52,15 @@ type FormErrors = {
   probability?: string[]
   description?: string[]
   assigned_to?: string[]
+  contact_name?: string[]
   contacts?: string[]
   due_date?: string[]
   tags?: string[]
   opportunity_attachment?: string[]
   file?: string[]
-  contact_name?: string[]
   lead?: string[]
 }
+
 interface FormData {
   name: string
   account: string
@@ -102,8 +102,8 @@ export function EditOpportunity () {
   const [leadSourceSelectOpen, setLeadSourceSelectOpen] = useState(false)
   const [statusSelectOpen, setStatusSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
-  const [contactSelectOpen, setContactSelectOpen] = useState(false)
   const [currencySelectOpen, setCurrencySelectOpen] = useState(false)
+  const [contactSelectOpen, setContactSelectOpen] = useState(false)
   const [accountSelectOpen, setAccountSelectOpen] = useState(false)
   const [stageSelectOpen, setStageSelectOpen] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
@@ -551,49 +551,6 @@ export function EditOpportunity () {
                               : ''}
                           </FormHelperText>
                         </FormControl>
-                        {/* <FormControl error={!!errors?.contacts?.[0]} sx={{ width: '70%' }}>
-                                                    <Autocomplete
-                                                        multiple
-                                                        value={selectedContacts}
-                                                        limitTags={2}
-                                                        options={state.contacts || []}
-                                                        getOptionLabel={(option: any) => state.contacts ? option?.first_name : option}
-                                                        onChange={(e: any, value: any) => handleChange2('contacts', value)}
-                                                        size='small'
-                                                        filterSelectedOptions
-                                                        renderTags={(value: any, getTagProps: any) =>
-                                                            value.map((option: any, index: any) => (
-                                                                <Chip
-                                                                    deleteIcon={<FaTimes style={{ width: '9px' }} />}
-                                                                    sx={{
-                                                                        backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                                                                        height: '18px'
-                                                                    }}
-                                                                    variant='outlined'
-                                                                    label={state.contacts ? option?.first_name : option}
-                                                                    {...getTagProps({ index })}
-                                                                />
-                                                            ))
-                                                        }
-                                                        popupIcon={<CustomPopupIcon><FaPlus className='input-plus-icon' /></CustomPopupIcon>}
-                                                        renderInput={(params: any) => (
-                                                            <TextField {...params}
-                                                                placeholder='Add Contacts'
-                                                                InputProps={{
-                                                                    ...params.InputProps,
-                                                                    sx: {
-                                                                        '& .MuiAutocomplete-popupIndicator': { '&:hover': { backgroundColor: 'white' } },
-                                                                        '& .MuiAutocomplete-endAdornment': {
-                                                                            mt: '-8px',
-                                                                            mr: '-8px',
-                                                                        }
-                                                                    }
-                                                                }}
-                                                            />
-                                                        )}
-                                                    />
-                                                    <FormHelperText>{errors?.contacts?.[0] || ''}</FormHelperText>
-                                                </FormControl> */}
                       </div>
                     </div>
                     <div className="fieldContainer2">
@@ -668,7 +625,7 @@ export function EditOpportunity () {
                             limitTags={2}
                             options={state.users || []}
                             getOptionLabel={(option: any) =>
-                              state.users ? option?.user_details?.email : option
+                              state.users ? option?.user__email : option
                             }
                             onChange={(e: any, value: any) =>
                               handleChange2('assigned_to', value)
@@ -687,9 +644,7 @@ export function EditOpportunity () {
                                   }}
                                   variant="outlined"
                                   label={
-                                    state.users
-                                      ? option?.user_details?.email
-                                      : option
+                                    state.users ? option?.user__email : option
                                   }
                                   {...getTagProps({ index })}
                                 />
@@ -972,7 +927,7 @@ export function EditOpportunity () {
                             {errors?.lead?.[0] || ''}
                           </FormHelperText>
                         </FormControl>
-                      </div>                
+                      </div>
                     </div>
                   </Box>
                 </AccordionDetails>

@@ -530,8 +530,8 @@ export default function Opportunities (props: any) {
                           <TableCell className="tableCell">
                             {item?.assigned_to ? (
                               <Avatar
-                                src={item?.assigned_to}
-                                alt={item?.assigned_to}
+                                src={item?.assigned_to?.user_details?.profile_pic}
+                                alt={item?.assigned_to.user_details?.email}
                               />
                             ) : (
                               '----'
