@@ -52,13 +52,17 @@ type FormErrors = {
   probability?: string[]
   description?: string[]
   assigned_to?: string[]
-  contact_name?: string[]
   contacts?: string[]
   due_date?: string[]
   tags?: string[]
   opportunity_attachment?: string[]
   file?: string[]
   lead?: string[]
+}
+
+interface AssignedTo {
+  id: string
+  name: string
 }
 
 interface FormData {
@@ -71,13 +75,12 @@ interface FormData {
   lead_source: string
   probability: number
   description: string
-  assigned_to: string[]
+  assigned_to: AssignedTo[]
   contacts: string[]
   due_date: string
   tags: string[]
   opportunity_attachment: string | null
   file: string | null
-  contact_name: string | null
   lead: string | null
 }
 
@@ -123,9 +126,9 @@ export function EditOpportunity () {
     tags: [],
     opportunity_attachment: null,
     file: null,
-    contact_name: '',
     lead: ''
   })
+  const userOptions = state.users.map((k: any, i: any) => { return { id: k.id, label: k.user__email } })
 
   useEffect(() => {
     // Scroll to the top of the page when the component mounts
@@ -139,6 +142,7 @@ export function EditOpportunity () {
         }
       })
     }
+
     // Cleanup: Remove event listener when the component unmounts
     return () => {
       if (quill) {
@@ -157,6 +161,10 @@ export function EditOpportunity () {
       if (quill && initialContentRef.current !== null) {
         quill.clipboard.dangerouslyPasteHTML(initialContentRef.current)
       }
+    }
+    if (state?.value?.assigned_to) {
+      let assignedToIds = state.value.assigned_to.map((k: any, i: any) => k.id)
+      setSelectedAssignTo(userOptions.filter((item: any) => assignedToIds.includes(item.id)))
     }
     return () => {
       setReset(false)
@@ -190,13 +198,13 @@ export function EditOpportunity () {
     } else if (title === 'assigned_to') {
       setFormData({
         ...formData,
-        assigned_to: val.length > 0 ? val.map((item: any) => item.id) : []
+        assigned_to: val
       })
       setSelectedAssignTo(val)
     } else if (title === 'tags') {
       setFormData({
         ...formData,
-        assigned_to: val.length > 0 ? val.map((item: any) => item.id) : []
+        tags: val.length > 0 ? val.map((item: any) => item.id) : []
       })
       setSelectedTags(val)
     } else if (title === 'teams') {
@@ -204,7 +212,7 @@ export function EditOpportunity () {
         ...formData,
         teams: val.length > 0 ? val.map((item: any) => item.id) : []
       })
-      setSelectedTags(val)
+      setSelectedTeams(val)
     } else {
       setFormData({ ...formData, [title]: val })
     }
@@ -216,7 +224,11 @@ export function EditOpportunity () {
     } else if (type === 'checkbox') {
       setFormData({ ...formData, [name]: checked })
     } else {
-      setFormData({ ...formData, [name]: value })
+      let val = value
+      if (name === 'contacts') {
+        val = [value]
+      }
+      setFormData({ ...formData, [name]: val })
     }
   }
   const handleFileChange = (event: any) => {
@@ -255,19 +267,18 @@ export function EditOpportunity () {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org')
     }
-    // console.log('Form data:', formData.lead_attachment,'sfs', formData.file);
+
     const data = {
       name: formData.name,
       account: formData.account,
       amount: formData.amount,
       currency: formData.currency,
-      contact_name: formData.contact_name,
       stage: formData.stage,
       teams: formData.teams,
       lead_source: formData.lead_source,
       probability: formData.probability,
       description: formData.description,
-      assigned_to: formData.assigned_to,
+      assigned_to: formData.assigned_to.map((k: any, i: number) => k.id),
       contacts: formData.contacts,
       due_date: formData.due_date,
       tags: formData.tags,
@@ -303,7 +314,6 @@ export function EditOpportunity () {
       currency: '',
       stage: '',
       teams: [],
-      contact_name: '',
       lead_source: '',
       probability: 1,
       description: '',
@@ -511,8 +521,8 @@ export function EditOpportunity () {
                         <div className="fieldTitle">Contact Name</div>
                         <FormControl sx={{ width: '70%' }}>
                           <RequiredSelect
-                            name="contact_name"
-                            value={formData.contact_name}
+                            name="contacts"
+                            value={formData.contacts?.[0] || ''}
                             open={contactSelectOpen}
                             onClick={() =>
                               setContactSelectOpen(!contactSelectOpen)
@@ -533,21 +543,21 @@ export function EditOpportunity () {
                             )}
                             className="select"
                             onChange={handleChange}
-                            error={!!errors?.contact_name?.[0]}
+                            error={!!errors?.contacts?.[0]}
                           >
                             {state?.contacts?.length &&
                               state?.contacts.map((option: any) => (
                                 <MenuItem
                                   key={option?.id}
-                                  value={option?.first_name}
+                                  value={option?.id}
                                 >
                                   {option?.first_name}
                                 </MenuItem>
                               ))}
                           </RequiredSelect>
                           <FormHelperText className="helperText">
-                            {errors?.contact_name?.[0]
-                              ? errors?.contact_name[0]
+                            {errors?.contacts?.[0]
+                              ? errors?.contacts[0]
                               : ''}
                           </FormHelperText>
                         </FormControl>
@@ -623,9 +633,9 @@ export function EditOpportunity () {
                             multiple
                             value={selectedAssignTo}
                             limitTags={2}
-                            options={state.users || []}
+                            options={userOptions || []}
                             getOptionLabel={(option: any) =>
-                              state.users ? option?.user__email : option
+                              state.users ? option?.label : option
                             }
                             onChange={(e: any, value: any) =>
                               handleChange2('assigned_to', value)
@@ -644,7 +654,7 @@ export function EditOpportunity () {
                                   }}
                                   variant="outlined"
                                   label={
-                                    state.users ? option?.user__email : option
+                                    state.users ? option?.label : option
                                   }
                                   {...getTagProps({ index })}
                                 />
