@@ -652,7 +652,7 @@ export default function Leads (props: any) {
                           <Box sx={{ ml: 1 }}>
                             {item.tags.map((tagData: any, index: any) => (
                               // tag.slice(0, 3).map((tagData: any, index: any) => (
-                              <Label tags={tagData} key={index} />
+                              <Label tags={tagData.name} key={index} />
                             ))}
                             {item.tags.length > 4 ? (
                               <Link sx={{ ml: 1 }}>
