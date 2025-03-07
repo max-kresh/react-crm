@@ -62,11 +62,11 @@ const tooltips = {
   attachment: 'Attach a file for this lead.',
   probability: 'Enter the likelihood (in percentage) of converting this lead into a customer. This helps in forecasting and ' + 
               'prioritizing sales efforts.',
-  displayName: 'Enter an alternative name for the point of contact. This name will be used to identify the ' + 
-              'contact within this lead, instead of their first and last name. You can also use fist name and last name. ' + 
-              '(It will also be used as account name when this lead is converted to an account)',
+  displayName: 'When this Lead is converted a new Account will be created by using the information provided in this section. ' + 
+            'Display name will be used as the name of the new Account. It has to be unique (There should not be any Account with the same name).',
   contactsSelect: 'Use one of the contacts linked to this lead as point of contact.',
-  organization: 'Name of the organization(s) this lead is related to'
+  organization: 'Name of the organization(s) this lead is related to',
+  account_info: 'This information will be used to create an Account when this Lead is converted.'
   
 }
 
@@ -398,7 +398,7 @@ export function LeadForm ({ state, method }: StateProps) {
         last_name: contact.last_name || '',
         phone: contact.mobile_number || '',
         email: contact.primary_email || '',
-        account_name: (`${contact.first_name} ${contact.last_name} (${contact.title})`) || '',
+        account_name: (`${contact.first_name} ${contact.last_name} (From Lead: ${formData.title})`) || '',
         address_line: contact.address__address_line || '',
         street: contact.address__street || '',
         postcode: contact.address__postcode || '',
@@ -985,7 +985,7 @@ export function LeadForm ({ state, method }: StateProps) {
                 <AccordionSummary
                   expandIcon={<FiChevronDown style={{ fontSize: '25px' }} />}
                 >
-                  <Typography className="accordion-header">Point of Contact</Typography>
+                  <Typography className="accordion-header" title={tooltips.account_info}>Account Info</Typography>
                 </AccordionSummary>
                 <Divider className="divider" />
                 <AccordionDetails>

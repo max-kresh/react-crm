@@ -199,7 +199,7 @@ export default function Leads (props: any) {
         null as any,
         Header
       ).then((res) => {
-        // console.log(res, 'leads')
+        // console.log('leads', res)
         if (!res.error) {
           // if (initial) {
           setOpenLeads(res?.open_leads?.open_leads)
