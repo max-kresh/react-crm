@@ -112,6 +112,7 @@ type response = {
 }
 
 const NOTE_ICON_SIZE = 13
+const NOTE_MAX_LENGTH = 255
 const COMMENT_SORT_DIRECTIONS = ['Recent Last', 'Recent First']
 
 function LeadDetails (props: any) {
@@ -143,6 +144,8 @@ function LeadDetails (props: any) {
   const [attachedFiles, setAttachedFiles] = useState<File[]>([])
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
 
+  const [editingNote, setEditingNote] = useState({ id: '', text: '' })
+
   useEffect(() => {
     getLeadDetails(state.leadId)
   }, [state.leadId])
@@ -157,7 +160,6 @@ function LeadDetails (props: any) {
     fetchData(`${LeadUrl}/${id}/`, 'GET', null as any, Header)
       .then((res) => {
         if (!res.error) {
-          console.log('resss ', res)
           setLeadDetails(res?.lead_obj)
           setUsers(res?.users)
           setAttachments(res?.attachments)
@@ -189,38 +191,7 @@ function LeadDetails (props: any) {
         </Snackbar>
       })
   }
-  const sendComment = () => {
-    // const formData = new FormData();
-    // formData.append('inputValue', inputValue);
-    // attachedFiles.forEach((file, index) => {
-    //   formData.append(`file_${index}`, file);
-    // });
-
-    // const data = { comment: note }
-    // const data = { comment:  inputValue }
-    // const data = { comment: inputValue, attachedFiles }
-    const data = { Comment: inputValue || note, lead_attachment: attachments }
-    console.log('sendComment inputValue', inputValue)
-    console.log('sendComment note', note)
-    console.log('sendComment attachments', attachments)
-
-    // fetchData(`${LeadUrl}/comment/${state.leadId}/`, 'PUT', JSON.stringify(data), Header)
-    // fetchData(
-    //   `${LeadUrl}/${state.leadId}/`,
-    //   'POST',
-    //   JSON.stringify(data),
-    //   compileHeader()
-    // )
-    //   .then((res: any) => {
-    //     // console.log('Form data:', res);
-    //     if (!res.error) {
-    //       resetForm()
-    //       getLeadDetails(state?.leadId)
-    //     }
-    //   })
-    //   .catch(() => {})
-  }
-
+  
   const backbtnHandle = () => {
     navigate('/app/leads')
   }
@@ -318,7 +289,7 @@ function LeadDetails (props: any) {
             alert('An error occurred while uploading the file(s)')
           }
         })
-        .catch(() => { console.log('An error occurred while uploading the file(s)') })
+        .catch(() => { alert('An error occurred while uploading the file(s)') })
   }
 
   const handleDeleteAttachment = async (id: any) => {
@@ -330,7 +301,7 @@ function LeadDetails (props: any) {
             alert('An error occurred while deleting the file')
           }
         })
-        .catch(() => { console.log('An error occurred while uploading the file') })
+        .catch(() => { alert('An error occurred while uploading the file') })
   }
 
   const addAttachments = (e: any) => {
@@ -341,7 +312,7 @@ function LeadDetails (props: any) {
   }
 
   const handleNotChange = (e: any) => {
-    setNote(e?.target?.value?.substring(0, 255))
+    setNote(e?.target?.value?.substring(0, NOTE_MAX_LENGTH))
   }
 
   const handleSendNote = () => {
@@ -358,7 +329,7 @@ function LeadDetails (props: any) {
           alert('An error occurred while sending the note')
         }
       })
-      .catch(() => { console.log('An error occurred while sending the note') })
+      .catch(() => { alert('An error occurred while sending the note') })
   }
 
   const handleDeleteNote = (id: any) => {
@@ -370,7 +341,29 @@ function LeadDetails (props: any) {
           alert('An error occurred while deleting the note')
         }
       })
-      .catch(() => { console.log('An error occurred while deleting the note') })
+      .catch(() => { alert('An error occurred while deleting the note') })
+  }
+
+  const handleEditNoteChange = (e: any) => {
+    setEditingNote((prev: any) => ({ ...prev, text: e.target.value?.substring(0, NOTE_MAX_LENGTH) }))
+  }
+
+  const resetEditingNote = () => (setEditingNote({ id: '', text: '' }))
+
+  const handleSubmitUpdatedNote = () => {
+    const data = JSON.stringify({ comment: editingNote.text })
+    fetchData(`${LeadUrl}/comment/${editingNote.id}/`, 'PUT', data, compileHeader())
+    .then((res: any) => {
+      if (!res.error) {
+        setComments((prev: any) => 
+          prev.filter((comment: any) => comment.id !== res.comment?.id).concat(res.comment)
+        )
+        resetEditingNote()        
+      } else {
+        alert('An error occurred while updating the note.')
+      }
+    })
+    .catch(() => { alert('An error occurred while updating the note.') })
   }
 
   const handleClickFile = (
@@ -962,9 +955,9 @@ function LeadDetails (props: any) {
                     // style={{ height: '175px' }}
                     sx={{ mb: '15px', width: '100%', borderRadius: '10px' }}
                   />
-                  <div style={{ fontSize: '0.8rem' }}>{`(${note.length}/255)`}</div>
+                  <div style={{ fontSize: '0.8rem' }}>{`(${note.length}/${NOTE_MAX_LENGTH})`}</div>
                 </div>
-                <div style={{ display: 'flex 9 1', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <FaCheck 
                     fill='green' 
                     size={ NOTE_ICON_SIZE * 2.1} 
@@ -982,7 +975,7 @@ function LeadDetails (props: any) {
                 </div>
               </div>
               
-              <List sx={{ maxWidth: '500px' }}>
+              <List sx={{ width: '90%' }}>
                  {comments?.length
                   ? (comments?.slice().sort((c1: any, c2: any) => 
                     commentSortDirection === COMMENT_SORT_DIRECTIONS[0] 
@@ -990,7 +983,10 @@ function LeadDetails (props: any) {
                     : new Date(c2.commented_on).getTime() - new Date(c1.commented_on).getTime()
                   ) ?? []) 
                   .map((val: any, i: any) => (
-                      <ListItem alignItems="flex-start">
+                      <ListItem 
+                        alignItems="flex-start" 
+                        sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.2)', mb: '15px', ml: '15px' }}
+                      >
                         <ListItemAvatar>
                           <FaRegStickyNote size={30} />
                         </ListItemAvatar>
@@ -999,7 +995,76 @@ function LeadDetails (props: any) {
                             <Stack
                               sx={{ display: 'flex', flexDirection: 'column' }}
                             >
-                              <Typography>{val.comment}</Typography>
+                              <TextField
+                                value={ editingNote.id === val.id ? editingNote.text : val.comment }
+                                multiline
+                                maxRows={20}
+                                onChange={handleEditNoteChange}
+                                InputProps={{ style: { borderRadius: '0px', border: '1px solid white' } }}
+                                disabled={editingNote.id !== val.id}
+                                sx={{ 
+                                  mb: '15px',
+                                  '& fieldset': { 
+                                      borderRadius: '10px', 
+                                      borderWidth: editingNote.id !== val.id ? '0' : '3px',
+                                      color: 'rgb(100, 100, 100)'
+                                    },
+                                    '& .MuiInputBase-input.Mui-disabled': {
+                                      color: 'rgb(90, 90, 90)', 
+                                      WebkitTextFillColor: 'rgb(90, 90, 90)'
+                                    }                                    
+                                  }} 
+                              />
+                              {/* <Typography>{val.comment}</Typography> */}
+                              {editingNote.id === val.id && 
+                              <div style={{ 
+                                display: 'flex', 
+                                flexDirection: 'row', 
+                                justifyContent: 'space-between',
+                                // justifyContent: 'flex-end',
+                                marginBottom: '15px'
+                              }}>
+                                <Stack
+                                  sx={{
+                                    mt: 1,
+                                    mb: 1.5,
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'flex-start',
+                                    gap: '20px' 
+                                  }}
+                                >
+                                  <FaCheck 
+                                    fill='rgb(100, 200, 100)' 
+                                    size={ NOTE_ICON_SIZE * 1.7} 
+                                    title='Send Note' 
+                                    cursor='pointer'
+                                    onClick={ handleSubmitUpdatedNote }
+                                  />
+                                  <FaTimes 
+                                    fill='rgb(200, 100, 100)' 
+                                    size={ NOTE_ICON_SIZE * 1.7} 
+                                    title='Clear Note' 
+                                    cursor='pointer'
+                                    onClick={resetEditingNote}
+                                  />
+                                </Stack>
+                                <Stack
+                                  sx={{
+                                    mt: 1,
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'flex-start'
+                                  }}
+                                >
+                                  <div style={{ fontSize: '0.8rem' }}>
+                                    {`(${note.length}/${NOTE_MAX_LENGTH})`}
+                                  </div>
+                                </Stack>
+                                
+                              </div>}
                             </Stack>
                           }
                           secondary={
@@ -1038,7 +1103,9 @@ function LeadDetails (props: any) {
                                   <FaEdit 
                                     title='Edit' 
                                     size={ NOTE_ICON_SIZE } 
-                                    style={{ cursor: 'pointer' }}/>        
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={ () => setEditingNote({ id: val.id, text: val.comment })}  
+                                  />  
                                 </Typography>
                                 <Typography style={{ fontSize: '0.7rem' }}>
                                   <FaTrashAlt 
