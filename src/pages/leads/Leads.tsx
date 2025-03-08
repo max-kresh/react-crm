@@ -625,7 +625,7 @@ export default function Leads (props: any) {
                         >
                           {item?.title}
                         </div>
-                        <div onClick={() => deleteLead(item)}>
+                        <div onClick={() => deleteLead(item?.id)}>
                           <FaTrashAlt
                             style={{ cursor: 'pointer', color: 'gray' }}
                           />
