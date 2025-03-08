@@ -446,7 +446,7 @@ export function LeadForm ({ state, method }: StateProps) {
                           className="fieldTitle"
                           title={tooltips.lead_name}
                         >Lead Name</div>
-                        <TextField
+                        <RequiredTextField
                           name="title"
                           value={formData.title}
                           onChange={handleChange}
@@ -1117,7 +1117,16 @@ export function LeadForm ({ state, method }: StateProps) {
                       style={{ marginLeft: '5%', marginTop: '19px' }}
                     >
                       <div className="fieldTitle">Email Address</div>
-                      <TextField
+                      {formData.status?.localeCompare('converted') === 0 ? <RequiredTextField
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        style={{ width: '70%' }}
+                        size="small"
+                        helperText={errors?.email?.[0] ? errors?.email[0] : ''}
+                        error={!!errors?.email?.[0]}
+                      /> : <TextField
                         name="email"
                         type="email"
                         value={formData.email}
@@ -1127,6 +1136,7 @@ export function LeadForm ({ state, method }: StateProps) {
                         helperText={errors?.email?.[0] ? errors?.email[0] : ''}
                         error={!!errors?.email?.[0]}
                       />
+                      }
                     </div>
                   </Box>
                 </AccordionDetails>
