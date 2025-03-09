@@ -340,6 +340,8 @@ function LeadDetails (props: any) {
       .then((res: any) => {
         if (!res?.error) {
           setComments((prev: any) => prev.filter((c: any) => c.id !== id))
+          // User might have deleted the note in edit mode. Thus reset it.
+          resetEditingNote()
         } else {
           alert('An error occurred while deleting the note')
         }
@@ -960,7 +962,7 @@ function LeadDetails (props: any) {
                   />
                   <div style={{ fontSize: '0.8rem' }}>{`(${note.length}/${NOTE_MAX_LENGTH})`}</div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: note === '' ? 'none' : 'flex', flexDirection: 'column', gap: '15px' }}>
                   <FaCheck 
                     fill='green' 
                     size={ NOTE_ICON_SIZE * 2.1} 
