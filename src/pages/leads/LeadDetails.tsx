@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
   Link,
   Button,
@@ -52,6 +52,7 @@ import {
 import FormateTime from '../../components/FormateTime'
 import '../../styles/style.css'
 import { COUNTRIES } from '../../utils/Constants'
+import { UserContext } from '../../context/UserContext'
 
 export const formatDate = (dateString: any) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -145,6 +146,8 @@ function LeadDetails (props: any) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
 
   const [editingNote, setEditingNote] = useState({ id: '', text: '' })
+
+  const userCtx = useContext(UserContext)
 
   useEffect(() => {
     getLeadDetails(state.leadId)
@@ -1103,7 +1106,11 @@ function LeadDetails (props: any) {
                                   <FaEdit 
                                     title='Edit' 
                                     size={ NOTE_ICON_SIZE } 
-                                    style={{ cursor: 'pointer' }}
+                                    style={{ 
+                                      cursor: userCtx.user.email === val.commented_by_email ? 'pointer' : '',
+                                      pointerEvents: userCtx.user.email !== val.commented_by_email ? 'none' : 'auto',
+                                      opacity: userCtx.user.email !== val.commented_by_email ? '0.4' : '1'
+                                    }}
                                     onClick={ () => setEditingNote({ id: val.id, text: val.comment })}  
                                   />  
                                 </Typography>
