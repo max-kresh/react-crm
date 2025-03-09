@@ -24,7 +24,6 @@ import { Label } from '../../components/Label'
 import { fetchData } from '../../components/FetchData'
 import { Spinner } from '../../components/Spinner'
 import FormateTime from '../../components/FormateTime'
-import { getComparator, stableSort } from '../../components/Sorting'
 import { FaTrashAlt } from 'react-icons/fa'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
@@ -39,15 +38,6 @@ import {
 } from '../../styles/CssStyled'
 import '../../styles/style.css'
 
-// import css from './css';
-// import emotionStyled from '@emotion/styled';
-// import { styled } from '@mui/system';
-// import { css } from '@emotion/react';
-
-// margin-bottom: -15px;
-//   display: flex;
-//   justify-content: space-between;
-//   background-color: #1A3353;
 export const CustomTablePagination = styled(TablePagination)`
   .MuiToolbar-root {
     min-width: 100px;
@@ -118,15 +108,8 @@ export const ToolbarNew = styled(Toolbar)({
     }
   }
 })
-// export const formatDate = (dateString: any) => {
-//   const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' }
-//   return new Date(dateString).toLocaleDateString(undefined, options)
-// }
-// interface LeadList {
-//   drawer: number;
-// }
+
 export default function Leads (props: any) {
-  // const {drawer}=props
   const navigate = useNavigate()
   const [tab, setTab] = useState('open')
   const [loading, setLoading] = useState(true)
@@ -152,9 +135,6 @@ export default function Leads (props: any) {
   const [industries, setIndustries] = useState([])
 
   const [selectOpen, setSelectOpen] = useState(false)
-  const [currentPage, setCurrentPage] = useState<number>(1)
-  const [recordsPerPage, setRecordsPerPage] = useState<number>(10)
-  const [totalPages, setTotalPages] = useState<number>(0)
 
   const [openCurrentPage, setOpenCurrentPage] = useState<number>(1)
   const [openRecordsPerPage, setOpenRecordsPerPage] = useState<number>(10)
@@ -199,9 +179,7 @@ export default function Leads (props: any) {
         null as any,
         Header
       ).then((res) => {
-        // console.log('leads', res)
         if (!res.error) {
-          // if (initial) {
           setOpenLeads(res?.open_leads?.open_leads)
           setOpenLeadsCount(res?.open_leads?.leads_count)
           setOpenTotalPages(
@@ -276,7 +254,6 @@ export default function Leads (props: any) {
           tags: tags || [],
           users: users || [],
           industries: industries || []
-          // status: leads.status, source: leads.source, industry: leads.industries, users: leads.users, tags: leads.tags, contacts: leads.contacts
         }
       })
     }
@@ -296,7 +273,6 @@ export default function Leads (props: any) {
         industries: industries || []
       }
     })
-    // navigate('/app/leads/lead-details', { state: { leadId: leadItem.id, edit: storeData, value } })
   }
   const deleteLead = (deleteId: any) => {
     setDeleteLeadModal(true)
@@ -319,7 +295,6 @@ export default function Leads (props: any) {
     }
     fetchData(`${LeadUrl}/${selectedId}/`, 'DELETE', null as any, Header)
       .then((res: any) => {
-        // console.log('delete:', res);
         if (!res.error) {
           deleteLeadModalClose()
           getLeads()
@@ -362,11 +337,12 @@ export default function Leads (props: any) {
     [50, '50 Records per page']
   ]
 
+  const leadList = tab === 'open' ? openLeads : closedLeads
+
   return (
     <Box
       sx={{
         mt: '60px'
-        // width: '1370px'
       }}
     >
       <CustomToolbar>
@@ -481,227 +457,100 @@ export default function Leads (props: any) {
         </Stack>
       </CustomToolbar>
 
-      {tab === 'open' ? (
-        <Box sx={{ p: '10px', mt: '5px' }}>
-          {
-            // leads.open && leads.open
-            //   ? stableSort(leads.open && leads.open, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item, index) => (
-            // stableSort(openLeads, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item: any, index: any) => (
-            openLeads?.length ? (
-              openLeads.map((item: any, index: any) => (
-                <Box key={index}>
-                  <Box className="lead-box">
-                    <Box className="lead-box1">
-                      <Stack className="lead-row1">
+      <Box sx={{ p: '10px', mt: '5px' }}>
+        {
+          leadList?.length ? (
+            leadList.map((item: any, index: any) => (
+              <Box key={index}>
+                <Box className="lead-box">
+                  <Box className="lead-box1">
+                    <Stack className="lead-row1">
+                      <div
+                        style={{
+                          color: '#1A3353',
+                          fontSize: '1rem',
+                          fontWeight: '500',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => selectLeadList(item?.id)}
+                      >
+                        {item?.title}
+                      </div>
+                      <div onClick={() => deleteLead(item?.id)}>
+                        <FaTrashAlt
+                          style={{ cursor: 'pointer', color: 'gray' }}
+                        />
+                      </div>
+                    </Stack>
+                    <Stack className="lead-row2">
+                      <div className="lead-row2-col1">
                         <div
                           style={{
-                            color: '#1A3353',
-                            fontSize: '1rem',
-                            fontWeight: '500',
-                            cursor: 'pointer'
+                            color: 'gray',
+                            fontSize: '16px',
+                            textTransform: 'capitalize'
                           }}
-                          onClick={() => selectLeadList(item?.id)}
                         >
-                          {item?.title}
+                          {item?.country || ''} - source{' '}
+                          <span style={{ color: '#1a3353', fontWeight: 500 }}>
+                            {item?.source || '--'}
+                          </span>{' '}
+                          - status{' '}
+                          <span style={{ color: '#1a3353', fontWeight: 500 }}>
+                            {item?.status || '--'}
+                          </span>
                         </div>
-                        <div onClick={() => deleteLead(item?.id)}>
-                          <FaTrashAlt
-                            style={{ cursor: 'pointer', color: 'gray' }}
-                          />
-                        </div>
-                      </Stack>
-                      <Stack className="lead-row2">
-                        <div className="lead-row2-col1">
-                          <div
-                            style={{
-                              color: 'gray',
-                              fontSize: '16px',
-                              textTransform: 'capitalize'
-                            }}
-                          >
-                            {item?.country || ''} - source{' '}
-                            <span style={{ color: '#1a3353', fontWeight: 500 }}>
-                              {item?.source || '--'}
-                            </span>{' '}
-                            - status{' '}
-                            <span style={{ color: '#1a3353', fontWeight: 500 }}>
-                              {item?.status || '--'}
-                            </span>
+                        <Box
+                          sx={{
+                            ml: 1
+                          }}
+                        >
+                          {item.tags.map((tagData: any, index: any) => (
+                            <Label tags={tagData.name} key={index} />
+                          ))}
+                          {item.tags.length > 4 ? (
+                            <Link sx={{ ml: 1 }}>
+                              +{item.tags.length - 4}
+                            </Link>
+                          ) : (
+                            ''
+                          )}
+                        </Box>
+                        <Box sx={{ ml: 1 }}>
+                          <div style={{ display: 'flex' }}>
+                            <AvatarGroup
+                              max={3}
+                            >
+                              {item?.team &&
+                                item?.team?.map((team: any, index: any) => (
+                                  <Avatar alt={team} src={team}>
+                                    {team}
+                                  </Avatar>
+                                ))}
+                            </AvatarGroup>
                           </div>
-                          <Box
-                            sx={{
-                              ml: 1
-                              //  flexWrap: 'wrap', width: '50%'
-                            }}
-                          >
-                            {item.tags.map((tagData: any, index: any) => (
-                              // tag.slice(0, 3).map((tagData: any, index: any) => (
-                              <Label tags={tagData.name} key={index} />
-                            ))}
-                            {item.tags.length > 4 ? (
-                              <Link sx={{ ml: 1 }}>
-                                +{item.tags.length - 4}
-                              </Link>
-                            ) : (
-                              ''
-                            )}
-                          </Box>
-                          <Box sx={{ ml: 1 }}>
-                            <div style={{ display: 'flex' }}>
-                              <AvatarGroup
-                                // total={2}
-                                max={3}
-                              >
-                                {/* <Tooltip title={con.user.username}> */}
-                                {/* {tag.map((tagData: any, index: any) => ( */}
-                                {item?.team &&
-                                  item?.team?.map((team: any, index: any) => (
-                                    <Avatar alt={team} src={team}>
-                                      {team}
-                                    </Avatar>
-                                  ))}
-                                {/* </Tooltip> */}
-                                {/* )} */}
-                              </AvatarGroup>
-                            </div>
-                          </Box>
-                          {/* {
-                          item.assigned_to.map((assignItem: any, index: any) => (
-                            assignItem.user_details.profile_pic
-                              ? <Avatar alt='Remy Sharp'
-                                src={assignItem.user_details.profile_pic}
-                              />
-                              : <Avatar alt='Remy Sharp'
-                                size='small'
-                              // sx={{ backgroundColor: 'deepOrange', color: 'white', textTransform: 'capitalize', mt: '-20px', ml: '10px' }}
-                              >
-                                {assignItem.user_details.first_name.charAt(0)}
-                              </Avatar>
-                          ))
-                        } */}
-                        </div>
-                        <div className="lead-row2-col2">
-                          {/* created on {formatDate(item.created_on)} by   &nbsp;<span> */}
-                          created&nbsp; {FormateTime(item?.created_at)}&nbsp; by
-                          <Avatar
-                            alt={item?.first_name}
-                            src={item?.created_by?.profile_pic}
-                            sx={{ ml: 1 }}
-                            // style={{
-                            //   height: '20px',
-                            //   width: '20px'
-                            // }}
-                          />{' '}
-                          &nbsp;&nbsp;{item?.created_by?.email}
-                        </div>
-                      </Stack>
-                    </Box>
+                        </Box>
+                      </div>
+                      <div className="lead-row2-col2">
+                        created&nbsp; {FormateTime(item?.created_at)}&nbsp; by
+                        <Avatar
+                          alt={item?.first_name}
+                          src={item?.created_by?.profile_pic}
+                          sx={{ ml: 1 }}
+                        />{' '}
+                        &nbsp;&nbsp;{item?.created_by?.email}
+                      </div>
+                    </Stack>
                   </Box>
                 </Box>
-              ))
-            ) : loading && (
-              <Spinner />
-            )
-          }
-        </Box>
-      ) : (
-        <Box sx={{ p: '10px', mt: '5px' }}>
-          {
-            // stableSort(closedLeads?.length || [], getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item: any, index: any) => (
-            closedLeads?.length ? (
-              closedLeads.map((item: any, index: any) => (
-                <Box key={index}>
-                  <Box className="lead-box">
-                    <Box className="lead-box1">
-                      <Stack className="lead-row1">
-                        <div
-                          style={{
-                            color: '#1A3353',
-                            fontSize: '1rem',
-                            fontWeight: '500',
-                            cursor: 'pointer'
-                          }}
-                          onClick={() => selectLeadList(item?.id)}
-                        >
-                          {item?.title}
-                        </div>
-                        <div onClick={() => deleteLead(item?.id)}>
-                          <FaTrashAlt
-                            style={{ cursor: 'pointer', color: 'gray' }}
-                          />
-                        </div>
-                      </Stack>
-                      <Stack className="lead-row2">
-                        <div className="lead-row2-col1">
-                          <div
-                            style={{
-                              color: 'gray',
-                              fontSize: '16px',
-                              textTransform: 'capitalize'
-                            }}
-                          >
-                            {item?.country || ''} - source{' '}
-                            <span style={{ color: '#1a3353', fontWeight: 500 }}>
-                              {item?.source || '--'}
-                            </span>{' '}
-                            - status{' '}
-                            <span style={{ color: '#1a3353', fontWeight: 500 }}>
-                              {item?.status || '--'}
-                            </span>
-                          </div>
-                          <Box sx={{ ml: 1 }}>
-                            {item.tags.map((tagData: any, index: any) => (
-                              // tag.slice(0, 3).map((tagData: any, index: any) => (
-                              <Label tags={tagData.name} key={index} />
-                            ))}
-                            {item.tags.length > 4 ? (
-                              <Link sx={{ ml: 1 }}>
-                                +{item.tags.length - 4}
-                              </Link>
-                            ) : (
-                              ''
-                            )}
-                          </Box>
-                          <Box sx={{ ml: 1 }}>
-                            <div style={{ display: 'flex' }}>
-                              <AvatarGroup
-                                // total={2}
-                                max={3}
-                              >
-                                {/* {con.map((con) => */}
-                                {/* <Tooltip title={con.user.username}> */}
-                                {item?.team &&
-                                  item?.team?.map((team: any, index: any) => (
-                                    <Avatar alt={team} src={team}>
-                                      {team}
-                                    </Avatar>
-                                  ))}
-                                {/* </Tooltip> */}
-                                {/* )} */}
-                              </AvatarGroup>
-                            </div>
-                          </Box>
-                        </div>
-                        <div className="lead-row2-col2">
-                          created&nbsp; {FormateTime(item?.created_at)}&nbsp; by
-                          <Avatar
-                            alt={item?.first_name}
-                            src={item?.created_by?.profile_pic}
-                            sx={{ ml: 1 }}
-                          />{' '}
-                          &nbsp;&nbsp;{item?.first_name}&nbsp;{item?.last_name}
-                        </div>
-                      </Stack>
-                    </Box>
-                  </Box>
-                </Box>
-              ))
-            ) : loading && (
-              <Spinner />
-            )
-          }
-        </Box>
-      )}
+              </Box>
+            ))
+          ) : loading && (
+            <Spinner />
+          )
+        }
+      </Box>
+      
       <DeleteModal
         onClose={deleteLeadModalClose}
         open={deleteLeadModal}
