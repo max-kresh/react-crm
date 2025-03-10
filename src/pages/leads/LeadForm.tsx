@@ -39,7 +39,7 @@ import {
 } from '../../styles/CssStyled'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
-import { COUNTRIES } from '../../utils/Constants'
+import { COUNTRIES, HTTP_METHODS } from '../../utils/Constants'
 
 const tooltips = {
   amount: 'Potential Revenue Opportunity',
@@ -59,7 +59,9 @@ const tooltips = {
   industry: 'Select the industry this lead belongs to. This helps categorize leads for better tracking, segmentation, and sales strategy.',
   tags: 'Add keywords or labels to categorize and quickly find this lead. Use tags like \'VIP\', ' + 
         '\'Hot Lead\', or \'Follow-up\' for better tracking.',
-  attachment: 'Attach a file for this lead.',
+  attachment_enabled: 'Attach a file for this lead.',
+  attachment_disabled: 'This field is not available in \'Edit\' mode. You can add new attachment(s) in the ' + 
+          '\'Lead Details\' page.',
   probability: 'Enter the likelihood (in percentage) of converting this lead into a customer. This helps in forecasting and ' + 
               'prioritizing sales efforts.',
   displayName: 'When this Lead is converted a new Account will be created by using the information provided in this section. ' + 
@@ -70,7 +72,7 @@ const tooltips = {
   
 }
 
-const NEW_CONTACT_INFO = 'New Contact Info'
+const CREATE_NEW_ACCOUNT_NAME_OPTION = { id: '__#__new_contact_info__#__', value: 'New Contact Info' }
 const ADD_NEW_TAG_ID_PLACEHOLDER = 'ADD_NEW_TAG_PLACEHOLDER'
 
 type FormErrors = {
@@ -158,7 +160,7 @@ export function LeadForm ({ state, method }: StateProps) {
   const [errors, setErrors] = useState<FormErrors>({})
 
   // this variable controls the selected option for "Use From" select component.
-  let selectedContact = null
+  let selectedContact:any = null
   try {
     selectedContact = state?.value?.contacts.filter((contact: any) => 
       contact.first_name === state?.value?.first_name && contact.last_name === state?.value?.last_name &&
@@ -166,7 +168,8 @@ export function LeadForm ({ state, method }: StateProps) {
   } catch (error) {
     
   }
-  const [formData, setFormData] = useState<FormData>({
+
+  const compileInitialFormData = () => ({
     title: state?.value?.title || '',
     first_name: state?.value?.first_name || '',
     last_name: state?.value?.last_name || '',
@@ -193,9 +196,11 @@ export function LeadForm ({ state, method }: StateProps) {
     probability: state?.value?.probability || 50,
     industry: state?.value?.industry || 'ADVERTISING',
     skype_ID: state?.value?.skype_ID || '',
-    contactsSelect: selectedContact ?? NEW_CONTACT_INFO,
-    organization: state?.value?.organization
+    contactsSelect: selectedContact ?? CREATE_NEW_ACCOUNT_NAME_OPTION,
+    organization: state?.value?.organization || ''
   })
+  
+  const [formData, setFormData] = useState<FormData>(compileInitialFormData())
 
   useEffect(() => {
     if (quill) {
@@ -319,7 +324,7 @@ export function LeadForm ({ state, method }: StateProps) {
     form.append('form_data', JSON.stringify(data))
     form.append('lead_attachment', formData.lead_attachment)
 
-    const apiUrl = method === 'PUT' ? `${LeadUrl}/${state?.id}/` : `${LeadUrl}/`
+    const apiUrl = method === HTTP_METHODS.PUT ? `${LeadUrl}/${state?.id}/` : `${LeadUrl}/`
 
     fetchData(apiUrl, method, form, compileHeaderMultipart())
       .then((res: any) => {
@@ -364,7 +369,7 @@ export function LeadForm ({ state, method }: StateProps) {
       probability: 1,
       industry: 'ADVERTISING',
       skype_ID: '',
-      contactsSelect: NEW_CONTACT_INFO,
+      contactsSelect: CREATE_NEW_ACCOUNT_NAME_OPTION.value,
       organization: ''
     })
     setErrors({})
@@ -373,11 +378,23 @@ export function LeadForm ({ state, method }: StateProps) {
     setSelectedTags([])
   }
   const onCancel = () => {
-    resetForm()
+    setFormData(compileInitialFormData())
+    setError(false)
+    setSelectedContacts(state?.value?.contacts || [])
+    setSelectedAssignTo(state?.value?.assigned_to || [])
+    setSelectedTags(state?.value?.tags || [])
+    setSelectedCountry([])
+    setSourceSelectOpen(false)
+    setStatusSelectOpen(false)
+    setCountrySelectOpen(false)
+    setIndustrySelectOpen(false)
+    setContactsSelectOpen(false)
+    setErrors({})    
+    quill.clipboard.dangerouslyPasteHTML(state?.value?.description || '')
   }
 
   const backbtnHandle = () => {
-    if (method === 'PUT') {
+    if (method === HTTP_METHODS.PUT) {
       navigate('/app/leads/lead-details', {
         state: { leadId: state?.id, detail: true }
       })
@@ -387,7 +404,7 @@ export function LeadForm ({ state, method }: StateProps) {
   }
 
   const module = 'Leads'
-  const crntPage = method === 'POST' ? 'Add Leads' : 'Edit Lead'
+  const crntPage = method === HTTP_METHODS.POST ? 'Add Leads' : 'Edit Lead'
   const backBtn = 'Back To Leads'
 
   function handleContactSelect (e: any) {
@@ -529,7 +546,7 @@ export function LeadForm ({ state, method }: StateProps) {
                             options={state?.users?.filter((user: any) => 
                               !selectedAssignTo.find((s_user: any) => s_user.id === user.id)) || []}
                             getOptionLabel={(option: any) =>
-                              method === 'POST' ? (state?.users ? option?.user__email : '')  
+                              method === HTTP_METHODS.POST ? (state?.users ? option?.user__email : '')  
                                 : (state?.users ? option?.user_details?.email : '')
                             }
                             onChange={(e: any, value: any) =>
@@ -549,7 +566,7 @@ export function LeadForm ({ state, method }: StateProps) {
                                   }}
                                   variant="outlined"
                                   label={
-                                    method === 'POST' ? (state?.users ? option?.user__email : option)  
+                                    method === HTTP_METHODS.POST ? (state?.users ? option?.user__email : option)  
                                       : (state?.users ? option?.user_details?.email : option)
                                   }
                                   {...getTagProps({ index })}
@@ -807,18 +824,28 @@ export function LeadForm ({ state, method }: StateProps) {
                           </FormHelperText>
                         </FormControl>
                       </div>
-                      <div className="fieldSubContainer">
-                        <div className="fieldTitle" title={tooltips.attachment}>Lead Attachment</div>
+                      <div 
+                        className="fieldSubContainer" 
+                        style={{ color: method === HTTP_METHODS.PUT ? 'rgb(200, 200, 200)' : 'inherit' }}
+                      >
+                        <div 
+                          className="fieldTitle" 
+                          title={ method === HTTP_METHODS.PUT ? tooltips.attachment_disabled : tooltips.attachment_enabled }
+                        >
+                          Lead Attachment
+                        </div>
                         <TextField
                           name="lead_attachment"
-                          title={tooltips.attachment}
-                          value={formData.lead_attachment?.name}
+                          title={ method === HTTP_METHODS.PUT ? tooltips.attachment_disabled : tooltips.attachment_enabled }
+                          value={formData.lead_attachment?.name || ''}      
+                          disabled={ method === HTTP_METHODS.PUT }          
                           InputProps={{
                             endAdornment: (
                               <InputAdornment position="end">
                                 <IconButton
                                   disableFocusRipple
                                   disableTouchRipple
+                                  disabled={ method === HTTP_METHODS.PUT }
                                   sx={{
                                     width: '40px',
                                     height: '40px',
@@ -1033,7 +1060,7 @@ export function LeadForm ({ state, method }: StateProps) {
                               }
                             }}                  
                           >
-                            <MenuItem key={NEW_CONTACT_INFO} value={NEW_CONTACT_INFO}>
+                            <MenuItem key={CREATE_NEW_ACCOUNT_NAME_OPTION.id} value={CREATE_NEW_ACCOUNT_NAME_OPTION.value}>
                               New Contact Info
                             </MenuItem>
                             {formData.contacts.map((option: any) => (

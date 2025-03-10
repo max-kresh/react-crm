@@ -7,6 +7,13 @@ export const Constants = {
     ALLOW_LOGIN_WITHOUT_INVITATION: 'allow_login_without_invitation'
 }
 
+export const HTTP_METHODS = {
+    POST: 'POST',
+    PUT: 'PUT',
+    DELETE: 'DELETE',
+    PATCH: 'PATCH'
+}
+
 export const COUNTRIES = [
     ['GB', 'United Kingdom'],
     ['AF', 'Afghanistan'],
