@@ -51,7 +51,7 @@ import {
 } from '../../styles/CssStyled'
 import FormateTime from '../../components/FormateTime'
 import '../../styles/style.css'
-import { COUNTRIES } from '../../utils/Constants'
+import { COUNTRIES, HTTP_METHODS } from '../../utils/Constants'
 import { UserContext } from '../../context/UserContext'
 
 export const formatDate = (dateString: any) => {
@@ -284,7 +284,7 @@ function LeadDetails (props: any) {
     for (const attachment of attachments) {
       form.append('lead_attachment', attachment)
     }
-    fetchData(`${LeadUrl}/attachment/${id}/`, 'POST', form, compileHeaderMultipart())
+    fetchData(`${LeadUrl}/attachment/${id}/`, HTTP_METHODS.POST, form, compileHeaderMultipart())
         .then((res: any) => {
           if (!res.error) {
             setAttachments((prev: any) => [...prev, ...res.attachments])
@@ -296,7 +296,7 @@ function LeadDetails (props: any) {
   }
 
   const handleDeleteAttachment = async (id: any) => {
-    fetchData(`${LeadUrl}/attachment/${id}/`, 'DELETE', '', compileHeaderMultipart())
+    fetchData(`${LeadUrl}/attachment/${id}/`, HTTP_METHODS.DELETE, '', compileHeaderMultipart())
         .then((res: any) => {
           if (!res.error) {
             setAttachments((prev: any) => prev.filter((attachment: any) => attachment.id !== id))
@@ -323,7 +323,7 @@ function LeadDetails (props: any) {
     const data = {
       comment: note
     }
-    fetchData(`${LeadUrl}/comment/${leadDetails?.id}/`, 'POST', JSON.stringify(data), compileHeader())
+    fetchData(`${LeadUrl}/comment/${leadDetails?.id}/`, HTTP_METHODS.POST, JSON.stringify(data), compileHeader())
       .then((res: any) => {
         if (!res?.error) {
           setComments((prev: any) => [...prev, res.comment])
@@ -336,7 +336,7 @@ function LeadDetails (props: any) {
   }
 
   const handleDeleteNote = (id: any) => {
-    fetchData(`${LeadUrl}/comment/${id}/`, 'DELETE', null, compileHeader())
+    fetchData(`${LeadUrl}/comment/${id}/`, HTTP_METHODS.DELETE, null, compileHeader())
       .then((res: any) => {
         if (!res?.error) {
           setComments((prev: any) => prev.filter((c: any) => c.id !== id))
@@ -357,7 +357,7 @@ function LeadDetails (props: any) {
 
   const handleSubmitUpdatedNote = () => {
     const data = JSON.stringify({ comment: editingNote.text })
-    fetchData(`${LeadUrl}/comment/${editingNote.id}/`, 'PUT', data, compileHeader())
+    fetchData(`${LeadUrl}/comment/${editingNote.id}/`, HTTP_METHODS.PUT, data, compileHeader())
     .then((res: any) => {
       if (!res.error) {
         setComments((prev: any) => 

@@ -37,6 +37,7 @@ import {
   FabRight
 } from '../../styles/CssStyled'
 import '../../styles/style.css'
+import { HTTP_METHODS } from '../../utils/Constants'
 
 export const CustomTablePagination = styled(TablePagination)`
   .MuiToolbar-root {
@@ -293,7 +294,7 @@ export default function Leads (props: any) {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org')
     }
-    fetchData(`${LeadUrl}/${selectedId}/`, 'DELETE', null as any, Header)
+    fetchData(`${LeadUrl}/${selectedId}/`, HTTP_METHODS.DELETE, null as any, Header)
       .then((res: any) => {
         if (!res.error) {
           deleteLeadModalClose()
