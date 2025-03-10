@@ -1,10 +1,8 @@
-import React, { ChangeEvent, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
-  Card,
   Link,
   Button,
   Avatar,
-  Divider,
   TextField,
   Box,
   MenuItem,
@@ -22,30 +20,39 @@ import {
   ListItemIcon
 } from '@mui/material'
 import {
+  FaCheck,
+  FaClock,
+  FaCross,
+  FaDoorClosed,
+  FaEdit,
   FaEllipsisV,
+  FaEvernote,
+  FaItunesNote,
   FaPaperclip,
   FaPlus,
-  FaRegAddressCard,
+  FaRegStickyNote,
   FaStar,
-  FaTimes
+  FaStop,
+  FaTimes,
+  FaTrashAlt,
+  FaUserAlt
 } from 'react-icons/fa'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { LeadUrl } from '../../services/ApiUrls'
-import { fetchData } from '../../components/FetchData'
+import { LeadUrl, SERVER_HOST } from '../../services/ApiUrls'
+import { compileHeader, compileHeaderMultipart, fetchData } from '../../components/FetchData'
 import { Label } from '../../components/Label'
 import {
   AntSwitch,
   CustomInputBoxWrapper,
-  CustomSelectField,
   CustomSelectField1,
   StyledListItemButton,
   StyledListItemText
 } from '../../styles/CssStyled'
 import FormateTime from '../../components/FormateTime'
-import { formatFileSize } from '../../components/FormatSize'
 import '../../styles/style.css'
-import { COUNTRIES } from '../../utils/Constants'
+import { COUNTRIES, HTTP_METHODS } from '../../utils/Constants'
+import { UserContext } from '../../context/UserContext'
 
 export const formatDate = (dateString: any) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -82,8 +89,8 @@ type response = {
   website: string
   description: string | ''
   teams: string
-  assigned_to: string
-  contacts: string
+  assigned_to: any
+  contacts: any
   status: string
   source: string
   address_line: string
@@ -104,6 +111,11 @@ type response = {
   created_from_site: boolean
   id: string
 }
+
+const NOTE_ICON_SIZE = 13
+const NOTE_MAX_LENGTH = 255
+const COMMENT_SORT_DIRECTIONS = ['Recent Last', 'Recent First']
+
 function LeadDetails (props: any) {
   const { state } = useLocation()
   const navigate = useNavigate()
@@ -116,22 +128,26 @@ function LeadDetails (props: any) {
       }
     }>
   >([])
-  const [attachments, setAttachments] = useState<string[]>([])
-  const [attachmentList, setAttachmentList] = useState<File[]>([])
+  const [attachments, setAttachments] = useState<object[]>([])
   const [tags, setTags] = useState([])
   const [source, setSource] = useState([])
   const [status, setStatus] = useState([])
   const [industries, setIndustries] = useState([])
+  const [companies, setCompanies] = useState([])
   const [contacts, setContacts] = useState([])
   const [users, setUsers] = useState([])
   const [teams, setTeams] = useState([])
-  const [comments, setComments] = useState([])
-  const [commentList, setCommentList] = useState('Recent Last')
+  const [comments, setComments] = useState<object[]>([])
+  const [commentSortDirection, setCommentSortDirection] = useState(COMMENT_SORT_DIRECTIONS[0])
   const [note, setNote] = useState('')
   const [selectedFile, setSelectedFile] = useState()
   const [inputValue, setInputValue] = useState<string>('')
   const [attachedFiles, setAttachedFiles] = useState<File[]>([])
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
+
+  const [editingNote, setEditingNote] = useState({ id: '', text: '' })
+
+  const userCtx = useContext(UserContext)
 
   useEffect(() => {
     getLeadDetails(state.leadId)
@@ -152,6 +168,7 @@ function LeadDetails (props: any) {
           setAttachments(res?.attachments)
           setTags(res?.tags)
           setIndustries(res?.industries)
+          setCompanies(res?.companies)
           setStatus(res?.status)
           setSource(res?.source)
           setUsers(res?.users)
@@ -177,53 +194,19 @@ function LeadDetails (props: any) {
         </Snackbar>
       })
   }
-  const sendComment = () => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
-    // const formData = new FormData();
-    // formData.append('inputValue', inputValue);
-    // attachedFiles.forEach((file, index) => {
-    //   formData.append(`file_${index}`, file);
-    // });
-
-    // const data = { comment: note }
-    // const data = { comment:  inputValue }
-    // const data = { comment: inputValue, attachedFiles }
-    const data = { Comment: inputValue || note, lead_attachment: attachments }
-    // fetchData(`${LeadUrl}/comment/${state.leadId}/`, 'PUT', JSON.stringify(data), Header)
-    fetchData(
-      `${LeadUrl}/${state.leadId}/`,
-      'POST',
-      JSON.stringify(data),
-      Header
-    )
-      .then((res: any) => {
-        // console.log('Form data:', res);
-        if (!res.error) {
-          resetForm()
-          getLeadDetails(state?.leadId)
-        }
-      })
-      .catch(() => {})
-  }
-
+  
   const backbtnHandle = () => {
     navigate('/app/leads')
   }
   const resetForm = () => {
     setNote('')
     setInputValue('')
-    setAttachmentList([])
+    setAttachments([])
     setAttachedFiles([])
     setAttachments([])
   }
 
   const editHandle = () => {
-    // navigate('/contacts/edit-contacts', { state: { value: contactDetails, address: newAddress } })
     let country: string[] | undefined
     for (country of COUNTRIES) {
       if (
@@ -276,7 +259,8 @@ function LeadDetails (props: any) {
         users,
         contacts,
         teams,
-        comments
+        comments,
+        companies
       }
     })
   }
@@ -294,23 +278,102 @@ function LeadDetails (props: any) {
       setAttachedFiles((prevFiles: any) => [...prevFiles, ...Array.from(files)])
     }
   }
+
+  const handleSendAttachment = async (attachments: any, id: any) => {
+    const form = new FormData()
+    for (const attachment of attachments) {
+      form.append('lead_attachment', attachment)
+    }
+    fetchData(`${LeadUrl}/attachment/${id}/`, HTTP_METHODS.POST, form, compileHeaderMultipart())
+        .then((res: any) => {
+          if (!res.error) {
+            setAttachments((prev: any) => [...prev, ...res.attachments])
+          } else {
+            alert('An error occurred while uploading the file(s)')
+          }
+        })
+        .catch(() => { alert('An error occurred while uploading the file(s)') })
+  }
+
+  const handleDeleteAttachment = async (id: any) => {
+    fetchData(`${LeadUrl}/attachment/${id}/`, HTTP_METHODS.DELETE, '', compileHeaderMultipart())
+        .then((res: any) => {
+          if (!res.error) {
+            setAttachments((prev: any) => prev.filter((attachment: any) => attachment.id !== id))
+          } else {
+            alert('An error occurred while deleting the file')
+          }
+        })
+        .catch(() => { alert('An error occurred while uploading the file') })
+  }
+
   const addAttachments = (e: any) => {
-    // console.log(e.target.files?.[0], 'e');
     const files = e.target.files
-    if (files) {
-      const reader = new FileReader()
-      reader.onload = () => {
-        setAttachments((attachments: string[]) => [
-          ...(attachments || []),
-          reader.result as string
-        ])
+    if (files && files.length > 0) {
+      handleSendAttachment(files, leadDetails?.id)
+    }
+  }
+
+  const handleNotChange = (e: any) => {
+    setNote(e?.target?.value?.substring(0, NOTE_MAX_LENGTH))
+  }
+
+  const handleSendNote = () => {
+    if (note.trim().length === 0) return
+    const data = {
+      comment: note
+    }
+    fetchData(`${LeadUrl}/comment/${leadDetails?.id}/`, HTTP_METHODS.POST, JSON.stringify(data), compileHeader())
+      .then((res: any) => {
+        if (!res?.error) {
+          setComments((prev: any) => [...prev, res.comment])
+          setNote('')
+        } else {
+          alert('An error occurred while sending the note')
+        }
+      })
+      .catch(() => { alert('An error occurred while sending the note') })
+  }
+
+  const handleDeleteNote = (id: any) => {
+    fetchData(`${LeadUrl}/comment/${id}/`, HTTP_METHODS.DELETE, null, compileHeader())
+      .then((res: any) => {
+        if (!res?.error) {
+          setComments((prev: any) => prev.filter((c: any) => c.id !== id))
+          // User might have deleted the note in edit mode. Thus reset it.
+          resetEditingNote()
+        } else {
+          alert('An error occurred while deleting the note')
+        }
+      })
+      .catch(() => { alert('An error occurred while deleting the note') })
+  }
+
+  const handleEditNoteChange = (e: any) => {
+    setEditingNote((prev: any) => ({ ...prev, text: e.target.value?.substring(0, NOTE_MAX_LENGTH) }))
+  }
+
+  const resetEditingNote = () => (setEditingNote({ id: '', text: '' }))
+
+  const handleSubmitUpdatedNote = () => {
+    const data = JSON.stringify({ comment: editingNote.text })
+    fetchData(`${LeadUrl}/comment/${editingNote.id}/`, HTTP_METHODS.PUT, data, compileHeader())
+    .then((res: any) => {
+      if (!res.error) {
+        setComments((prev: any) => 
+          prev.filter((comment: any) => comment.id !== res.comment?.id).concat(res.comment)
+        )
+        resetEditingNote()        
+      } else {
+        alert('An error occurred while updating the note.')
       }
-      reader.readAsDataURL(files[0])
-    }
-    if (files) {
-      const filesArray = Array.from(files)
-      setAttachmentList((prevFiles: any) => [...prevFiles, ...filesArray])
-    }
+    })
+    .catch(() => { alert('An error occurred while updating the note.') })
+  }
+
+  const handleNotesSortDirectionChange = (e: any) => {
+    resetEditingNote()
+    setCommentSortDirection(e.target.value)
   }
 
   const handleClickFile = (
@@ -325,19 +388,8 @@ function LeadDetails (props: any) {
     setAnchorEl(null)
   }
 
-  const deleteFile = () => {
-    setAttachmentList((prevItems) =>
-      prevItems.filter((item, i) => i !== selectedFile)
-    )
-    setAttachments((prevItems) =>
-      prevItems.filter((item, i) => i !== selectedFile)
-    )
-    handleCloseFile()
-  }
-
   const open = Boolean(anchorEl)
   const id = open ? 'simple-popover' : undefined
-  // console.log(attachedFiles, 'dsfsd', attachmentList, 'aaaaa', attachments);
 
   const module = 'Leads'
   const crntPage = 'Lead Details'
@@ -414,8 +466,7 @@ function LeadDetails (props: any) {
                       alt={leadDetails?.created_by?.email}
                     />
                     &nbsp; &nbsp;
-                    {leadDetails?.first_name}&nbsp;
-                    {leadDetails?.last_name}
+                    {leadDetails?.created_by?.email}&nbsp;
                   </div>
                 </div>
               </div>
@@ -429,7 +480,6 @@ function LeadDetails (props: any) {
               >
                 <div className="title2">
                   {leadDetails?.title}
-                  {/* {console.log(users?.length && users.length,'lll')} */}
                   <Stack
                     sx={{
                       display: 'flex',
@@ -438,11 +488,6 @@ function LeadDetails (props: any) {
                       mt: 1
                     }}
                   >
-                    {/* {
-                                                lead.assigned_to && lead.assigned_to.map((assignItem) => (
-                                                    assignItem.user_details.profile_pic
-                                                        ? */}
-
                     {usersDetails?.length
                       ? usersDetails.map((val: any, i: any) => (
                           <Avatar
@@ -465,7 +510,7 @@ function LeadDetails (props: any) {
                 >
                   {leadDetails?.tags?.length
                     ? leadDetails?.tags.map((tagData: any) => (
-                        <Label tags={tagData} />
+                        <Label tags={tagData.name} />
                       ))
                     : ''}
                 </Stack>
@@ -479,29 +524,33 @@ function LeadDetails (props: any) {
                 }}
               >
                 <div style={{ width: '32%' }}>
-                  <div className="title2">Expected close date</div>
+                  <div className="title2">Organization</div>
                   <div className="title3">
-                    {leadDetails?.close_date || '---'}
+                    {leadDetails?.organization || '---'}
                   </div>
                 </div>
                 <div style={{ width: '32%' }}>
-                  <div className="title2">Account Name</div>
-                  <div className="title3">{leadDetails?.account_name}</div>
+                  <div className="title2">Industry</div>
+                  <div className="title3">{leadDetails?.industry || '---'}</div>
                 </div>
                 <div style={{ width: '32%' }}>
-                  <div className="title2">Organization Name</div>
+                  <div className="title2">website</div>
                   <div className="title3">
-                    {leadDetails?.organization || '---'}
+                    {leadDetails?.website ? (
+                      <Link href={leadDetails?.website} target="_blank" rel="noopener noreferrer">
+                        {leadDetails?.website}
+                      </Link>
+                    ) : (
+                      '---'
+                    )}
                   </div>
                 </div>
               </div>
               <div className="detailList">
                 <div style={{ width: '32%' }}>
-                  <div className="title2">Created from site</div>
+                  <div className="title2">Potential Revenue</div>
                   <div className="title3">
-                    {/* {lead.pipeline ? lead.pipeline : '------'} */}
-                    {/* {leadDetails?.created_from_site} */}
-                    <AntSwitch checked={leadDetails?.created_from_site} />
+                    {leadDetails?.opportunity_amount || '---'}
                   </div>
                 </div>
                 <div style={{ width: '32%' }}>
@@ -511,40 +560,37 @@ function LeadDetails (props: any) {
                   </div>
                 </div>
                 <div style={{ width: '32%' }}>
-                  <div className="title2">website</div>
+                  <div className="title2">Created from site</div>
                   <div className="title3">
-                    {leadDetails?.website ? (
-                      <Link>{leadDetails?.website}</Link>
-                    ) : (
-                      '---'
-                    )}
+                    <AntSwitch checked={leadDetails?.created_from_site} />
                   </div>
                 </div>
               </div>
               <div className="detailList">
                 <div style={{ width: '32%' }}>
-                  <div className="title2">Industry</div>
-                  <div className="title3">{leadDetails?.industry || '---'}</div>
+                  <div className="title2">Assigned To</div>
+                  {leadDetails?.assigned_to?.map((user: any) => 
+                    <div key={user.id} className="title3">
+                      {user.user_details.email}
+                    </div>
+                  )}
                 </div>
                 <div style={{ width: '32%' }}>
-                  <div className="title2">SkypeID</div>
+                  <div className="title2">Related Contacts</div>
+                  {leadDetails?.contacts?.map((user: any) => 
+                    <div key={user.id} className="title3">
+                      {`${user.first_name.length > 0  
+                        ? (user.first_name.charAt(0) + '.') : ''} ${user.last_name} (${user.primary_email})`}
+                    </div>
+                  )}
+                </div>
+                <div style={{ width: '32%' }}>
+                  <div className="title2">Status</div>
                   <div className="title3">
-                    {leadDetails?.skype_ID ? (
-                      <Link>{leadDetails?.skype_ID}</Link>
-                    ) : (
-                      '---'
-                    )}
+                    {leadDetails?.status.charAt(0).toUpperCase().concat(leadDetails?.status.substring(1)) || '---'}
                   </div>
-                </div>
-                <div style={{ width: '32%' }}>
-                  <div style={{ fontSize: '16px', fontWeight: 600 }}>
-                    &nbsp;
-                  </div>
-                  <div style={{ fontSize: '16px', color: 'gray' }}>&nbsp;</div>
                 </div>
               </div>
-              {/* </div> */}
-              {/* Contact details */}
               <div style={{ marginTop: '2%' }}>
                 <div
                   style={{
@@ -575,6 +621,10 @@ function LeadDetails (props: any) {
                   }}
                 >
                   <div style={{ width: '32%' }}>
+                    <div className="title2">Display Name</div>
+                    <div className="title3">{leadDetails?.account_name}</div>
+                  </div>
+                  <div style={{ width: '32%' }}>
                     <div className="title2">First Name</div>
                     <div className="title3">
                       {leadDetails?.first_name || '---'}
@@ -586,10 +636,6 @@ function LeadDetails (props: any) {
                       {leadDetails?.last_name || '---'}
                     </div>
                   </div>
-                  <div style={{ width: '32%' }}>
-                    <div className="title2">Job Title</div>
-                    <div className="title3">{leadDetails?.title || '---'}</div>
-                  </div>
                 </div>
                 <div className="detailList">
                   <div style={{ width: '32%' }}>
@@ -598,9 +644,9 @@ function LeadDetails (props: any) {
                       {leadDetails?.email ? (
                         <Link>
                           {leadDetails?.email}
-                          <FaStar
+                          {/* <FaStar
                             style={{ fontSize: '16px', fill: 'yellow' }}
-                          />
+                          /> */}
                         </Link>
                       ) : (
                         '---'
@@ -611,9 +657,7 @@ function LeadDetails (props: any) {
                     <div className="title2">Mobile Number</div>
                     <div className="title3">
                       {leadDetails?.phone
-                        ? `${leadDetails?.phone}
-                                                <FaStar style={{ fontSize: '16px', fill: 'yellow' }} /><br />`
-                        : '---'}
+                        ? leadDetails?.phone : '---'}
                     </div>
                   </div>
                   <div style={{ width: '32%' }}>
@@ -669,7 +713,7 @@ function LeadDetails (props: any) {
                 </div>
                 <div className="detailList">
                   <div style={{ width: '32%' }}>
-                    <div className="title2">Pincode</div>
+                    <div className="title2">Postcode</div>
                     <div className="title3">
                       {leadDetails?.postcode || '---'}
                     </div>
@@ -707,7 +751,6 @@ function LeadDetails (props: any) {
                     Description
                   </div>
                 </div>
-                {/* <p style={{ fontSize: '16px', color: 'gray', padding: '15px' }}> */}
                 <Box sx={{ p: '15px' }}>
                   {leadDetails?.description ? (
                     <div
@@ -719,7 +762,6 @@ function LeadDetails (props: any) {
                     '---'
                   )}
                 </Box>
-                {/* </p> */}
               </div>
               <div style={{ marginTop: '2%' }}>
                 <div
@@ -745,8 +787,6 @@ function LeadDetails (props: any) {
                     marginTop: '5%'
                   }}
                 >
-                  {/* {lead && lead.description} */}
-                  {/* fhj */}
                 </p>
               </div>
             </Box>
@@ -793,6 +833,7 @@ function LeadDetails (props: any) {
                 >
                   <input
                     type="file"
+                    multiple
                     style={{ display: 'none' }}
                     onChange={(e: any) => addAttachments(e)}
                   />
@@ -808,69 +849,51 @@ function LeadDetails (props: any) {
                   overflowY: 'scroll'
                 }}
               >
-                {/* {lead && lead.lead_attachment} */}
                 <Box
                   sx={{
-                    display: 'flex',
-                    justifyContent: 'flex-start',
-                    alignItems: 'flex-start',
-                    flexWrap: 'wrap',
-                    alignContent: 'flex-start'
+                    display: 'block'
                   }}
                 >
-                  {attachmentList?.length
-                    ? attachmentList.map((pic: any, i: any) => (
-                        <Box
-                          key={i}
-                          sx={{
-                            width: '45%',
-                            height: '35%',
-                            border: '0.5px solid #ccc',
-                            borderRadius: '3px',
-                            overflow: 'hidden',
-                            alignSelf: 'auto',
-                            flexShrink: 1,
-                            mr: 2.5,
-                            mb: 2
-                          }}
-                        >
-                          <img
-                            src={URL.createObjectURL(pic)}
-                            alt={pic?.name}
-                            style={{ width: '100%', height: '50%' }}
-                          />
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'flex-start'
-                            }}
+                  {attachments?.length
+                    ? attachments.map((file: any, i: any) => (
+                      <Box
+                        title={file.file_name}
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'flex-start',
+                          alignItems: 'flex-start',
+                          alignContent: 'flex-start',
+                          WebkitAlignItems: 'center',
+                          margin: '10px 0',
+                          padding: '2px',
+                          WebkitJustifyContent: 'space-between',
+                          border: '1px solid rgba(240, 240, 240, 0.3)'
+                        }}
+                      >
+                        <div>
+                          <Link 
+                            key={i}
+                            href={`${SERVER_HOST}${file.file_path}`}
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >{file.file_name}</Link>
+                        </div>
+                        <div>
+                          <div 
+                            onClick={() => handleDeleteAttachment(file.id)} 
+                            title={`Delete ${file.file_name}`}
                           >
-                            <Box sx={{ ml: 1 }}>
-                              <Typography sx={{ overflow: 'hidden' }}>
-                                {pic?.name}
-                              </Typography>
-                              <br />
-                              <Typography sx={{ color: 'gray' }}>
-                                {formatFileSize(pic?.size)}
-                              </Typography>
-                            </Box>
-                            <IconButton
-                              onClick={(e: any) => handleClickFile(e, i)}
-                            >
-                              <FaEllipsisV />
-                            </IconButton>
-                          </Box>
-                        </Box>
+                            <FaTrashAlt
+                              style={{ cursor: 'pointer', color: 'gray', margin: '3px' }}
+                              size={ NOTE_ICON_SIZE }
+                            />
+                          </div>                         
+                        </div>
+                        
+                      </Box>
                       ))
-                    : ''}
-                  {/* {attachments?.length ? attachments.map((pic: any, i: any) => <img src={pic} />) : ''} */}
+                    : ''} 
                 </Box>
-                {/* {attachments?.length ? attachments.map((pic: any, i: any) =>
-                                    <Box key={i} sx={{ width: '100px', height: '100px', border: '0.5px solid gray', borderRadius: '5px' }}>
-                                        <img src={pic} alt={pic} />
-                                    </Box>
-                                ) : ''} */}
               </div>
             </Box>
             <Box
@@ -903,7 +926,7 @@ function LeadDetails (props: any) {
                 <CustomSelectField1
                   name="industry"
                   select
-                  value={commentList}
+                  value={commentSortDirection}
                   InputProps={{
                     style: {
                       height: '32px',
@@ -911,74 +934,207 @@ function LeadDetails (props: any) {
                       borderRadius: '10px'
                     }
                   }}
-                  onChange={(e: any) => setCommentList(e.target.value)}
-                  sx={{ width: '27%' }}
-                  // helperText={errors?.industry?.[0] ? errors?.industry[0] : ''}
-                  // error={!!errors?.industry?.[0]}
+                  onChange={ handleNotesSortDirectionChange }
+                  sx={{ width: '37%' }}
                 >
-                  {['Recent Last', 'Recent Last'].map((option: any) => (
+                  {COMMENT_SORT_DIRECTIONS.map((option: any) => (
                     <MenuItem key={option} value={option}>
                       {option}
                     </MenuItem>
                   ))}
                 </CustomSelectField1>
+              </div>     
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'flex-end', 
+                  padding: '10px', 
+                  marginTop: '20px', 
+                  width: '100%' 
+                }}
+                >
+                  <TextField
+                    label="Add Note"
+                    id="fullWidth"
+                    value={note}
+                    multiline
+                    maxRows={20}
+                    onChange={handleNotChange}
+                    InputProps={{ style: { borderRadius: '10px', minHeight: '8rem' } }}
+                    // style={{ height: '175px' }}
+                    sx={{ mb: '15px', width: '100%', borderRadius: '10px' }}
+                  />
+                  <div style={{ fontSize: '0.8rem' }}>{`(${note.length}/${NOTE_MAX_LENGTH})`}</div>
+                </div>
+                <div style={{ display: note === '' ? 'none' : 'flex', flexDirection: 'column', gap: '15px' }}>
+                  <FaCheck 
+                    fill='green' 
+                    size={ NOTE_ICON_SIZE * 2.1} 
+                    title='Send Note' 
+                    cursor='pointer'
+                    onClick={handleSendNote}
+                  />
+                  <FaTimes 
+                    fill='red' 
+                    size={ NOTE_ICON_SIZE * 2.1} 
+                    title='Clear Note' 
+                    cursor='pointer'
+                    onClick={() => setNote('')}
+                  />
+                </div>
               </div>
-              <List sx={{ maxWidth: '500px' }}>
-                {comments?.length
-                  ? comments.map((val: any, i: any) => (
-                      <ListItem alignItems="flex-start">
+              
+              <List sx={{ width: '90%' }}>
+                 {comments?.length
+                  ? (comments?.slice().sort((c1: any, c2: any) => 
+                    commentSortDirection === COMMENT_SORT_DIRECTIONS[0] 
+                    ? new Date(c1.commented_on).getTime() - new Date(c2.commented_on).getTime() 
+                    : new Date(c2.commented_on).getTime() - new Date(c1.commented_on).getTime()
+                  ) ?? []) 
+                  .map((val: any, i: any) => (
+                      <ListItem 
+                        alignItems="flex-start" 
+                        sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.2)', mb: '15px', ml: '15px' }}
+                      >
                         <ListItemAvatar>
-                          <Avatar alt="testing" src="test" />
+                          <FaRegStickyNote size={30} />
                         </ListItemAvatar>
                         <ListItemText
                           primary={
                             <Stack
                               sx={{ display: 'flex', flexDirection: 'column' }}
                             >
-                              <Typography>{val.comment}</Typography>
-                              <Avatar
-                                alt="testing"
-                                src="test"
-                                sx={{ mt: 1, mb: 1 }}
+                              <TextField
+                                value={ editingNote.id === val.id ? editingNote.text : val.comment }
+                                multiline
+                                maxRows={20}
+                                onChange={handleEditNoteChange}
+                                InputProps={{ style: { borderRadius: '0px', border: '1px solid white' } }}
+                                disabled={editingNote.id !== val.id}
+                                sx={{ 
+                                  mb: '15px',
+                                  '& fieldset': { 
+                                      borderRadius: '10px', 
+                                      borderWidth: editingNote.id !== val.id ? '0' : '3px',
+                                      color: 'rgb(100, 100, 100)'
+                                    },
+                                    '& .MuiInputBase-input.Mui-disabled': {
+                                      color: 'rgb(90, 90, 90)', 
+                                      WebkitTextFillColor: 'rgb(90, 90, 90)'
+                                    }                                    
+                                  }} 
                               />
+                              {/* <Typography>{val.comment}</Typography> */}
+                              {editingNote.id === val.id && 
+                              <div style={{ 
+                                display: 'flex', 
+                                flexDirection: 'row', 
+                                justifyContent: 'space-between',
+                                // justifyContent: 'flex-end',
+                                marginBottom: '15px'
+                              }}>
+                                <Stack
+                                  sx={{
+                                    mt: 1,
+                                    mb: 1.5,
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'flex-start',
+                                    gap: '20px' 
+                                  }}
+                                >
+                                  <FaCheck 
+                                    fill='rgb(100, 200, 100)' 
+                                    size={ NOTE_ICON_SIZE * 1.7} 
+                                    title='Send Note' 
+                                    cursor='pointer'
+                                    onClick={ handleSubmitUpdatedNote }
+                                  />
+                                  <FaTimes 
+                                    fill='rgb(200, 100, 100)' 
+                                    size={ NOTE_ICON_SIZE * 1.7} 
+                                    title='Clear Note' 
+                                    cursor='pointer'
+                                    onClick={resetEditingNote}
+                                  />
+                                </Stack>
+                                <Stack
+                                  sx={{
+                                    mt: 1,
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'flex-start'
+                                  }}
+                                >
+                                  <div style={{ fontSize: '0.8rem' }}>
+                                    {`(${note.length}/${NOTE_MAX_LENGTH})`}
+                                  </div>
+                                </Stack>
+                                
+                              </div>}
                             </Stack>
                           }
                           secondary={
                             <React.Fragment>
                               <Stack
                                 sx={{
-                                  mt: 3,
+                                  mt: 1,
                                   display: 'flex',
                                   flexDirection: 'row',
                                   justifyContent: 'space-between',
                                   alignItems: 'flex-start'
                                 }}
                               >
-                                <Typography>
-                                  {val?.lead}
-                                  test &nbsp;-&nbsp;
-                                  {val?.commented_by}
-                                  test &nbsp;-&nbsp;
-                                  <span style={{ textDecoration: 'underline' }}>
-                                    reply
-                                  </span>
+                                <Typography style={{ fontSize: '0.7rem' }}>
+                                  <div style={{ display: 'flex', gap: '5px' }}>
+                                      <FaUserAlt size={ NOTE_ICON_SIZE }/>
+                                      <div>{ val?.commented_by_email }</div>
+                                  </div>      
                                 </Typography>
                                 <Typography
                                   sx={{
                                     display: 'flex',
                                     flexDirection: 'row',
-                                    alignItems: 'flex-start'
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '0.7rem' 
                                   }}
                                 >
-                                  {FormateTime(val?.commented_on)}
-                                  &nbsp;-&nbsp;test
-                                  {val?.commented_by}
+                                  <div style={{ display: 'flex', gap: '5px' }}>
+                                      <FaClock size={ NOTE_ICON_SIZE }/>
+                                      <div>{FormateTime(val?.commented_on)}</div>
+                                  </div>  
+                                  
                                 </Typography>
+                                <Typography style={{ fontSize: '0.7rem' }}>
+                                  <FaEdit 
+                                    title='Edit' 
+                                    size={ NOTE_ICON_SIZE } 
+                                    style={{ 
+                                      cursor: userCtx.user.email === val.commented_by_email ? 'pointer' : '',
+                                      pointerEvents: userCtx.user.email !== val.commented_by_email ? 'none' : 'auto',
+                                      opacity: userCtx.user.email !== val.commented_by_email ? '0.4' : '1'
+                                    }}
+                                    onClick={ () => setEditingNote({ id: val.id, text: val.comment })}  
+                                  />  
+                                </Typography>
+                                <Typography style={{ fontSize: '0.7rem' }}>
+                                  <FaTrashAlt 
+                                    title='Delete' 
+                                    size={ NOTE_ICON_SIZE } 
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => handleDeleteNote(val.id)}
+                                  />        
+                                </Typography>
+                                
                               </Stack>
                             </React.Fragment>
                           }
                         />
-                        <Stack
+                        {/* <Stack
                           sx={{
                             display: 'flex',
                             alignItems: 'flex-start',
@@ -988,150 +1144,11 @@ function LeadDetails (props: any) {
                           <IconButton aria-label="comments">
                             <FaEllipsisV style={{ width: '7px' }} />
                           </IconButton>
-                        </Stack>
+                        </Stack> */}
                       </ListItem>
                     ))
                   : ''}
-              </List>
-              {/* <div style={{ padding: '10px', marginTop: '15px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <div style={{ display: 'flex', flexDirection: 'row', marginTop: '5%' }}>
-                                    <div>
-                                        <Avatar
-                                            src='/broken-image.jpg'
-                                            style={{
-                                                height: '30px',
-                                                width: '30px'
-                                            }}
-                                        />
-                                    </div>
-                                    <div style={{ fontSize: '16px', marginLeft: '10px', marginRight: '10px', textAlign: 'justify' }}>
-                                        Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{ padding: '10px' }}>Attachments</div> */}
-              {/* <div style={{ paddingLeft: '10px', paddingBottom: '10px', paddingRight: '10px', width: '100%', marginBottom: '10px' }}>
-                                <div style={{
-                                    border: '1px solid gray',
-                                    padding: '10px',
-                                    // paddingBottom: '10px',
-                                    borderRadius: '5px',
-                                    // paddingLeft: '5px',
-                                    marginRight: '20px'
-                                }}
-                                >
-                                    <TextField
-                                        fullWidth
-                                        label='Add Note'
-                                        id='fullWidth'
-                                        InputProps={{ disableUnderline: true }}
-                                    />
-                                </div>
-                            </div> */}
-              <div style={{ padding: '20px', marginBottom: '10px' }}>
-                <TextField
-                  label="Add Note"
-                  id="fullWidth"
-                  value={note}
-                  onChange={(e: any) => setNote(e.target.value)}
-                  InputProps={{ style: { borderRadius: '10px' } }}
-                  sx={{ mb: '30px', width: '100%', borderRadius: '10px' }}
-                  // InputProps={{ disableUnderline: true }}
-                />
-                <CustomInputBoxWrapper
-                  aria-label="qwe"
-                  // className='CustomInputBoxWrapper'
-                  contentEditable="true"
-                  onInput={(e: any) => setInputValue(e.currentTarget.innerText)}
-                  // onInput={(e: React.SyntheticEvent<HTMLDivElement>) => setInputValue(e.currentTarget.innerText)}
-                  // onInput={(e) => setInputValue(e.target.innerText)}
-                >
-                  {attachedFiles.length > 0 && (
-                    <div>
-                      {attachedFiles.map((file, index) => (
-                        <div key={index}>
-                          <div>{file.name}</div>
-                          <img
-                            src={URL.createObjectURL(file)}
-                            alt={file.name}
-                            style={{
-                              maxWidth: '100%',
-                              maxHeight: '100px',
-                              marginTop: '8px'
-                            }}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CustomInputBoxWrapper>
-                <Box
-                  sx={{
-                    pt: '10px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    border: '1px solid #ccc',
-                    borderTop: 'none',
-                    mt: '-5px',
-                    borderBottomLeftRadius: '8px',
-                    borderBottomRightRadius: '8px',
-                    pb: '10px'
-                  }}
-                >
-                  <Button
-                    component="label"
-                    onClick={handleAttachmentClick}
-                    sx={{ ml: '5px' }}
-                  >
-                    <FaPaperclip style={{ fill: 'gray' }} />
-                  </Button>
-                  <Grid container justifyContent="flex-end">
-                    <Button
-                      variant="contained"
-                      size="small"
-                      color="inherit"
-                      disableFocusRipple
-                      disableRipple
-                      disableTouchRipple
-                      sx={{
-                        backgroundColor: '#808080b5',
-                        borderRadius: '8px',
-                        color: 'white',
-                        textTransform: 'none',
-                        ml: '8px',
-                        '&:hover': { backgroundColor: '#C0C0C0' }
-                      }}
-                      onClick={resetForm}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      sx={{
-                        backgroundColor: '#1976d2',
-                        borderRadius: '8px',
-                        textTransform: 'none',
-                        ml: '8px',
-                        mr: '12px'
-                      }}
-                      onClick={sendComment}
-                    >
-                      Send
-                    </Button>
-                  </Grid>
-                </Box>
-                {/* {attachedFiles.length > 0 && (
-                                    <div>
-                                        <strong>Attached Files:</strong>
-                                        <ul>
-                                            {attachedFiles.map((file: any, index) => (
-                                                <li key={index}>{file.name}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )} */}
-              </div>
+              </List>            
             </Box>
           </Box>
         </Box>
@@ -1152,7 +1169,7 @@ function LeadDetails (props: any) {
       >
         <List disablePadding>
           <ListItem disablePadding>
-            <StyledListItemButton onClick={deleteFile}>
+            <StyledListItemButton>
               <ListItemIcon>
                 {' '}
                 <FaTimes fill="#3e79f7" />

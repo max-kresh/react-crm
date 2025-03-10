@@ -151,6 +151,9 @@ export default function Sidebar (props: any) {
   }
   // TODO This array must be revised according to user roles
   const createSidebarList = () => {
+    if (userCtx.user.role === Constants.USER) {
+      return ['contacts']
+    }
     const list = [
       'leads',
       'contacts',
@@ -159,7 +162,6 @@ export default function Sidebar (props: any) {
       'companies',
       'cases'
     ]
-    console.log('************User email: ', userCtx.user.email)
     if ([Constants.ADMIN, Constants.SALES_MANAGER].includes(userCtx.user.role)) {
       list.push('users')
     }
