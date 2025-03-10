@@ -371,6 +371,11 @@ function LeadDetails (props: any) {
     .catch(() => { alert('An error occurred while updating the note.') })
   }
 
+  const handleNotesSortDirectionChange = (e: any) => {
+    resetEditingNote()
+    setCommentSortDirection(e.target.value)
+  }
+
   const handleClickFile = (
     event: React.MouseEvent<HTMLButtonElement>,
     pic: any
@@ -929,7 +934,7 @@ function LeadDetails (props: any) {
                       borderRadius: '10px'
                     }
                   }}
-                  onChange={(e: any) => setCommentSortDirection(e.target.value)}
+                  onChange={ handleNotesSortDirectionChange }
                   sx={{ width: '37%' }}
                 >
                   {COMMENT_SORT_DIRECTIONS.map((option: any) => (
