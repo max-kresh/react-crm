@@ -98,6 +98,19 @@ type response = {
   opportunity_attachment: []
   account: { id: string; name: string }
 }
+type opportunityStage={
+  opportunity:string, 
+  old_stage:string, 
+  new_stage:string, 
+  changed_by:{
+    id:string, 
+    role:string, 
+    user_details:{
+      email:string, id:string
+    }
+  }, 
+  changed_at:string
+}
 export const OpportunityDetails = (props: any) => {
   const { state } = useLocation()
   const navigate = useNavigate()
@@ -127,6 +140,7 @@ export const OpportunityDetails = (props: any) => {
   const [comments, setComments] = useState([])
   const [commentList, setCommentList] = useState('Recent Last')
   const [note, setNote] = useState('')
+  const [opportunityStageHistory, setOpportunityStageHistory] = useState<opportunityStage[]>([])
 
   useEffect(() => {
     getOpportunityDetails(state.opportunityId)
@@ -145,6 +159,7 @@ export const OpportunityDetails = (props: any) => {
         if (!res.error) {
           setOpportunityDetails(res?.opportunity_obj)
           setUsers(res?.users)
+          setOpportunityStageHistory(res?.stage_history)
         }
       })
       .catch((err) => {
@@ -227,6 +242,10 @@ export const OpportunityDetails = (props: any) => {
   const crntPage = 'Opportunity Details'
   const backBtn = 'Back To Opportunities'
   console.log(state, 'oppdetail')
+  const userDetail = (userId: any, e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    navigate('/app/users/user-details', { state: { userId, detail: true } })
+  }
 
   return (
     <Box sx={{ mt: '60px' }}>
@@ -473,6 +492,7 @@ export const OpportunityDetails = (props: any) => {
                   </div>
                 </div>
               </div>
+              
               <div
                 style={{
                   padding: '20px',
@@ -497,6 +517,25 @@ export const OpportunityDetails = (props: any) => {
                   <div className="title2"></div>
                   <div className="title3">
                   </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  padding: '20px',
+                  marginTop: '10px',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <div style={{ width: '90%' }}>
+                  <div className="title2">Stage History</div>
+                  {opportunityStageHistory.length > 0 ? <div className="title3">
+                    {opportunityStageHistory.map(stage => (
+                    <p>Stage changed from { stage.old_stage } to { stage.new_stage }  by {/* TODO: Does everyone can view user details? Update accordingly. */}<a href='#' onClick = { (e) => { userDetail(stage.changed_by.id, e) } } > { stage.changed_by.role } </a> { FormateTime(stage.changed_at) }</p>
+                    ))}
+                  </div> : <div className='title3'>----</div>}
+                  
                 </div>
               </div>
               {/* </div> */}
