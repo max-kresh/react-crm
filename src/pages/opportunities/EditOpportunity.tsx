@@ -26,7 +26,6 @@ import { fetchData } from '../../components/FetchData'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import {
   FaCheckCircle,
-  FaFileUpload,
   FaPlus,
   FaTimes,
   FaTimesCircle,
@@ -58,8 +57,14 @@ type FormErrors = {
   tags?: string[]
   opportunity_attachment?: string[]
   file?: string[]
-  contact_name?: string[]
+  lead?: string[]
 }
+
+interface AssignedTo {
+  id: string
+  name: string
+}
+
 interface FormData {
   name: string
   account: string
@@ -70,13 +75,13 @@ interface FormData {
   lead_source: string
   probability: number
   description: string
-  assigned_to: string[]
+  assigned_to: AssignedTo[]
   contacts: string[]
   due_date: string
   tags: string[]
   opportunity_attachment: string | null
   file: string | null
-  contact_name: string
+  lead: string | null
 }
 
 export function EditOpportunity () {
@@ -97,10 +102,11 @@ export function EditOpportunity () {
   const [selectedTeams, setSelectedTeams] = useState<any[]>([])
   const [selectedCountry, setSelectedCountry] = useState<any[]>([])
   const [leadSelectOpen, setLeadSelectOpen] = useState(false)
+  const [leadSourceSelectOpen, setLeadSourceSelectOpen] = useState(false)
   const [statusSelectOpen, setStatusSelectOpen] = useState(false)
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
-  const [contactSelectOpen, setContactSelectOpen] = useState(false)
   const [currencySelectOpen, setCurrencySelectOpen] = useState(false)
+  const [contactSelectOpen, setContactSelectOpen] = useState(false)
   const [accountSelectOpen, setAccountSelectOpen] = useState(false)
   const [stageSelectOpen, setStageSelectOpen] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
@@ -120,8 +126,9 @@ export function EditOpportunity () {
     tags: [],
     opportunity_attachment: null,
     file: null,
-    contact_name: ''
+    lead: ''
   })
+  const userOptions = state.users.map((k: any, i: any) => { return { id: k.id, label: k.user__email } })
 
   useEffect(() => {
     // Scroll to the top of the page when the component mounts
@@ -135,6 +142,7 @@ export function EditOpportunity () {
         }
       })
     }
+
     // Cleanup: Remove event listener when the component unmounts
     return () => {
       if (quill) {
@@ -153,6 +161,10 @@ export function EditOpportunity () {
       if (quill && initialContentRef.current !== null) {
         quill.clipboard.dangerouslyPasteHTML(initialContentRef.current)
       }
+    }
+    if (state?.value?.assigned_to) {
+      let assignedToIds = state.value.assigned_to.map((k: any, i: any) => k.id)
+      setSelectedAssignTo(userOptions.filter((item: any) => assignedToIds.includes(item.id)))
     }
     return () => {
       setReset(false)
@@ -186,13 +198,13 @@ export function EditOpportunity () {
     } else if (title === 'assigned_to') {
       setFormData({
         ...formData,
-        assigned_to: val.length > 0 ? val.map((item: any) => item.id) : []
+        assigned_to: val
       })
       setSelectedAssignTo(val)
     } else if (title === 'tags') {
       setFormData({
         ...formData,
-        assigned_to: val.length > 0 ? val.map((item: any) => item.id) : []
+        tags: val.length > 0 ? val.map((item: any) => item.id) : []
       })
       setSelectedTags(val)
     } else if (title === 'teams') {
@@ -200,7 +212,7 @@ export function EditOpportunity () {
         ...formData,
         teams: val.length > 0 ? val.map((item: any) => item.id) : []
       })
-      setSelectedTags(val)
+      setSelectedTeams(val)
     } else {
       setFormData({ ...formData, [title]: val })
     }
@@ -212,7 +224,11 @@ export function EditOpportunity () {
     } else if (type === 'checkbox') {
       setFormData({ ...formData, [name]: checked })
     } else {
-      setFormData({ ...formData, [name]: value })
+      let val = value
+      if (name === 'contacts') {
+        val = [value]
+      }
+      setFormData({ ...formData, [name]: val })
     }
   }
   const handleFileChange = (event: any) => {
@@ -251,24 +267,24 @@ export function EditOpportunity () {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org')
     }
-    // console.log('Form data:', formData.lead_attachment,'sfs', formData.file);
+
     const data = {
       name: formData.name,
       account: formData.account,
       amount: formData.amount,
       currency: formData.currency,
-      contact_name: formData.contact_name,
       stage: formData.stage,
       teams: formData.teams,
       lead_source: formData.lead_source,
       probability: formData.probability,
       description: formData.description,
-      assigned_to: formData.assigned_to,
+      assigned_to: formData.assigned_to.map((k: any, i: number) => k.id),
       contacts: formData.contacts,
       due_date: formData.due_date,
       tags: formData.tags,
       // opportunity_attachment: formData.opportunity_attachment,
-      opportunity_attachment: formData.file
+      opportunity_attachment: formData.file,
+      lead: formData.lead
     }
 
     fetchData(
@@ -298,7 +314,6 @@ export function EditOpportunity () {
       currency: '',
       stage: '',
       teams: [],
-      contact_name: '',
       lead_source: '',
       probability: 1,
       description: '',
@@ -307,7 +322,8 @@ export function EditOpportunity () {
       due_date: '',
       tags: [],
       opportunity_attachment: null,
-      file: null
+      file: null,
+      lead: ''
     })
     setErrors({})
     setSelectedContacts([])
@@ -321,12 +337,10 @@ export function EditOpportunity () {
   }
 
   const module = 'Opportunities'
-  const crntPage = 'Add Opportunities'
+  const crntPage = 'Edit Opportunity'
   const backBtn = state?.edit
     ? 'Back To Opportunities'
     : 'Back To OpportunityDetails'
-
-  console.log(state, 'opportunityedit')
   return (
     <Box sx={{ mt: '60px' }}>
       <CustomAppBar
@@ -507,8 +521,8 @@ export function EditOpportunity () {
                         <div className="fieldTitle">Contact Name</div>
                         <FormControl sx={{ width: '70%' }}>
                           <RequiredSelect
-                            name="contact_name"
-                            value={formData.contact_name}
+                            name="contacts"
+                            value={formData.contacts?.[0] || ''}
                             open={contactSelectOpen}
                             onClick={() =>
                               setContactSelectOpen(!contactSelectOpen)
@@ -529,67 +543,24 @@ export function EditOpportunity () {
                             )}
                             className="select"
                             onChange={handleChange}
-                            error={!!errors?.contact_name?.[0]}
+                            error={!!errors?.contacts?.[0]}
                           >
                             {state?.contacts?.length &&
                               state?.contacts.map((option: any) => (
                                 <MenuItem
                                   key={option?.id}
-                                  value={option?.first_name}
+                                  value={option?.id}
                                 >
                                   {option?.first_name}
                                 </MenuItem>
                               ))}
                           </RequiredSelect>
                           <FormHelperText className="helperText">
-                            {errors?.contact_name?.[0]
-                              ? errors?.contact_name[0]
+                            {errors?.contacts?.[0]
+                              ? errors?.contacts[0]
                               : ''}
                           </FormHelperText>
                         </FormControl>
-                        {/* <FormControl error={!!errors?.contacts?.[0]} sx={{ width: '70%' }}>
-                                                    <Autocomplete
-                                                        multiple
-                                                        value={selectedContacts}
-                                                        limitTags={2}
-                                                        options={state.contacts || []}
-                                                        getOptionLabel={(option: any) => state.contacts ? option?.first_name : option}
-                                                        onChange={(e: any, value: any) => handleChange2('contacts', value)}
-                                                        size='small'
-                                                        filterSelectedOptions
-                                                        renderTags={(value: any, getTagProps: any) =>
-                                                            value.map((option: any, index: any) => (
-                                                                <Chip
-                                                                    deleteIcon={<FaTimes style={{ width: '9px' }} />}
-                                                                    sx={{
-                                                                        backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                                                                        height: '18px'
-                                                                    }}
-                                                                    variant='outlined'
-                                                                    label={state.contacts ? option?.first_name : option}
-                                                                    {...getTagProps({ index })}
-                                                                />
-                                                            ))
-                                                        }
-                                                        popupIcon={<CustomPopupIcon><FaPlus className='input-plus-icon' /></CustomPopupIcon>}
-                                                        renderInput={(params: any) => (
-                                                            <TextField {...params}
-                                                                placeholder='Add Contacts'
-                                                                InputProps={{
-                                                                    ...params.InputProps,
-                                                                    sx: {
-                                                                        '& .MuiAutocomplete-popupIndicator': { '&:hover': { backgroundColor: 'white' } },
-                                                                        '& .MuiAutocomplete-endAdornment': {
-                                                                            mt: '-8px',
-                                                                            mr: '-8px',
-                                                                        }
-                                                                    }
-                                                                }}
-                                                            />
-                                                        )}
-                                                    />
-                                                    <FormHelperText>{errors?.contacts?.[0] || ''}</FormHelperText>
-                                                </FormControl> */}
                       </div>
                     </div>
                     <div className="fieldContainer2">
@@ -599,16 +570,16 @@ export function EditOpportunity () {
                           <Select
                             name="lead_source"
                             value={formData.lead_source}
-                            open={leadSelectOpen}
-                            onClick={() => setLeadSelectOpen(!leadSelectOpen)}
+                            open={leadSourceSelectOpen}
+                            onClick={() => setLeadSourceSelectOpen(!leadSourceSelectOpen)}
                             IconComponent={() => (
                               <div
                                 onClick={() =>
-                                  setLeadSelectOpen(!leadSelectOpen)
+                                  setLeadSourceSelectOpen(!leadSourceSelectOpen)
                                 }
                                 className="select-icon-background"
                               >
-                                {leadSelectOpen ? (
+                                {leadSourceSelectOpen ? (
                                   <FiChevronUp className="select-icon" />
                                 ) : (
                                   <FiChevronDown className="select-icon" />
@@ -662,9 +633,9 @@ export function EditOpportunity () {
                             multiple
                             value={selectedAssignTo}
                             limitTags={2}
-                            options={state.users || []}
+                            options={userOptions || []}
                             getOptionLabel={(option: any) =>
-                              state.users ? option?.user_details?.email : option
+                              state.users ? option?.label : option
                             }
                             onChange={(e: any, value: any) =>
                               handleChange2('assigned_to', value)
@@ -683,9 +654,7 @@ export function EditOpportunity () {
                                   }}
                                   variant="outlined"
                                   label={
-                                    state.users
-                                      ? option?.user_details?.email
-                                      : option
+                                    state.users ? option?.label : option
                                   }
                                   {...getTagProps({ index })}
                                 />
@@ -931,7 +900,44 @@ export function EditOpportunity () {
                           </FormHelperText>
                         </FormControl>
                       </div>
-                      <div className="fieldSubContainer"></div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Lead</div>
+                        <FormControl sx={{ width: '70%' }}>
+                          <Select
+                            name="lead"
+                            value={formData.lead}
+                            open={leadSelectOpen}
+                            onClick={() => setLeadSelectOpen(!leadSelectOpen)}
+                            IconComponent={() => (
+                              <div
+                                onClick={() =>
+                                  setLeadSelectOpen(!leadSelectOpen)
+                                }
+                                className="select-icon-background"
+                              >
+                                {leadSelectOpen ? (
+                                  <FiChevronUp className="select-icon" />
+                                ) : (
+                                  <FiChevronDown className="select-icon" />
+                                )}
+                              </div>
+                            )}
+                            className={'select'}
+                            onChange={handleChange}
+                            error={!!errors?.lead?.[0]}
+                          >
+                            {state?.leads?.length &&
+                              state?.leads.map((option: any) => (
+                                <MenuItem key={option?.id} value={option?.id}>
+                                  {option?.title}
+                                </MenuItem>
+                              ))}
+                          </Select>
+                          <FormHelperText className="helperText">
+                            {errors?.lead?.[0] || ''}
+                          </FormHelperText>
+                        </FormControl>
+                      </div>
                     </div>
                   </Box>
                 </AccordionDetails>

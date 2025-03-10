@@ -40,7 +40,7 @@ type response = {
     profile_pic: string
   }
   org: { name: string }
-  lead: { account_name: string }
+  lead: { id: string; title: string }
   account_attachment: []
   assigned_to: []
   billing_address_line: string
@@ -66,7 +66,7 @@ type response = {
   opportunity_amount: string
   website: string
   description: string
-  contacts: string
+  contacts: [{ id: string, first_name: string }]
   status: string
   source: string
   address_line: string
@@ -98,6 +98,19 @@ type response = {
   opportunity_attachment: []
   account: { id: string; name: string }
 }
+type opportunityStage={
+  opportunity:string, 
+  old_stage:string, 
+  new_stage:string, 
+  changed_by:{
+    id:string, 
+    role:string, 
+    user_details:{
+      email:string, id:string
+    }
+  }, 
+  changed_at:string
+}
 export const OpportunityDetails = (props: any) => {
   const { state } = useLocation()
   const navigate = useNavigate()
@@ -127,6 +140,7 @@ export const OpportunityDetails = (props: any) => {
   const [comments, setComments] = useState([])
   const [commentList, setCommentList] = useState('Recent Last')
   const [note, setNote] = useState('')
+  const [opportunityStageHistory, setOpportunityStageHistory] = useState<opportunityStage[]>([])
 
   useEffect(() => {
     getOpportunityDetails(state.opportunityId)
@@ -145,6 +159,7 @@ export const OpportunityDetails = (props: any) => {
         if (!res.error) {
           setOpportunityDetails(res?.opportunity_obj)
           setUsers(res?.users)
+          setOpportunityStageHistory(res?.stage_history)
         }
       })
       .catch((err) => {
@@ -199,10 +214,11 @@ export const OpportunityDetails = (props: any) => {
           probability: opportunityDetails?.probability,
           description: opportunityDetails?.description,
           assigned_to: opportunityDetails?.assigned_to,
-          contact_name: opportunityDetails?.contact_name,
+          contacts: opportunityDetails?.contacts?.map((k, i) => k.id),
           due_date: opportunityDetails?.closed_on,
           tags: opportunityDetails?.tags,
-          opportunity_attachment: opportunityDetails?.opportunity_attachment
+          opportunity_attachment: opportunityDetails?.opportunity_attachment,
+          lead: opportunityDetails?.lead?.id
         },
         id: state?.opportunityId,
         contacts: state?.contacts || [],
@@ -212,7 +228,8 @@ export const OpportunityDetails = (props: any) => {
         account: state?.account || [],
         stage: state?.stage || [],
         users: state?.users || [],
-        teams: state?.teams || []
+        teams: state?.teams || [],
+        leads: state?.leads || []
       }
     })
   }
@@ -225,6 +242,10 @@ export const OpportunityDetails = (props: any) => {
   const crntPage = 'Opportunity Details'
   const backBtn = 'Back To Opportunities'
   console.log(state, 'oppdetail')
+  const userDetail = (userId: any, e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    navigate('/app/users/user-details', { state: { userId, detail: true } })
+  }
 
   return (
     <Box sx={{ mt: '60px' }}>
@@ -315,29 +336,6 @@ export const OpportunityDetails = (props: any) => {
               >
                 <div className="title2">
                   {opportunityDetails?.name}
-                  <Stack
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      mt: 1
-                    }}
-                  >
-                    {/* {
-                                            lead.assigned_to && lead.assigned_to.map((assignItem) => (
-                                                assignItem.user_details.profile_pic
-                                                    ? */}
-                    {users?.length
-                      ? users.map((val: any, i: any) => (
-                          <Avatar
-                            key={i}
-                            alt={val?.user_details?.email}
-                            src={val?.user_details?.profile_pic}
-                            sx={{ mr: 1 }}
-                          />
-                        ))
-                      : ''}
-                  </Stack>
                 </div>
                 <Stack
                   sx={{
@@ -441,7 +439,7 @@ export const OpportunityDetails = (props: any) => {
                 <div style={{ width: '32%' }}>
                   <div className="title2">Contacts</div>
                   <div className="title3">
-                    {opportunityDetails?.contact_name || '----'}
+                    {opportunityDetails?.contacts?.map((k, i) => k.first_name).join(',') || '----'}
                   </div>
                 </div>
               </div>
@@ -462,8 +460,29 @@ export const OpportunityDetails = (props: any) => {
                 </div>
                 <div style={{ width: '32%' }}>
                   <div className="title2">Assigned Users</div>
-                  <div className="title3">
-                    {opportunityDetails?.assigned_to || '----'}
+                  <div className="title3" style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'flex-start',
+                      alignItems: 'center',
+                      marginRight: '15px'
+                    }}>
+                {opportunityDetails?.assigned_to?.length
+                  ? opportunityDetails.assigned_to.map(
+                      (item: any, i: any) => (
+                              <Avatar
+                                key={i}
+                                src={item?.user_details?.profile_pic}
+                                alt={item?.user_details?.email}
+                              />
+                      )
+                    )
+                  : ('----')}
+                {opportunityDetails?.assigned_to?.length
+                  ? opportunityDetails.assigned_to.map(
+                      (item: any, i: any) => (item?.user_details?.email)
+                    ).join(',')
+                  : ''}
                   </div>
                 </div>
                 <div style={{ width: '32%' }}>
@@ -471,6 +490,52 @@ export const OpportunityDetails = (props: any) => {
                   <div className="title3">
                     {opportunityDetails?.closed_on || '----'}
                   </div>
+                </div>
+              </div>
+              
+              <div
+                style={{
+                  padding: '20px',
+                  marginTop: '10px',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <div style={{ width: '32%' }}>
+                  <div className="title2">Lead</div>
+                  <div className="title3">
+                    {opportunityDetails?.lead?.title || '----'}
+                  </div>
+                </div>
+                <div style={{ width: '32%' }}>
+                  <div className="title2"></div>
+                  <div className="title3">
+                  </div>
+                </div>
+                <div style={{ width: '32%' }}>
+                  <div className="title2"></div>
+                  <div className="title3">
+                  </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  padding: '20px',
+                  marginTop: '10px',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <div style={{ width: '90%' }}>
+                  <div className="title2">Stage History</div>
+                  {opportunityStageHistory.length > 0 ? <div className="title3">
+                    {opportunityStageHistory.map(stage => (
+                    <p>Stage changed from { stage.old_stage } to { stage.new_stage }  by {/* TODO: Does everyone can view user details? Update accordingly. */}<a href='#' onClick = { (e) => { userDetail(stage.changed_by.id, e) } } > { stage.changed_by.role } </a> { FormateTime(stage.changed_at) }</p>
+                    ))}
+                  </div> : <div className='title3'>----</div>}
+                  
                 </div>
               </div>
               {/* </div> */}

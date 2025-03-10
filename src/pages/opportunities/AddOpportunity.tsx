@@ -15,9 +15,8 @@ import {
   Autocomplete,
   FormHelperText,
   IconButton,
-  Tooltip,
-  Divider,
   Select,
+  Divider,
   Button
 } from '@mui/material'
 import { useQuill } from 'react-quilljs'
@@ -53,12 +52,12 @@ type FormErrors = {
   probability?: string[]
   description?: string[]
   assigned_to?: string[]
-  contact_name?: string[]
   contacts?: string[]
   due_date?: string[]
   tags?: string[]
   opportunity_attachment?: string[]
   file?: string[]
+  lead?: string[]
 }
 
 interface FormData {
@@ -72,33 +71,39 @@ interface FormData {
   probability: number
   description: string
   assigned_to: string[]
-  contact_name: string
   contacts: string[]
   due_date: string
   tags: string[]
   opportunity_attachment: string | null
   file: string | null
+  lead: string | null
 }
 
 export function AddOpportunity () {
   const navigate = useNavigate()
   const { state } = useLocation()
   const { quill, quillRef } = useQuill()
-  const initialContentRef = useRef(null)
+  const initialContentRef = useRef<string | null>(null)
+  const pageContainerRef = useRef<HTMLDivElement | null>(null)
+
+  const [hasInitialFocus, setHasInitialFocus] = useState(false)
 
   const autocompleteRef = useRef<any>(null)
   const [error, setError] = useState(false)
+  const [reset, setReset] = useState(false)
   const [selectedContacts, setSelectedContacts] = useState<any[]>([])
   const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>([])
   const [selectedTags, setSelectedTags] = useState<any[]>([])
   const [selectedTeams, setSelectedTeams] = useState<any[]>([])
   const [selectedCountry, setSelectedCountry] = useState<any[]>([])
   const [leadSelectOpen, setLeadSelectOpen] = useState(false)
+  const [leadSourceSelectOpen, setLeadSourceSelectOpen] = useState(false)
+  const [statusSelectOpen, setStatusSelectOpen] = useState(false)
+  const [countrySelectOpen, setCountrySelectOpen] = useState(false)
   const [currencySelectOpen, setCurrencySelectOpen] = useState(false)
-  const [stageSelectOpen, setStageSelectOpen] = useState(false)
   const [contactSelectOpen, setContactSelectOpen] = useState(false)
   const [accountSelectOpen, setAccountSelectOpen] = useState(false)
-
+  const [stageSelectOpen, setStageSelectOpen] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -111,12 +116,12 @@ export function AddOpportunity () {
     probability: 1,
     description: '',
     assigned_to: [],
-    contact_name: '',
     contacts: [],
     due_date: '',
     tags: [],
     opportunity_attachment: null,
-    file: null
+    file: null,
+    lead: ''
   })
 
   useEffect(() => {
@@ -142,7 +147,7 @@ export function AddOpportunity () {
     } else if (title === 'tags') {
       setFormData({
         ...formData,
-        assigned_to: val.length > 0 ? val.map((item: any) => item.id) : []
+        tags: val.length > 0 ? val.map((item: any) => item.id) : []
       })
       setSelectedTags(val)
     } else if (title === 'teams') {
@@ -150,7 +155,7 @@ export function AddOpportunity () {
         ...formData,
         teams: val.length > 0 ? val.map((item: any) => item.id) : []
       })
-      setSelectedTags(val)
+      setSelectedTeams(val)
     } else {
       setFormData({ ...formData, [title]: val })
     }
@@ -204,7 +209,6 @@ export function AddOpportunity () {
       Authorization: localStorage.getItem('Token'),
       org: localStorage.getItem('org')
     }
-    // console.log('Form data:', formData.lead_attachment,'sfs', formData.file);
     const data = {
       name: formData.name,
       account: formData.account,
@@ -216,16 +220,15 @@ export function AddOpportunity () {
       probability: formData.probability,
       description: formData.description,
       assigned_to: formData.assigned_to,
-      // contacts: formData.contacts,
-      contact_name: formData.contacts,
+      contacts: formData.contacts,
       due_date: formData.due_date,
       tags: formData.tags,
-      opportunity_attachment: formData.file
+      opportunity_attachment: formData.file,
+      lead: formData.lead
     }
 
     fetchData(`${OpportunityUrl}/`, 'POST', JSON.stringify(data), Header)
       .then((res: any) => {
-        // console.log('Form data:', res);
         if (!res.error) {
           resetForm()
           navigate('/app/opportunities')
@@ -249,12 +252,12 @@ export function AddOpportunity () {
       probability: 1,
       description: '',
       assigned_to: [],
-      contact_name: '',
       contacts: [],
       due_date: '',
       tags: [],
       opportunity_attachment: null,
-      file: null
+      file: null,
+      lead: ''
     })
     setErrors({})
     setSelectedContacts([])
@@ -273,7 +276,6 @@ export function AddOpportunity () {
   const crntPage = 'Add Opportunity'
   const backBtn = 'Back To Opportunities'
 
-  console.log(state, 'leadsform')
   return (
     <Box sx={{ mt: '60px' }}>
       <CustomAppBar
@@ -452,8 +454,8 @@ export function AddOpportunity () {
                         <div className="fieldTitle">Contact Name</div>
                         <FormControl sx={{ width: '70%' }}>
                           <RequiredSelect
-                            name="contact_name"
-                            value={formData.contact_name}
+                            name="contacts"
+                            value={formData.contacts?.[0]}
                             open={contactSelectOpen}
                             onClick={() =>
                               setContactSelectOpen(!contactSelectOpen)
@@ -473,22 +475,25 @@ export function AddOpportunity () {
                               </div>
                             )}
                             className="select"
-                            onChange={handleChange}
-                            error={!!errors?.contact_name?.[0]}
+                            onChange={(e: any, value: any) => {
+                              setFormData({ ...formData, contacts: [value.props.value] })
+                            }
+                            }
+                            error={!!errors?.contacts?.[0]}
                           >
                             {state?.contacts?.length &&
                               state?.contacts.map((option: any) => (
                                 <MenuItem
                                   key={option?.id}
-                                  value={option?.first_name}
+                                  value={option?.id}
                                 >
                                   {option?.first_name}
                                 </MenuItem>
                               ))}
                           </RequiredSelect>
                           <FormHelperText className="helperText">
-                            {errors?.contact_name?.[0]
-                              ? errors?.contact_name[0]
+                            {errors?.contacts?.[0]
+                              ? errors?.contacts[0]
                               : ''}
                           </FormHelperText>
                         </FormControl>
@@ -501,16 +506,16 @@ export function AddOpportunity () {
                           <Select
                             name="lead_source"
                             value={formData.lead_source}
-                            open={leadSelectOpen}
-                            onClick={() => setLeadSelectOpen(!leadSelectOpen)}
+                            open={leadSourceSelectOpen}
+                            onClick={() => setLeadSourceSelectOpen(!leadSourceSelectOpen)}
                             IconComponent={() => (
                               <div
                                 onClick={() =>
-                                  setLeadSelectOpen(!leadSelectOpen)
+                                  setLeadSourceSelectOpen(!leadSourceSelectOpen)
                                 }
                                 className="select-icon-background"
                               >
-                                {leadSelectOpen ? (
+                                {leadSourceSelectOpen ? (
                                   <FiChevronUp className="select-icon" />
                                 ) : (
                                   <FiChevronDown className="select-icon" />
@@ -831,7 +836,44 @@ export function AddOpportunity () {
                           </FormHelperText>
                         </FormControl>
                       </div>
-                      <div className="fieldSubContainer"></div>
+                      <div className="fieldSubContainer">
+                        <div className="fieldTitle">Lead</div>
+                        <FormControl sx={{ width: '70%' }}>
+                          <Select
+                            name="lead"
+                            value={formData.lead}
+                            open={leadSelectOpen}
+                            onClick={() => setLeadSelectOpen(!leadSelectOpen)}
+                            IconComponent={() => (
+                              <div
+                                onClick={() =>
+                                  setLeadSelectOpen(!leadSelectOpen)
+                                }
+                                className="select-icon-background"
+                              >
+                                {leadSelectOpen ? (
+                                  <FiChevronUp className="select-icon" />
+                                ) : (
+                                  <FiChevronDown className="select-icon" />
+                                )}
+                              </div>
+                            )}
+                            className={'select'}
+                            onChange={handleChange}
+                            error={!!errors?.lead?.[0]}
+                          >
+                            {state?.leads?.length &&
+                              state?.leads.map((option: any) => (
+                                <MenuItem key={option?.id} value={option?.id}>
+                                  {option?.title}
+                                </MenuItem>
+                              ))}
+                          </Select>
+                          <FormHelperText className="helperText">
+                            {errors?.lead?.[0] || ''}
+                          </FormHelperText>
+                        </FormControl>
+                      </div>
                     </div>
                   </Box>
                 </AccordionDetails>
