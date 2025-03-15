@@ -207,6 +207,7 @@ export function LeadForm ({ state, method }: StateProps) {
       // Save the initial state (HTML content) of the Quill editor
       initialContentRef.current = quillRef.current.firstChild.innerHTML
       quill.clipboard.dangerouslyPasteHTML(state?.value?.description || '')
+      window.scrollTo(0, 0)
     }
   }, [quill])
 
@@ -253,7 +254,7 @@ export function LeadForm ({ state, method }: StateProps) {
     if (quill) {
       quill.setText(state?.value?.description || '')
     }
-  }, [state])
+  }, [state?.id])
 
   const handleChange = (e: any) => {
     const { name, value, files, type, checked, id } = e.target
