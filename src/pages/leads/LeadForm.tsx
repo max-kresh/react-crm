@@ -72,7 +72,8 @@ const tooltips = {
   
 }
 
-const CREATE_NEW_ACCOUNT_NAME_OPTION = { id: '__#__new_contact_info__#__', value: 'New Contact Info' }
+const CREATE_NEW_ACCOUNT_NAME_ID = '__#__new_contact_info__#__'
+const CREATE_NEW_ACCOUNT_NAME_OPTION = { id: CREATE_NEW_ACCOUNT_NAME_ID, value: 'New Contact Info' }
 const ADD_NEW_TAG_ID_PLACEHOLDER = 'ADD_NEW_TAG_PLACEHOLDER'
 
 type FormErrors = {
@@ -416,7 +417,9 @@ export function LeadForm ({ state, method }: StateProps) {
         last_name: contact.last_name || '',
         phone: contact.mobile_number || '',
         email: contact.primary_email || '',
-        account_name: (`${contact.first_name} ${contact.last_name} (From Lead: ${formData.title})`) || '',
+        account_name: (
+          `${contact.first_name || ''} ${contact.last_name || ''}` + 
+          `${contact !== CREATE_NEW_ACCOUNT_NAME_OPTION.value ? ('(From Lead: ' + formData.title + ')') : ''}`), // ('(From Lead:' formData.title}')') : ''}`)
         address_line: contact.address__address_line || '',
         street: contact.address__street || '',
         postcode: contact.address__postcode || '',
@@ -1113,7 +1116,7 @@ export function LeadForm ({ state, method }: StateProps) {
                         <RequiredTextField
                           name="account_name"
                           title={tooltips.displayName}
-                          value={formData.account_name}
+                          value={formData?.account_name || ''}
                           onChange={handleChange}
                           style={{ width: '70%' }}
                           size="small"
