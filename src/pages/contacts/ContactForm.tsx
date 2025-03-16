@@ -63,31 +63,35 @@ export function ContactForm ({ state, httpReqMethod }: StateProps) {
   const initialContentRef = useRef(null)
 
   const [error, setError] = useState(false)
-  const [formData, setFormData] = useState(state?.value || {
-    salutation: '',
-    first_name: '',
-    last_name: '',
-    primary_email: '',
-    secondary_email: '',
-    mobile_number: '',
-    secondary_number: '',
-    date_of_birth: '',
-    organization: '',
-    title: '',
-    language: '',
-    do_not_call: false,
-    department: '',
-    address_line: '',
-    street: '',
-    city: '',
-    state: '',
-    country: '',
-    postcode: '',
-    description: '',
-    linked_in_url: '',
-    facebook_url: '',
-    twitter_username: ''
-  })
+
+  const compileInitialFormData = () => (state?.value ||
+    {
+      salutation: '',
+      first_name: '',
+      last_name: '',
+      primary_email: '',
+      secondary_email: '',
+      mobile_number: '',
+      secondary_number: '',
+      date_of_birth: '',
+      organization: '',
+      title: '',
+      language: '',
+      do_not_call: false,
+      department: '',
+      address_line: '',
+      street: '',
+      city: '',
+      state: '',
+      country: '',
+      postcode: '',
+      description: '',
+      linked_in_url: '',
+      facebook_url: '',
+      twitter_username: ''
+    }
+  )
+  const [formData, setFormData] = useState(compileInitialFormData())
   
   const [errors, setErrors] = useState<FormErrors>({})
   const [countrySelectOpen, setCountrySelectOpen] = useState(false)
@@ -103,8 +107,16 @@ export function ContactForm ({ state, httpReqMethod }: StateProps) {
   useEffect(() => {
     if (quill) {
       initialContentRef.current = quillRef.current.firstChild.innerHTML
+      quill.clipboard.dangerouslyPasteHTML(state?.value?.description || '')
+      window.scrollTo(0, 0)
     }
   }, [quill])
+
+  useEffect(() => {
+      if (quill) {
+        quill.setText(state?.value?.description || '')
+      }
+  }, [state?.id])
 
   const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target
@@ -158,7 +170,7 @@ export function ContactForm ({ state, httpReqMethod }: StateProps) {
         postcode: formData.postcode,
         state: formData.state
       },      
-      description: formData.description,
+      description: quill.getText(),
       linked_in_url: formData.linked_in_url,
       facebook_url: formData.facebook_url,
       twitter_username: formData.twitter_username
@@ -229,7 +241,8 @@ export function ContactForm ({ state, httpReqMethod }: StateProps) {
   const backBtn = 'Back To Contacts'
 
   const onCancel = () => {
-    resetForm()
+    setFormData(compileInitialFormData())
+    quill.setText(state?.value?.description || '')
   }
 
   return (

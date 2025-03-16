@@ -26,6 +26,7 @@ import { fetchData } from '../../components/FetchData'
 
 type response = {
   created_by: string
+  created_by_email: string
   created_on: string
   created_on_arrow: string
   date_of_birth: string
@@ -87,7 +88,6 @@ export default function ContactDetails () {
     }
     fetchData(`${ContactUrl}/${id}/`, 'GET', null as any, Header).then(
       (res) => {
-        // console.log(res, 'res');
         if (!res.error) {
           setContactDetails(res?.contact_obj)
           setAddressDetails(res?.address_obj)
@@ -97,32 +97,11 @@ export default function ContactDetails () {
     )
   }
 
-  //   useEffect(() => {
-  // navigate(-1)
-  //     fetchData(`${ContactUrl}/${state.contactId}/`, 'GET', null as any, Header)
-  //       .then((data) => {
-  //         if (!data.error) {
-  // setData(Object.assign({}, data, { cases: data.cases }));
-
-  //           setContactDetails(data.contact_obj)
-  //           setNewaddress(...contactDetails, {
-  //             addreslane: data.contact_obj.address.address_line,
-  //             city: data.contact_obj.address.city,
-  //             state: data.contact_obj.address.state,
-  //             postcode: data.contact_obj.address.postcode,
-  //             country: data.contact_obj.address.country,
-  //             street: data.contact_obj.address.street
-  //           })
-  //         }
-  //       })
-  //   }, [])
-
   const backbtnHandle = () => {
     navigate('/app/contacts')
   }
 
   const editHandle = () => {
-    // navigate('/contacts/edit-contacts', { state: { value: contactDetails, address: newAddress } })
     navigate('/app/contacts/edit-contact', {
       state: {
         value: {
@@ -158,7 +137,6 @@ export default function ContactDetails () {
   const module = 'Contacts'
   const crntPage = 'Contact Detail'
   const backBtn = 'Back To Contacts'
-  // console.log(state, 'contact');
 
   return (
     <Box sx={{ mt: '60px' }}>
@@ -216,18 +194,18 @@ export default function ContactDetails () {
                       flexDirection: 'row',
                       justifyContent: 'flex-end',
                       alignItems: 'center',
-                      marginRight: '15px',
-                      textTransform: 'capitalize'
+                      marginRight: '15px'
+                      // textTransform: 'capitalize'
                     }}
                   >
-                    created on
-                    {formatDate(contactDetails?.created_on)}
-                    &nbsp;by &nbsp;&nbsp;
+                    Created
+                    {` ${contactDetails?.created_on_arrow} by `}
                     <span
                       style={{
                         display: 'flex',
                         flexDirection: 'row',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        margin: '0 5px'
                       }}
                     >
                       <Avatar
@@ -237,24 +215,22 @@ export default function ContactDetails () {
                           width: '24px'
                         }}
                       />
-                    </span>{' '}
-                    &nbsp;&nbsp;
-                    {contactDetails?.first_name}
-                    {contactDetails?.last_name}
+                    </span>
+                    {contactDetails?.created_by_email}
                   </div>
-                  <div>Last update&nbsp;{contactDetails?.created_on_arrow}</div>
+                  {/* <div>{`Last update ${contactDetails?.created_on_arrow}`}</div> */}
                 </div>
               </div>
               <div
                 style={{
-                  padding: '20px',
+                  // padding: '10px',
                   display: 'flex',
                   flexDirection: 'row',
                   justifyContent: 'space-between'
                 }}
               >
                 <div style={{ width: '32%' }}>
-                  <div className="title2">Account Title</div>
+                  {/* <div className="title2">Account Title</div> */}
                   <div
                     style={{
                       fontSize: '16px',
@@ -265,15 +241,6 @@ export default function ContactDetails () {
                     }}
                   >
                     <div style={{ display: 'flex' }}>
-                      {/* <AvatarGroup
-                                                total={2}
-                                                max={3}
-                                            >
-                                                <Tooltip title={con.user.username}>
-                                                    <Avatar alt={'sdf'}>
-                                                    </Avatar>
-                                                </Tooltip>
-                                            </AvatarGroup> */}
                     </div>
                   </div>
                 </div>
@@ -325,9 +292,9 @@ export default function ContactDetails () {
                       {contactDetails?.primary_email ? (
                         <div>
                           <Link>{contactDetails?.primary_email}</Link>
-                          <FaStar
-                            style={{ fontSize: '16px', fill: 'yellow' }}
-                          />
+                          {contactDetails?.secondary_email && <FaStar
+                            style={{ fontSize: '13px', fill: 'gray', marginLeft: '5px' }}
+                          />}
                         </div>
                       ) : (
                         '----'
@@ -348,9 +315,9 @@ export default function ContactDetails () {
                       {contactDetails?.mobile_number ? (
                         <div>
                           {contactDetails?.mobile_number}
-                          {
+                          {contactDetails?.secondary_number &&
                             <FaStar
-                              style={{ fontSize: '16px', fill: 'yellow' }}
+                            style={{ fontSize: '13px', fill: 'gray', marginLeft: '5px' }}
                             />
                           }
                         </div>
@@ -397,12 +364,13 @@ export default function ContactDetails () {
                   </div>
                 </div>
                 <div style={{ width: '32%' }}>
-                  <div className="title2">Do Not Call</div>
+                  <div className="title2">Can be called?</div>
                   <div className="title3">
-                    <AntSwitch
+                    {/* <AntSwitch
                       checked={contactDetails?.do_not_call}
                       inputProps={{ 'aria-label': 'ant design' }}
-                    />
+                    /> */}
+                    {contactDetails?.do_not_call ? 'No' : 'Yes'}
                   </div>
                 </div>
               </div>

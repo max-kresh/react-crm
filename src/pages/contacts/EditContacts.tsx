@@ -3,7 +3,7 @@ import { ContactForm } from './ContactForm'
 
 function EditContacts () {
   const { state } = useLocation()
-  console.log('stateeeee ', state)
+
   return (
     <ContactForm state={state} httpReqMethod='PUT'/>
   )
