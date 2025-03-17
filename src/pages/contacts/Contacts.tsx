@@ -204,13 +204,10 @@ export default function Contacts () {
     [40, '40 Records per page'],
     [50, '50 Records per page']
   ]
-  // console.log(contactList, 'cccc')
-  // console.log(context, 'cc');
   return (
     <Box
       sx={{
         mt: '60px'
-        // , width: '1376px'
       }}
     >
       <CustomToolbar sx={{ flexDirection: 'row-reverse' }}>

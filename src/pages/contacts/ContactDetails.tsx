@@ -57,6 +57,7 @@ type response = {
   street: string
   name: string
   website: string
+  category: string
 }
 
 export const formatDate = (dateString: any) => {
@@ -127,7 +128,8 @@ export default function ContactDetails () {
           description: contactDetails?.description,
           linked_in_url: contactDetails?.linked_in_url,
           facebook_url: contactDetails?.facebook_url,
-          twitter_username: contactDetails?.twitter_username
+          twitter_username: contactDetails?.twitter_username,
+          category: contactDetails?.category
         },
         id: state?.contactId?.id
       }
@@ -371,6 +373,22 @@ export default function ContactDetails () {
                       inputProps={{ 'aria-label': 'ant design' }}
                     /> */}
                     {contactDetails?.do_not_call ? 'No' : 'Yes'}
+                  </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  padding: '20px',
+                  marginTop: '15px',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between'
+                }}
+              >
+                <div style={{ width: '32%' }}>
+                  <div className="title2">Category</div>
+                  <div className="title3">
+                    {contactDetails?.category || '----'}
                   </div>
                 </div>
               </div>

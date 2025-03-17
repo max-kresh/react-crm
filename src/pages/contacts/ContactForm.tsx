@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   TextField,
@@ -26,6 +26,7 @@ import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
 import '../../styles/style.css'
 import { COUNTRIES } from '../../utils/Constants'
+import { UserContext } from '../../context/UserContext'
 
 type FormErrors = {
   salutation?: string[]
@@ -50,6 +51,7 @@ type FormErrors = {
   linked_in_url?: string[]
   facebook_url?: string[]
   twitter_username?: string[]
+  category?: string[] 
 }
 
 interface StateProps {
@@ -88,7 +90,8 @@ export function ContactForm ({ state, httpReqMethod }: StateProps) {
       description: '',
       linked_in_url: '',
       facebook_url: '',
-      twitter_username: ''
+      twitter_username: '',
+      category: null
     }
   )
   const [formData, setFormData] = useState(compileInitialFormData())
@@ -103,6 +106,8 @@ export function ContactForm ({ state, httpReqMethod }: StateProps) {
     mobile_number: '',
     secondary_number: ''
   })
+
+  const userCtx = useContext(UserContext)
 
   useEffect(() => {
     if (quill) {
@@ -173,8 +178,10 @@ export function ContactForm ({ state, httpReqMethod }: StateProps) {
       description: quill.getText(),
       linked_in_url: formData.linked_in_url,
       facebook_url: formData.facebook_url,
-      twitter_username: formData.twitter_username
+      twitter_username: formData.twitter_username,
+      is_prospect: formData.category === 'Prospect'
     }
+
     let url = ''
     if (httpReqMethod === 'POST') {
       url = `${ContactUrl}/`
@@ -213,6 +220,7 @@ export function ContactForm ({ state, httpReqMethod }: StateProps) {
       title: '',
       language: '',
       do_not_call: false,
+      is_prospect: false,
       department: '',
       address_line: '',
       street: '',
@@ -466,18 +474,33 @@ export function ContactForm ({ state, httpReqMethod }: StateProps) {
                         />
                       </div>
                       <div className="fieldSubContainer">
-                        <div className="fieldTitle">Do Not Call</div>
-                        <AntSwitch
-                          name="do_not_call"
-                          checked={formData.do_not_call}
-                          onChange={(e: any) => {
-                            setFormData((prevData: any) => ({
-                              ...prevData,
-                              do_not_call: e.target.checked
-                            }))
-                          }}
-                          sx={{ mt: '1%' }}
-                        />
+                          <div className="fieldTitle">Do Not Call</div>
+                          <AntSwitch
+                            name="do_not_call"
+                            checked={formData.do_not_call}
+                            onChange={(e: any) => {
+                              setFormData((prevData: any) => ({
+                                ...prevData,
+                                do_not_call: e.target.checked
+                              }))
+                            }}
+                            sx={{ mt: '1%' }}
+                          />
+                          {!userCtx.isUser() && ['Prospect', '', null].includes(formData.category) &&   
+                            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', width: '70%' }}>
+                            <div className="fieldTitle">Prospect</div>
+                            <AntSwitch
+                              name="is_prospect"
+                              checked={ formData.category === 'Prospect' }
+                              onChange={(e: any) => {
+                                setFormData((prevData: any) => ({
+                                  ...prevData,
+                                  category: e.target.checked ? 'Prospect' : null
+                                }))
+                              }}
+                              sx={{ mt: '1%' }}
+                            />
+                          </div>}
                       </div>
                     </div>
                   </Box>
