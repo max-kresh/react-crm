@@ -30,7 +30,7 @@ export const formatDate = (dateString: any) => {
   }
   return new Date(dateString).toLocaleDateString(undefined, options)
 }
-type response = {
+export type accountResponse = {
   created_by: {
     email: string
     id: string
@@ -95,7 +95,7 @@ export const AccountDetails = (props: any) => {
   const { state } = useLocation()
   const navigate = useNavigate()
 
-  const [accountDetails, setAccountDetails] = useState<response | null>(null)
+  const [accountDetails, setAccountDetails] = useState<accountResponse | null>(null)
   const [usersDetails, setUsersDetails] = useState<
     Array<{
       user_details: {

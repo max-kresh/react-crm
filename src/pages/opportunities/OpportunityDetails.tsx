@@ -28,7 +28,7 @@ export const formatDate = (dateString: any) => {
   }
   return new Date(dateString).toLocaleDateString(undefined, options)
 }
-type response = {
+export type opportunityResponse = {
   created_by: {
     email: string
     id: string
@@ -115,7 +115,7 @@ export const OpportunityDetails = (props: any) => {
   const { state } = useLocation()
   const navigate = useNavigate()
 
-  const [opportunityDetails, setOpportunityDetails] = useState<response | null>(
+  const [opportunityDetails, setOpportunityDetails] = useState<opportunityResponse | null>(
     null
   )
   const [usersDetails, setUsersDetails] = useState<

@@ -68,6 +68,7 @@ import { StyledListItemButton, StyledListItemText } from '../styles/CssStyled'
 import MyContext from '../context/Context'
 import { UserContext } from '../context/UserContext'
 import { Constants } from '../utils/Constants'
+import { Dashboard } from '../pages/dashboard/Dashboard'
 
 // declare global {
 //     interface Window {
@@ -78,7 +79,7 @@ import { Constants } from '../utils/Constants'
 export default function Sidebar (props: any) {
   const navigate = useNavigate()
   const location = useLocation()
-  const [screen, setScreen] = useState('contacts')
+  const [screen, setScreen] = useState('dashboard')
   const [drawerWidth, setDrawerWidth] = useState(200)
   const [headerWidth, setHeaderWidth] = useState(drawerWidth)
   const [userDetail, setUserDetail] = useState('')
@@ -113,9 +114,9 @@ export default function Sidebar (props: any) {
     if (
       location.pathname.split('/')[1] === '' ||
       location.pathname.split('/')[1] === undefined ||
-      location.pathname.split('/')[2] === 'leads'
+      location.pathname.split('/')[2] === 'dashboard'
     ) {
-      setScreen('leads')
+      setScreen('dashboard')
     } else if (location.pathname.split('/')[2] === 'contacts') {
       setScreen('contacts')
     } else if (location.pathname.split('/')[2] === 'opportunities') {
@@ -130,6 +131,8 @@ export default function Sidebar (props: any) {
       setScreen('cases')
     } else if (location.pathname.split('/')[2] === 'settings') {
       setScreen('settings')
+    } else if (location.pathname.split('/')[2] === 'dashboard') {
+      setScreen('leads')
     }
   }
 
@@ -152,6 +155,7 @@ export default function Sidebar (props: any) {
   // TODO This array must be revised according to user roles
   const createSidebarList = () => {
     const list = [
+      'dashboard', 
       'leads',
       'contacts',
       'opportunities',
@@ -217,6 +221,12 @@ export default function Sidebar (props: any) {
           <FaWrench fill="#3e79f7" />
         ) : (
           <FaWrench />
+        )
+      case 'dashboard':
+        return screen === 'dashboard' ? (
+          <FaDiceD6 fill="#3e79f7" />
+        ) : (
+          <FaDiceD6 />
         )
       default:
         return <FaDiceD6 fill="#3e79f7" />
@@ -423,7 +433,8 @@ export default function Sidebar (props: any) {
                             <Route index element={<Navigate to="/contacts" replace />} />
                             </Routes> */}
             <Routes>
-              <Route index element={<Leads />} />
+            <Route index element={<Dashboard />} />
+            <Route path="/app/dashboard" element={<Dashboard />} />
               {/* <Route path='/' element={<Contacts />} /> */}
               <Route path="/app/leads" element={<Leads />} />
               <Route path="/app/leads/add-leads" element={<AddLeads />} />
