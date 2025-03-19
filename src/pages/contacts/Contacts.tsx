@@ -65,18 +65,6 @@ const headCells: readonly HeadCell[] = [
     disablePadding: false,
     label: 'Name'
   },
-  // {
-  //     id: 'first_name',
-  //     numeric: false,
-  //     disablePadding: false,
-  //     label: 'First Name'
-  // },
-  // {
-  //     id: 'last_name',
-  //     numeric: true,
-  //     disablePadding: false,
-  //     label: 'Last Name'
-  // },
 
   {
     id: 'primary_email',
@@ -106,7 +94,6 @@ const headCells: readonly HeadCell[] = [
 
 export default function Contacts () {
   const navigate = useNavigate()
-  // const context = useMyContext();
 
   const [value, setValue] = useState('Open')
   const [loading, setLoading] = useState(true)
@@ -127,30 +114,10 @@ export default function Contacts () {
   const [recordsPerPage, setRecordsPerPage] = useState<number>(10)
   const [totalPages, setTotalPages] = useState<number>(0)
 
-  // useEffect(() => {
-  //     getContacts()
-  // }, [localStorage.getItem('org')])
-
   useEffect(() => {
     getContacts()
   }, [currentPage, recordsPerPage])
 
-  // const handleChangeTab = (e: SyntheticEvent, val: any) => {
-  //     setValue(val)
-  // }
-
-  // const fetch2 = () => {
-  //     const headers = new Headers({
-  //         'Accept': 'application/json',
-  //         'Content-Type': 'application/json',
-  //         'Authorization': localStorage.getItem('Token') || '',
-  //         'org': localStorage.getItem('org') || '',
-  //     });
-  //     // fetch(`https://8000-little-dawn-70215372.eu-ws3.runcode.io/api/${ContactUrl}/`, { method: 'GET', headers: headers })
-  //     fetch(`https://8000-little-dawn-70215372.eu-ws3.runcode.io/api/${ContactUrl}/?offset=0&limit=20`, { method: 'GET', headers: headers })
-  //         .then((response) => response.json())
-  //         .then((data) => { console.log(data, 'data') })
-  // }
   const getContacts = async () => {
     try {
       const offset = (currentPage - 1) * recordsPerPage
@@ -160,13 +127,9 @@ export default function Contacts () {
         null as any,
         compileHeader()
       )
-        // fetchData(`${ContactUrl}/`, 'GET', null as any, Header)
         .then((data) => {
           if (!data.error) {
-            // console.log(data.contact_obj_list, 'contact')
-            // if (initial) {
             setContactList(data.contact_obj_list)
-            // setTotalPages(data?.contacts_count)
             setTotalPages(Math.ceil(data?.contacts_count / recordsPerPage))
             setLoading(false)
           }
@@ -185,7 +148,6 @@ export default function Contacts () {
   const DeleteItem = () => {
     fetchData(`${ContactUrl}/${selectedId}/`, 'DELETE', null as any, compileHeader())
       .then((res: any) => {
-        // console.log('delete:', res);
         if (!res.error) {
           deleteRowModalClose()
           getContacts()
@@ -216,7 +178,6 @@ export default function Contacts () {
     if (!loading) {
       navigate('/app/contacts/add-contacts')
     }
-    // navigate('/contacts/add-contacts?page=add-contacts')
   }
 
   const contactHandle = (contactId: any) => {
@@ -243,36 +204,18 @@ export default function Contacts () {
     [40, '40 Records per page'],
     [50, '50 Records per page']
   ]
-  // console.log(contactList, 'cccc')
-  // console.log(context, 'cc');
   return (
     <Box
       sx={{
         mt: '60px'
-        // , width: '1376px'
       }}
     >
       <CustomToolbar sx={{ flexDirection: 'row-reverse' }}>
-        {/* <Tabs defaultValue={value} onChange={handleChangeTab} sx={{ mt: '27px' }}>
-                    <CustomTab value="Open" label="Open"
-                        sx={{
-                            backgroundColor: value === 'Open' ? '#F0F7FF' : '#223d60',
-                            color: value === 'Open' ? '#3f51b5' : 'white',
-                        }}></CustomTab>
-                    <CustomTab value="Closed" label="Closed"
-                        sx={{
-                            backgroundColor: value === 'Closed' ? '#F0F7FF' : '#223d60',
-                            color: value === 'Closed' ? '#3f51b5' : 'white',
-                            ml: '5px',
-                        }}
-                    ></CustomTab>
-                </Tabs> */}
         <Stack
           sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
         >
           <Select
             value={recordsPerPage}
-            // onChange={(e: any) => setRecordsPerPage(e.target.value)}
             onChange={(e: any) => handleRecordsPerPage(e)}
             open={selectOpen}
             onOpen={() => setSelectOpen(true)}
@@ -358,27 +301,14 @@ export default function Contacts () {
                   numSelected={selected.length}
                   order={order}
                   orderBy={orderBy}
-                  // onSelectAllClick={tab === 0 ? handleSelectAllClick : ''}
-                  // onSelectAllClick={''}
                   onRequestSort={handleRequestSort}
-                  // rowCount={tab === 0 ? usersData.active_users_count : usersData.inactive_users_count}
                   numSelectedId={selectedId}
                   isSelectedId={isSelectedId}
                   headCells={headCells}
                 />
-                {/* <TableHead>
-                            <TableRow>
-                                <StyledTableCell style={{ fontWeight: 'bold', fontSize: '13p', color: '#1A3353' }}>Name</StyledTableCell>
-                                <StyledTableCell style={{ fontWeight: 'bold', fontSize: '13p', color: '#1A3353' }}>Email</StyledTableCell>
-                                <StyledTableCell style={{ fontWeight: 'bold', fontSize: '13p', color: '#1A3353' }}>Phone Number</StyledTableCell>
-                                 <StyledTableCell style={{ fontWeight: 'bold', fontSize: '13p', color: '#1A3353' }}>Do Not Call</StyledTableCell> 
-                        <StyledTableCell style={{ fontWeight: 'bold', fontSize: '13p', color: '#1A3353' }}>Action</StyledTableCell>
-                    </TableRow>
-                </TableHead> */}
                 <TableBody>
                   {contactList?.length
                     ? stableSort(contactList, getComparator(order, orderBy))
-                        // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item: any, index: any) => {
                         .map((item: any, index: any) => {
                           return (
                             <TableRow
@@ -389,8 +319,8 @@ export default function Contacts () {
                                 '&:nth-of-type(even)': {
                                   backgroundColor: 'whitesmoke'
                                 },
-                                color: 'rgb(26, 51, 83)',
-                                textTransform: 'capitalize'
+                                color: 'rgb(26, 51, 83)'
+                                // textTransform: 'capitalize'
                               }}
                             >
                               <TableCell
@@ -412,9 +342,6 @@ export default function Contacts () {
                                   ? item.category
                                   : '---'}
                               </TableCell>                              
-                              {/* <StyledTableCell align='left'>
-                                                <AntSwitch checked={item.do_not_call} inputProps={{ 'aria-label': 'ant design' }} />
-                                            </StyledTableCell> */}
                               <TableCell className="tableCell">
                                 <FaTrashAlt
                                   style={{ cursor: 'pointer' }}
