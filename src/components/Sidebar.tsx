@@ -131,7 +131,7 @@ export default function Sidebar (props: any) {
       setScreen('cases')
     } else if (location.pathname.split('/')[2] === 'settings') {
       setScreen('settings')
-    } else if (location.pathname.split('/')[2] === 'dashboard') {
+    } else if (location.pathname.split('/')[2] === 'leads') {
       setScreen('leads')
     }
   }
