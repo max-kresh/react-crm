@@ -63,7 +63,7 @@ export const formatDate = (dateString: any) => {
   return new Date(dateString).toLocaleDateString(undefined, options)
 }
 
-type response = {
+export type leadResponse = {
   created_by: {
     email: string
     id: string
@@ -119,7 +119,7 @@ const COMMENT_SORT_DIRECTIONS = ['Recent Last', 'Recent First']
 function LeadDetails (props: any) {
   const { state } = useLocation()
   const navigate = useNavigate()
-  const [leadDetails, setLeadDetails] = useState<response | null>(null)
+  const [leadDetails, setLeadDetails] = useState<leadResponse | null>(null)
   const [usersDetails, setUsersDetails] = useState<
     Array<{
       user_details: {

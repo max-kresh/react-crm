@@ -24,7 +24,7 @@ import { AntSwitch } from '../../styles/CssStyled'
 import { ContactUrl } from '../../services/ApiUrls'
 import { fetchData } from '../../components/FetchData'
 
-type response = {
+export type contactResponse = {
   created_by: string
   created_by_email: string
   created_on: string
@@ -72,9 +72,9 @@ export const formatDate = (dateString: any) => {
 export default function ContactDetails () {
   const navigate = useNavigate()
   const { state } = useLocation()
-  const [contactDetails, setContactDetails] = useState<response | null>(null)
-  const [addressDetails, setAddressDetails] = useState<response | null>(null)
-  const [org, setOrg] = useState<response | null>(null)
+  const [contactDetails, setContactDetails] = useState<contactResponse | null>(null)
+  const [addressDetails, setAddressDetails] = useState<contactResponse | null>(null)
+  const [org, setOrg] = useState<contactResponse | null>(null)
 
   useEffect(() => {
     getContactDetail(state.contactId.id)
