@@ -24,6 +24,12 @@ import { AntSwitch } from '../../styles/CssStyled'
 import { ContactUrl } from '../../services/ApiUrls'
 import { fetchData } from '../../components/FetchData'
 
+interface Lead {
+  id: string,
+  title: string,
+  status: string
+}
+
 type response = {
   created_by: string
   created_by_email: string
@@ -58,6 +64,7 @@ type response = {
   name: string
   website: string
   category: string
+  leads: Lead[]
 }
 
 export const formatDate = (dateString: any) => {
@@ -90,6 +97,7 @@ export default function ContactDetails () {
     fetchData(`${ContactUrl}/${id}/`, 'GET', null as any, Header).then(
       (res) => {
         if (!res.error) {
+          console.log('contact det', res)
           setContactDetails(res?.contact_obj)
           setAddressDetails(res?.address_obj)
           setOrg(res?.org)
@@ -97,7 +105,7 @@ export default function ContactDetails () {
       }
     )
   }
-
+  console.log('contact det detalils', contactDetails)
   const backbtnHandle = () => {
     navigate('/app/contacts')
   }
@@ -388,7 +396,18 @@ export default function ContactDetails () {
                 <div style={{ width: '32%' }}>
                   <div className="title2">Category</div>
                   <div className="title3">
-                    {contactDetails?.category || '----'}
+                    {contactDetails?.leads && contactDetails?.leads.length > 0
+                      ? contactDetails?.leads?.map((lead: Lead) => 
+                        <p key={ lead.id }>
+                          <span style={{ fontWeight: '900' }}>{lead?.status.toLowerCase() === 'converted' ? 'Customer' : 'Lead'}</span> 
+                          for {lead.title}</p>) 
+                      : <p>{contactDetails?.category || '----'}</p>
+                    }
+                  {/* {contactDetails?.category && ['Lead', 'Customer', 'Customer/Lead'].includes(contactDetails?.category) 
+                      ? contactDetails?.leads?.map((lead: Lead) => 
+                        <p>{lead?.status.toLowerCase() === 'converted' ? 'Customer' : 'Lead'} for {lead.title}</p>
+                      ) : <p>{contactDetails?.category || '----'}</p>
+                    }  */}
                   </div>
                 </div>
               </div>

@@ -204,6 +204,21 @@ export default function Contacts () {
     [40, '40 Records per page'],
     [50, '50 Records per page']
   ]
+
+  function getContactCategory (contact: any) {
+    let category = '---'
+    if (contact?.leads && contact?.leads.length > 0) {
+      if (contact?.leads.filter((c: any) => c.status.toLowerCase() === 'converted').length > 0) {
+        category = 'Customer'
+      }
+      if (contact?.leads.filter((c: any) => c.status.toLowerCase() !== 'converted').length > 0) {
+        category = category === '---' ? 'Lead' : 'Customer/Lead'
+      }
+    } else {
+      category = contact?.category
+    }
+    return category
+  }
   return (
     <Box
       sx={{
@@ -338,9 +353,7 @@ export default function Contacts () {
                                   : '---'}
                               </TableCell>
                               <TableCell className="tableCell">
-                                {item.category
-                                  ? item.category
-                                  : '---'}
+                                { getContactCategory(item) }
                               </TableCell>                              
                               <TableCell className="tableCell">
                                 <FaTrashAlt
