@@ -204,26 +204,15 @@ export default function Login () {
                 </button>
               </div>
             </Grid>
-            <Grid item sx={{ mt: 4 }}>
+            {google_login_allowed && <Grid item sx={{ mt: 4 }}>
             <Typography style={{ 
                 fontStyle: 'italic',
                 justifyContent: 'center',
                 marginTop: '15px',
                 marginBottom: '10px'
                 }} variant="body2">
-                {google_login_allowed && <p>Or</p>} 
-              </Typography>
-              {/* <GoogleLogin
-                                onSuccess={credentialResponse => {
-                                    console.log(credentialResponse);
-                                }}
-
-                                onError={() => {
-                                    console.log('Login Failed');
-                                }}
-                            />
-                            <Button onClick={signout}>logout</Button> */}
-              {google_login_allowed && 
+                <p>Or</p> 
+              </Typography>              
               <GoogleButton
                 variant="outlined"
                 onClick={() => login()}
@@ -235,28 +224,8 @@ export default function Login () {
                   alt="google"
                   style={{ width: '17px', marginLeft: '5px' }}
                 />
-              </GoogleButton>}
-              {/* <Grid item sx={{ mt: 2, alignItems: 'center', alignContent: 'center' }}>
-                                <Grid item sx={{ mt: 1, ml: 6 }}>
-                                    <div className='authentication_wrapper'>
-                                        <div className='authentication_block'>
-                                            <div className='buttons'>
-                                                <GoogleLogin
-                                                    onSuccess={credentialResponse => {
-                                                        console.log(credentialResponse);
-                                                    }}
-
-                                                    onError={() => {
-                                                        console.log('Login Failed');
-                                                    }}
-
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Grid>
-                            </Grid> */}
-            </Grid>
+              </GoogleButton>              
+            </Grid>}
           </Grid>
         </Grid>
         <Grid

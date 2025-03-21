@@ -25,9 +25,16 @@ import { ContactUrl } from '../../services/ApiUrls'
 import { fetchData } from '../../components/FetchData'
 
 interface Lead {
-  id: string,
-  title: string,
-  status: string
+  contact_status: string,
+  lead: {
+    id: string,
+    title: string,
+    status: string
+  }
+}
+interface CategoryDetails {
+  general_category: string,
+  details: Lead[]
 }
 
 type response = {
@@ -64,7 +71,7 @@ type response = {
   name: string
   website: string
   category: string
-  leads: Lead[]
+  category_details: CategoryDetails
 }
 
 export const formatDate = (dateString: any) => {
@@ -396,18 +403,14 @@ export default function ContactDetails () {
                 <div style={{ width: '32%' }}>
                   <div className="title2">Category</div>
                   <div className="title3">
-                    {contactDetails?.leads && contactDetails?.leads.length > 0
-                      ? contactDetails?.leads?.map((lead: Lead) => 
-                        <p key={ lead.id }>
-                          <span style={{ fontWeight: '900' }}>{lead?.status.toLowerCase() === 'converted' ? 'Customer' : 'Lead'}</span> 
-                          for {lead.title}</p>) 
-                      : <p>{contactDetails?.category || '----'}</p>
-                    }
-                  {/* {contactDetails?.category && ['Lead', 'Customer', 'Customer/Lead'].includes(contactDetails?.category) 
-                      ? contactDetails?.leads?.map((lead: Lead) => 
-                        <p>{lead?.status.toLowerCase() === 'converted' ? 'Customer' : 'Lead'} for {lead.title}</p>
-                      ) : <p>{contactDetails?.category || '----'}</p>
-                    }  */}
+                    {!contactDetails?.category_details?.details?.length  
+                    ? contactDetails?.category_details?.general_category ?? '---'
+                    : contactDetails?.category_details?.details.map((detail: Lead) => 
+                      <p key={ detail.lead.id }>
+                        <span style={{ fontWeight: '900' }}>{detail.contact_status}</span> from
+                        &nbsp;{detail.lead.title}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

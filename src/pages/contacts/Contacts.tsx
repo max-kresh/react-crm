@@ -353,7 +353,7 @@ export default function Contacts () {
                                   : '---'}
                               </TableCell>
                               <TableCell className="tableCell">
-                                { getContactCategory(item) }
+                                { item.category_details.general_category ?? '---'}
                               </TableCell>                              
                               <TableCell className="tableCell">
                                 <FaTrashAlt
