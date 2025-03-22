@@ -57,12 +57,6 @@ interface HeadCell {
 }
 
 const headCells: readonly HeadCell[] = [
-  // {
-  //   id: '',
-  //   numeric: false,
-  //   disablePadding: false,
-  //   label: ''
-  // },
   {
     id: 'name',
     numeric: false,
@@ -347,21 +341,6 @@ export default function Opportunities (props: any) {
   return (
     <Box sx={{ mt: '60px' }}>
       <CustomToolbar sx={{ flexDirection: 'row-reverse' }}>
-        {/* <Tabs defaultValue={tab} onChange={handleChangeTab} sx={{ mt: '26px' }}>
-          <CustomTab value="open" label="Open"
-            sx={{
-              backgroundColor: tab === 'open' ? '#F0F7FF' : '#284871',
-              color: tab === 'open' ? '#3f51b5' : 'white',
-            }} />
-          <CustomTab value="closed" label="Closed"
-            sx={{
-              backgroundColor: tab === 'closed' ? '#F0F7FF' : '#284871',
-              color: tab === 'closed' ? '#3f51b5' : 'white',
-              ml: '5px',
-            }}
-          />
-        </Tabs> */}
-
         <Stack
           sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
         >
@@ -447,27 +426,6 @@ export default function Opportunities (props: any) {
           <Paper
             sx={{ width: 'cal(100%-15px)', mb: 2, p: '0px 15px 15px 15px' }}
           >
-            {/* <Toolbar sx={{ pl: { sm: 2 }, pr: { xs: 1, sm: 1 } }}>
-                            <Tooltip title='Delete'>
-                                <Button
-                                    variant='outlined'
-                                    onClick={() => !!(selectedId?.length !== 0) && handleDelete(selectedId)}
-                                    startIcon={<FaTrashAlt color='red' style={{ width: '12px' }} />}
-                                    size='small'
-                                    color='error'
-                                    sx={{ fontWeight: 'bold', textTransform: 'capitalize', color: 'red', borderColor: 'darkgrey' }}
-                                >
-                                    Delete
-                                </Button>
-                            </Tooltip>
-                            {selected.length > 0 ? (
-                                <Typography sx={{ flex: '1 1 100%', margin: '5px' }} color='inherit' variant='subtitle1' component='div'>
-                                    {selected.length} selected
-                                </Typography>
-                            ) : (
-                                ''
-                            )}
-                        </Toolbar> */}
             <TableContainer>
               <Table>
                 <EnhancedTableHead
@@ -504,20 +462,6 @@ export default function Opportunities (props: any) {
                             textTransform: 'capitalize'
                           }}
                         >
-                          {/* <TableCell
-                                                                    padding='checkbox'
-                                                                    sx={{ border: 0, color: 'inherit' }}
-                                                                    align='left'
-                                                                >
-                                                                    <Checkbox
-                                                                        checked={isSelectedId[rowIndex] || false}
-                                                                        onChange={() => handleRowSelect(item.id)}
-                                                                        inputProps={{
-                                                                            'aria-labelledby': labelId,
-                                                                        }}
-                                                                        sx={{ border: 0, color: 'inherit' }}
-                                                                    />
-                                                                </TableCell> */}
                           <TableCell
                             className="tableCell-link"
                             onClick={() => opportunityDetail(item.id)}
@@ -536,9 +480,6 @@ export default function Opportunities (props: any) {
                             ) : (
                               '----'
                             )}
-                            {/* <Stack style={{ display: 'flex', flexDirection: 'row', alignItems: "center" }}>
-                                  <Avatar src={item?.lead?.created_by?.profile_pic} alt={item?.lead?.created_by?.email} /><Stack sx={{ ml: 1 }}>{item?.lead?.account_name ? item?.lead?.account_name : '---'}</Stack>
-                                </Stack> */}
                           </TableCell>
                           <TableCell className="tableCell">
                             {item?.stage ? item?.stage : '---'}
@@ -562,12 +503,6 @@ export default function Opportunities (props: any) {
                             {item?.lead_source ? item?.lead_source : '---'}
                           </TableCell>
                           <TableCell className="tableCell">
-                            {/* <IconButton>
-                                                                        <FaEdit
-                                                                            onClick={() => EditItem(item?.id)}
-                                                                            style={{ fill: '#1A3353', cursor: 'pointer', width: '18px' }}
-                                                                        />
-                                                                    </IconButton> */}
                             <IconButton>
                               <FaTrashAlt
                                 onClick={() => deleteRow(item?.id)}
