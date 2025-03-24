@@ -309,35 +309,7 @@ export default function Opportunities (props: any) {
     [40, '40 Records per page'],
     [50, '50 Records per page']
   ]
-  const tag = [
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'account',
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'leading',
-    'account',
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'account',
-    'leading',
-    'account',
-    'leading'
-  ]
+  
   return (
     <Box sx={{ mt: '60px' }}>
       <CustomToolbar sx={{ flexDirection: 'row-reverse' }}>
@@ -458,8 +430,8 @@ export default function Opportunities (props: any) {
                             '&:nth-of-type(even)': {
                               backgroundColor: 'whitesmoke'
                             },
-                            color: 'rgb(26, 51, 83)',
-                            textTransform: 'capitalize'
+                            color: 'rgb(26, 51, 83)'
+                            // textTransform: 'capitalize'
                           }}
                         >
                           <TableCell
@@ -472,14 +444,24 @@ export default function Opportunities (props: any) {
                             {item?.account ? item?.account?.name : '---'}
                           </TableCell>
                           <TableCell className="tableCell">
-                            {item?.assigned_to ? (
+                            {/* {item?.assigned_to ? (
                               <Avatar
                                 src={item?.assigned_to?.user_details?.profile_pic}
                                 alt={item?.assigned_to.user_details?.email}
                               />
                             ) : (
                               '----'
-                            )}
+                            )} */}
+                            {item?.assigned_to?.length ? item?.assigned_to?.map((profile: any, index: number) => 
+                              <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'nowrap', gap: '10px' }}>
+                                <Avatar
+                                  src={item?.assigned_to?.user_details?.profile_pic}
+                                  alt={item?.assigned_to.user_details?.email}
+                                  sx={ { width: '40px', height: '40px' }}
+                                />
+                                <p key={index}>{profile.user_details?.email}</p>
+                              </div>
+                            ) : '---'}
                           </TableCell>
                           <TableCell className="tableCell">
                             {item?.stage ? item?.stage : '---'}
@@ -492,9 +474,9 @@ export default function Opportunities (props: any) {
                           <TableCell className="tableCell">
                             {item?.tags?.length
                               ? item?.tags.map((tag: any, i: any) => (
-                                  <Stack sx={{ mr: 0.5 }}>
+                                  <Stack sx={{ mr: 0.5, mb: 0.2 }}>
                                     {' '}
-                                    <Label tags={tag} />
+                                    <Label tags={tag.name} />
                                   </Stack>
                                 ))
                               : '---'}

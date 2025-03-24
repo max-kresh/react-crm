@@ -596,3 +596,114 @@ input[type='number'] {
   display: 'flex';
   justify-content: 'space-between';
 }
+
+
+:root {
+  --thickness: 10;
+  --line-height: calc(1px * var(--thickness)); 
+  --arrow-length: calc(2.5px * var(--thickness)); 
+  --diagonal: calc(var(--arrow-length) * 1.414); /*1.414 == sqrt(2) */
+  --circe-diameter: 60px;
+}
+
+.stages-panel {
+  display: flex;
+  height: 200px;
+  align-items: center;
+  margin: 10px 40px;
+}
+
+.stage-container {
+  display: flex;
+  flex-direction: column;
+  width: 350px;
+  /* height: 100px; */
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  margin-left: calc(var(--line-height)/2 + 5px);
+  /* background-color: rgb(132, 26, 26); */
+}
+.stage-circle {
+  display: flex;
+  color: white;
+  height: var(--circe-diameter);
+  font-weight: bold;
+  font-size: 1.1rem;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border-radius: 50%;  
+}
+
+.stage-circle:hover {
+  filter: brightness(65%);
+  height: calc(var(--circe-diameter) + 5px);
+}
+
+.stage-label {
+  display: flex;
+  align-items: center;
+  align-content: center;
+  color: black;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-align: center;
+  /* max-width: 50px; */
+}
+
+.connector {
+  height: var(--circe-diameter);
+  width:150px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.connector-line {
+  /* position: relative; */
+  width: 100%;
+  height: var(--line-height);
+  background-color: blue;
+  z-index: 110;
+}
+
+.connector-line-head {
+  width: var(--arrow-length);
+  height: var(--arrow-length);
+  background-color: blue;
+  position: absolute;
+  left: calc(100% - var(--diagonal)/2);
+  top: calc((var(--circe-diameter) - var(--arrow-length))/2);
+  transform: rotate(45deg);
+  z-index: 99;
+}
+
+.connector-head-clear {
+  width: var(--diagonal);
+  height: var(--diagonal);
+  background-color: white;
+  position: absolute;
+  left: calc(100% - var(--diagonal));
+  top: calc((var(--circe-diameter) - var(--diagonal))/2);
+  z-index: 100;
+}
+
+.connector-tail-clear {
+  width: var(--line-height);
+  height: var(--line-height);
+  background-color: white;
+  position: absolute;
+  top: calc((var(--circe-diameter) - var(--line-height))/2);
+  left: calc(var(--line-height) / -2);
+  transform: rotate(45deg);
+  z-index: 200;
+}
+
+.stages-panel {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-evenly;
+  gap: 10px;
+  margin-top: 30px;
+}
