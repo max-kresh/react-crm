@@ -107,7 +107,9 @@ type opportunityStage={
     id:string, 
     role:string, 
     user_details:{
-      email:string, id:string
+      email:string, 
+      id:string,
+      profile_pic: string
     }
   }, 
   changed_at:string
@@ -265,6 +267,7 @@ export const OpportunityDetails = (props: any) => {
     .then((res: any) => {
       if (!res.error) {
         setOpportunityDetails(res?.opportunity_obj)
+        setOpportunityStageHistory(res?.stage_history)
       }
     })
     .catch((err) => {
@@ -328,7 +331,73 @@ export const OpportunityDetails = (props: any) => {
                     color: '#1a3353f0'
                   }}
                 >
-                  Opportunity Information
+                  Opportunity Stage
+                </div>
+                <div
+                  style={{
+                    color: 'gray',
+                    fontSize: '16px',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'flex-end',
+                      alignItems: 'center',
+                      marginRight: '15px'
+                    }}
+                  >
+                    last updated &nbsp;
+                    {FormateTime(opportunityStageHistory?.[0]?.changed_at)} &nbsp; by
+                    &nbsp;
+                    <Avatar
+                      src={opportunityStageHistory?.[0]?.changed_by?.user_details?.profile_pic}
+                      alt={opportunityStageHistory?.[0]?.changed_by?.user_details?.email}
+                    />
+                    &nbsp; &nbsp;
+                    {opportunityStageHistory?.[0]?.changed_by?.user_details?.email}
+                  </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  padding: '10px',
+                  borderBottom: '1px solid lightgray',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                <OpportunityStages 
+                  orderedStageList={ leadStages } 
+                  currentStage={opportunityDetails?.stage} 
+                  onStageChange={handleStageChange}
+                />
+              </div>
+              <div
+                style={{
+                  padding: '20px',
+                  borderBottom: '1px solid lightgray',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+              >
+                <div
+                  style={{
+                    fontWeight: 600,
+                    fontSize: '18px',
+                    color: '#1a3353f0'
+                  }}
+                >
+                  Opportunity Details
                 </div>
                 <div
                   style={{
@@ -358,13 +427,9 @@ export const OpportunityDetails = (props: any) => {
                     />
                     &nbsp; &nbsp;
                     {opportunityDetails?.created_by?.email}
-                    {/* {opportunityDetails?.first_name}&nbsp;
-                                        {opportunityDetails?.last_name} */}
                   </div>
                 </div>
               </div>
-              <OpportunityStages orderedStageList={ leadStages } currentStage={opportunityDetails?.stage} onStageChange={handleStageChange}/>
-              
               <div
                 style={{
                   padding: '20px',

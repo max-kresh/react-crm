@@ -613,7 +613,8 @@ input[type='number'] {
   grid-template-columns: repeat(15, 1fr);
   grid-template-rows: repeat(1);
   place-items: center;
-  margin: 20px
+  margin: 10px;
+  margin-bottom: 20px;
 }
 
 .stages-panel div {

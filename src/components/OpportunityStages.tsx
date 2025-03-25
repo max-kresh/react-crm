@@ -54,7 +54,8 @@ export function OpportunityStages ({ orderedStageList, currentStage, onStageChan
             onStageChange(newStage)
         }
     }
-
+    const closedLost = stageInfo[stageInfo.length - 1]
+    const closedWon = stageInfo[stageInfo.length - 2]
     return (
         <div className='stages-panel'>
             {stageInfo.slice(0, stageInfo.length - 2).map((stage: any, index: number) =>
@@ -76,36 +77,36 @@ export function OpportunityStages ({ orderedStageList, currentStage, onStageChan
                 </>
             )}
             <StageConnector
-                color={stageInfo[stageInfo.length - 1].selected ? defaultSelectedColor : defaultNonSelectedColor}
-                key={`${stageInfo[stageInfo.length - 1].title}-${stageInfo[stageInfo.length - 1].selected || ''}-connector`}
+                color={closedLost.selected ? defaultSelectedColor : defaultNonSelectedColor}
+                key={`${closedLost.title}-${closedLost.selected || ''}-connector`}
                 classes={['connector-upwards']}
                 styles={{ gridRow: 2, gridColumn: 14, placeSelf: 'center start' }}
             />
             <StageConnector
-                color={stageInfo[stageInfo.length - 2].selected ? defaultSelectedColor : defaultNonSelectedColor}
-                key={`${stageInfo[stageInfo.length - 2].title}-${stageInfo[stageInfo.length - 2].selected || ''}-connector`}
+                color={closedWon.selected ? defaultSelectedColor : defaultNonSelectedColor}
+                key={`${closedWon.title}-${closedWon.selected || ''}-connector`}
                 classes={['connector-downwards']}
                 styles={{ gridRow: 2, gridColumn: 14, placeSelf: 'center start' }}
             />
             <div className='closed-stage-cell closed-lost-cell'>
-                <p className='stage-label'>{stageInfo[stageInfo.length - 1].title.replace('/', ' / ')}</p>
+                <p className='stage-label'>{closedLost.title.replace('/', ' / ')}</p>
                 <Stage
-                    key={`${stageInfo[stageInfo.length - 1].title}-${stageInfo[stageInfo.length - 1].selected || ''}`}
-                    stageProps={stageInfo[stageInfo.length - 1]}
-                    onClick={() => handleStageClick(stageInfo[stageInfo.length - 1].title)}
+                    key={`${closedLost.title}-${closedLost.selected || ''}`}
+                    stageProps={closedLost}
+                    onClick={() => handleStageClick(closedLost.title)}
                     {...props}
                     styles={{ placeSelf: 'center' }}
                 />
             </div>
             <div className='closed-stage-cell closed-won-cell'>
                 <Stage
-                    key={`${stageInfo[stageInfo.length - 2].title}-${stageInfo[stageInfo.length - 2].selected || ''}`}
-                    stageProps={stageInfo[stageInfo.length - 2]}
-                    onClick={() => handleStageClick(stageInfo[stageInfo.length - 2].title)}
+                    key={`${closedWon.title}-${closedWon.selected || ''}`}
+                    stageProps={closedWon}
+                    onClick={() => handleStageClick(closedWon.title)}
                     {...props}
                     styles={{ placeSelf: 'center' }}
                 />
-                <p className='stage-label'>{stageInfo[stageInfo.length - 2].title.replace('/', ' / ')}</p>
+                <p className='stage-label'>{closedWon.title.replace('/', ' / ')}</p>
             </div>
         </div>
     )
