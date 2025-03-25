@@ -11,14 +11,14 @@ import {
   Button,
   Chip
 } from '@mui/material'
-import { fetchData } from '../../components/FetchData'
+import { compileHeader, fetchData } from '../../components/FetchData'
 import { OpportunityUrl } from '../../services/ApiUrls'
 import { Tags } from '../../components/Tags'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import { FaPlus, FaStar } from 'react-icons/fa'
 import FormateTime from '../../components/FormateTime'
 import { Label } from '../../components/Label'
-import { COUNTRIES } from '../../utils/Constants'
+import { COUNTRIES, HTTP_METHODS } from '../../utils/Constants'
 import { Stage, StageConnector, OpportunityStages } from '../../components/OpportunityStages'
 
 export const formatDate = (dateString: any) => {
@@ -255,6 +255,34 @@ export const OpportunityDetails = (props: any) => {
     }
     leadStages.push(stateInfo)
   }
+
+  function handleStageChange (newStage: string) {
+    const opportunityCopy = structuredClone(state?.opportunity_obj) 
+    if (opportunityCopy) {
+      opportunityCopy.stage = newStage
+    }
+    fetchData(`${OpportunityUrl}/${state.opportunityId}/`, HTTP_METHODS.PATCH, JSON.stringify({ stage: newStage }), compileHeader())
+    .then((res: any) => {
+      if (!res.error) {
+        setOpportunityDetails(res?.opportunity_obj)
+      }
+    })
+    .catch((err) => {
+      ;<Snackbar
+        open={err}
+        autoHideDuration={4000}
+        onClose={() => navigate('/app/opportunities')}
+      >
+        <Alert
+          onClose={() => navigate('/app/opportunities')}
+          severity="error"
+          sx={{ width: '100%' }}
+        >
+          Failed to load!
+        </Alert>
+      </Snackbar>
+    })
+  }
   return (
     <Box sx={{ mt: '60px' }}>
       <div>
@@ -335,7 +363,7 @@ export const OpportunityDetails = (props: any) => {
                   </div>
                 </div>
               </div>
-              <OpportunityStages orderedStageList={ leadStages } currentStage={opportunityDetails?.stage}/>
+              <OpportunityStages orderedStageList={ leadStages } currentStage={opportunityDetails?.stage} onStageChange={handleStageChange}/>
               
               <div
                 style={{

@@ -608,21 +608,21 @@ input[type='number'] {
 
 .stages-panel {
   display: flex;
-  height: 200px;
-  align-items: center;
-  margin: 10px 40px;
+  flex-wrap: nowrap;
+  justify-items: space-evenly;
+  margin: 10px;
+  /* background-color: green; */
 }
 
 .stage-container {
   display: flex;
   flex-direction: column;
-  width: 350px;
-  /* height: 100px; */
+  width: 130px;
   align-items: center;
   align-content: center;
   justify-content: center;
   margin-left: calc(var(--line-height)/2 + 5px);
-  /* background-color: rgb(132, 26, 26); */
+  /* background-color: yellow; */
 }
 .stage-circle {
   display: flex;
@@ -645,16 +645,18 @@ input[type='number'] {
   display: flex;
   align-items: center;
   align-content: center;
-  color: black;
+  color: #1a3353f0;
   font-size: 0.9rem;
-  font-weight: bold;
+  font-weight: 600;
   text-align: center;
   /* max-width: 50px; */
 }
 
 .connector {
   height: var(--circe-diameter);
-  width:150px;
+  /* width:75px; */
+  width: 90%;
+  min-width: 50px;
   display: flex;
   align-items: center;
   position: relative;

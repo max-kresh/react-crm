@@ -11,7 +11,7 @@ export function Stage ({
     colorDefault = defaultNonSelectedColor,
     onClick
 }: any) {
-    const bgColor = stageProps?.selected ? `${colorSelected}` : `${colorDefault}`
+    const bgColor = stageProps?.selected ? `${stageProps.color ?? colorSelected}` : `${colorDefault}`
     return (
         <div className='stage-container'>
             <div className='stage-circle' style={{ backgroundColor: `${bgColor}` }} onClick={() => onClick(stageProps.title)}>
@@ -34,7 +34,7 @@ export function StageConnector ({ color }: any) {
     )
 }
 
-export function OpportunityStages ({ orderedStageList, currentStage, ...props }: any) {
+export function OpportunityStages ({ orderedStageList, currentStage, onStageChange, ...props }: any) {
     const [stageInfo, setStageInfo] = useState(orderedStageList)
 
     useEffect(() => {
@@ -46,34 +46,25 @@ export function OpportunityStages ({ orderedStageList, currentStage, ...props }:
         setStageInfo(stages)
     }, [currentStage])
 
-    function handleStageClick (title: string) {
-        const stageIndex = stageInfo.findIndex((stage: any) => stage.title === title)      
-        setStageInfo((prev: any) => {
-            const newState = structuredClone(prev)
-            for (var i = 0; i < newState.length; i++) {
-                newState[i].selected = i <= stageIndex 
-            }
-            return newState
-        })  
-    }
     return (
         <div className='stages-panel'>
-            {stageInfo.slice(0, stageInfo.length - 1).map((stage: any, index: number) => { 
-                return (<>
-                    <Stage 
-                        key={`${stage.title}-${stage.selected || ''}`}
-                        stageProps={stage} 
-                        onClick={handleStageClick}
-                        {...props} 
-                    />
-                    <StageConnector 
-                        color={stage.selected ? defaultSelectedColor : defaultNonSelectedColor} 
-                        key={`${stage.title}-${stage.selected || ''}-connector`}
-                    />
-                </>) 
-                }              
-            )}
-            <Stage stageProps={orderedStageList[orderedStageList.length - 1]} {...props} />
+            {stageInfo.map((stage: any, index: number) => { 
+                return (
+                    <>
+                        <Stage 
+                            key={`${stage.title}-${stage.selected || ''}`}
+                            stageProps={stage} 
+                            onClick={() => onStageChange(stage.title)}
+                            {...props} 
+                        />
+                        {index !== stageInfo.length - 1 && 
+                        <StageConnector 
+                            color={stage.selected ? defaultSelectedColor : defaultNonSelectedColor} 
+                            key={`${stage.title}-${stage.selected || ''}-connector`}
+                        />}
+                    </>
+                ) 
+            })}
         </div>
     )
 }
