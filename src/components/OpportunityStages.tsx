@@ -23,11 +23,12 @@ export function Stage ({
     )
 }
 
-export function StageConnector ({ color }: any) {
+export function StageConnector ({ color, classes }: any) {
+    const className = classes ? ['connector', ...classes].join(' ') : 'connector'
     return (
-        <div className='connector'>
+        <div className={className}>
             <div className='connector-line' style={{ backgroundColor: `${color}` }} />
-            <div className='connector-line-head' style={{ backgroundColor: `${color}` }} />
+            <div className='connector-head' style={{ backgroundColor: `${color}` }} />
             <div className='connector-head-clear' />
             <div className='connector-tail-clear' />
         </div>
@@ -54,23 +55,57 @@ export function OpportunityStages ({ orderedStageList, currentStage, onStageChan
 
     return (
         <div className='stages-panel'>
-            {stageInfo.slice(0, stageInfo.length - 2).map((stage: any, index: number) => { 
-                return (
-                    <>
-                        {index !== 0 && 
-                        <StageConnector 
-                            color={stage.selected ? defaultSelectedColor : defaultNonSelectedColor} 
-                            key={`${stage.title}-${stage.selected || ''}-connector`}
-                        />}
-                        <Stage 
-                            key={`${stage.title}-${stage.selected || ''}`}
-                            stageProps={stage} 
-                            onClick={() => handleStageClick(stage.title)}
-                            {...props} 
-                        />
-                    </>
-                ) 
-            })}
+            {stageInfo.slice(0, stageInfo.length - 2).map((stage: any, index: number) => 
+            <>
+                {index !== 0 && 
+                <div className='connector-panel'>
+                    <StageConnector 
+                        color={stage.selected ? defaultSelectedColor : defaultNonSelectedColor} 
+                        key={`${stage.title}-${stage.selected || ''}-connector`}
+                    />
+                </div>
+                }
+                
+                <Stage 
+                    key={`${stage.title}-${stage.selected || ''}`}
+                    stageProps={stage} 
+                    onClick={() => handleStageClick(stage.title)}
+                    {...props} 
+                />
+            </> 
+            )}
+            <div className='connector-tilted-stack'>
+                <div className='connector-panel'>
+                    <StageConnector 
+                        color={stageInfo[stageInfo.length - 1].selected ? defaultSelectedColor : defaultNonSelectedColor} 
+                        key={`${stageInfo[stageInfo.length - 1].title}-${stageInfo[stageInfo.length - 1].selected || ''}-connector`}
+                        classes={['connector-upwards']}
+                    />
+                </div>
+                <div className='connector-panel'>
+                    <StageConnector 
+                        color={stageInfo[stageInfo.length - 2].selected ? defaultSelectedColor : defaultNonSelectedColor} 
+                        key={`${stageInfo[stageInfo.length - 2].title}-${stageInfo[stageInfo.length - 2].selected || ''}-connector`}
+                        classes={['connector-downwards']}
+                    />
+                </div>
+            </div>
+            <div className='close-stage-panel'>
+                <Stage 
+                    key={`${stageInfo[stageInfo.length - 1].title}-${stageInfo[stageInfo.length - 1].selected || ''}`}
+                    stageProps={stageInfo[stageInfo.length - 1]} 
+                    onClick={() => handleStageClick(stageInfo[stageInfo.length - 1].title)}
+                    {...props} 
+                />
+
+                <Stage 
+                    key={`${stageInfo[stageInfo.length - 2].title}-${stageInfo[stageInfo.length - 2].selected || ''}`}
+                    stageProps={stageInfo[stageInfo.length - 2]} 
+                    onClick={() => handleStageClick(stageInfo[stageInfo.length - 2].title)}
+                    {...props} 
+                />
+            </div>
+            
         </div>
     )
 }

@@ -609,9 +609,11 @@ input[type='number'] {
 .stages-panel {
   display: flex;
   flex-wrap: nowrap;
+  align-items: start;
   justify-items: space-evenly;
-  margin: 10px;
-  /* background-color: green; */
+  gap: 10px;
+  margin-top: 30px;
+  /* background-color: yellow; */
 }
 
 .stage-container {
@@ -622,7 +624,6 @@ input[type='number'] {
   align-content: center;
   justify-content: center;
   margin-left: calc(var(--line-height)/2 + 5px);
-  /* background-color: yellow; */
 }
 .stage-circle {
   display: flex;
@@ -649,63 +650,82 @@ input[type='number'] {
   font-size: 0.9rem;
   font-weight: 600;
   text-align: center;
-  /* max-width: 50px; */
 }
-
-.connector {
+.connector-panel {
+  width: 100%;
   height: var(--circe-diameter);
-  /* width:75px; */
-  width: 90%;
-  min-width: 50px;
   display: flex;
   align-items: center;
+  min-width: 20px;
+}
+.connector {
+  display: flex;
+  align-items: center;
+  height: var(--diagonal);
   position: relative;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 
 .connector-line {
-  /* position: relative; */
-  width: 100%;
+  width: calc(100% - var(--diagonal)/2);
   height: var(--line-height);
-  background-color: blue;
-  z-index: 110;
+  z-index: 10;
 }
 
-.connector-line-head {
+.connector-head {
   width: var(--arrow-length);
   height: var(--arrow-length);
-  background-color: blue;
+  z-index: 8;
   position: absolute;
-  left: calc(100% - var(--diagonal)/2);
-  top: calc((var(--circe-diameter) - var(--arrow-length))/2);
+  left: calc(100% - var(--arrow-length) - var(--arrow-length) * 0.207);
+  top: calc((var(--diagonal) - var(--arrow-length))/2);
   transform: rotate(45deg);
-  z-index: 99;
 }
 
 .connector-head-clear {
-  width: var(--diagonal);
+  width: calc(var(--diagonal)/2);
   height: var(--diagonal);
-  background-color: white;
   position: absolute;
-  left: calc(100% - var(--diagonal));
-  top: calc((var(--circe-diameter) - var(--diagonal))/2);
-  z-index: 100;
+  top: 0;
+  left: calc(100% - calc(var(--diagonal)));
+  z-index: 9;
+  background-color: white;
 }
 
 .connector-tail-clear {
   width: var(--line-height);
   height: var(--line-height);
-  background-color: white;
   position: absolute;
-  top: calc((var(--circe-diameter) - var(--line-height))/2);
-  left: calc(var(--line-height) / -2);
+  left: -5px;
+  top: calc((var(--diagonal) - var(--line-height))/2);
+  z-index: 11;
   transform: rotate(45deg);
-  z-index: 200;
+  background-color: white;
 }
 
-.stages-panel {
+.connector-upwards {
+  transform-origin: 0% calc(var(--diagonal)/2);
+  transform: rotate(-45deg);
+}
+
+.connector-downwards {
+  transform-origin: 0% calc(var(--diagonal)/2);
+  transform: rotate(45deg);
+}
+
+.connector-tilted-stack {
+  width: 100%;
+  height: var(--circe-diameter);
   display: flex;
-  align-items: flex-start;
-  justify-content: space-evenly;
-  gap: 10px;
-  margin-top: 30px;
+  flex-direction: column;
+  align-items: center;
+  justify-items: start;
+  min-width: 20px;
+}
+
+.close-stage-panel {
+  display: flex;
+  flex-direction: column;
 }
