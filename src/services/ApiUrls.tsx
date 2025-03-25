@@ -32,3 +32,5 @@ export const UserUrl = 'user'
 export const ProfileUrl = 'profile'
 // SETTING
 export const AppSettingsUrl = 'app-settings'
+// TASKS
+export const TasksUrl = 'tasks'

@@ -24,6 +24,20 @@ import { AntSwitch } from '../../styles/CssStyled'
 import { ContactUrl } from '../../services/ApiUrls'
 import { fetchData } from '../../components/FetchData'
 
+interface Lead {
+  contact_status: string,
+  lead: {
+    id: string,
+    title: string,
+    status: string
+  }
+}
+
+interface CategoryDetails {
+  general_category: string,
+  details: Lead[]
+}
+
 export type contactResponse = {
   created_by: string
   created_by_email: string
@@ -58,6 +72,7 @@ export type contactResponse = {
   name: string
   website: string
   category: string
+  category_details: CategoryDetails
 }
 
 export const formatDate = (dateString: any) => {
@@ -90,6 +105,7 @@ export default function ContactDetails () {
     fetchData(`${ContactUrl}/${id}/`, 'GET', null as any, Header).then(
       (res) => {
         if (!res.error) {
+          console.log('contact det', res)
           setContactDetails(res?.contact_obj)
           setAddressDetails(res?.address_obj)
           setOrg(res?.org)
@@ -97,7 +113,7 @@ export default function ContactDetails () {
       }
     )
   }
-
+  console.log('contact det detalils', contactDetails)
   const backbtnHandle = () => {
     navigate('/app/contacts')
   }
@@ -388,7 +404,14 @@ export default function ContactDetails () {
                 <div style={{ width: '32%' }}>
                   <div className="title2">Category</div>
                   <div className="title3">
-                    {contactDetails?.category || '----'}
+                    {!contactDetails?.category_details?.details?.length  
+                    ? contactDetails?.category_details?.general_category ?? '---'
+                    : contactDetails?.category_details?.details.map((detail: Lead) => 
+                      <p key={ detail.lead.id }>
+                        <span style={{ fontWeight: '900' }}>{detail.contact_status}</span> from
+                        &nbsp;{detail.lead.title}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
