@@ -27,7 +27,8 @@ import {
   FaTachometerAlt,
   FaUserFriends,
   FaUsers,
-  FaWrench
+  FaWrench,
+  FaTasks
 } from 'react-icons/fa'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { fetchData, compileHeader } from './FetchData'
@@ -38,6 +39,9 @@ import AddCompany from '../pages/company/AddCompany'
 import CompanyDetails from '../pages/company/CompanyDetails'
 import EditCompany from '../pages/company/EditCompany'
 import Leads from '../pages/leads/Leads'
+import Tasks from '../pages/tasks/Tasks'
+import { TaskDetails } from '../pages/tasks/TaskDetails'
+import { EditTask } from '../pages/tasks/EditTask'
 import AddContacts from '../pages/contacts/AddContacts'
 import { EditLead } from '../pages/leads/EditLead'
 import LeadDetails from '../pages/leads/LeadDetails'
@@ -129,6 +133,8 @@ export default function Sidebar (props: any) {
       setScreen('users')
     } else if (location.pathname.split('/')[2] === 'cases') {
       setScreen('cases')
+    } else if (location.pathname.split('/')[2] === 'tasks') {
+      setScreen('tasks')
     } else if (location.pathname.split('/')[2] === 'settings') {
       setScreen('settings')
     } else if (location.pathname.split('/')[2] === 'leads') {
@@ -164,7 +170,8 @@ export default function Sidebar (props: any) {
       'opportunities',
       'accounts',
       'companies',
-      'cases'
+      'cases',
+      'tasks'
     ]
     if ([Constants.ADMIN, Constants.SALES_MANAGER].includes(userCtx.user.role)) {
       list.push('users')
@@ -217,6 +224,12 @@ export default function Sidebar (props: any) {
           <FaBriefcase fill="#3e79f7" />
         ) : (
           <FaBriefcase />
+        )
+      case 'tasks':
+        return screen === 'tasks' ? (
+          <FaTasks fill="#3e79f7" />
+        ) : (
+          <FaTasks />
         )
       case 'settings':
         return screen === 'settings' ? (
@@ -499,10 +512,14 @@ export default function Sidebar (props: any) {
                 element={<EditOpportunity />}
               />
               <Route path="/app/cases" element={<Cases />} />
-              <Route path="/app/settings" element={<Settings />} />
               <Route path="/app/cases/add-case" element={<AddCase />} />
               <Route path="/app/cases/edit-case" element={<EditCase />} />
               <Route path="/app/cases/case-details" element={<CaseDetails />} />
+              <Route path="/app/tasks" element={<Tasks />} />
+              <Route path="/app/tasks/task-details" element={<TaskDetails />} />
+              <Route path="/app/tasks/edit-task" element={<EditTask />} />
+              <Route path="/app/tasks/add-task" element={<EditTask />} />
+              <Route path="/app/settings" element={<Settings />} />
             </Routes>
           </Box>
         </MyContext.Provider>
