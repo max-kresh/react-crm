@@ -27,7 +27,8 @@ import {
   FaTachometerAlt,
   FaUserFriends,
   FaUsers,
-  FaWrench
+  FaWrench,
+  FaTasks
 } from 'react-icons/fa'
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { fetchData, compileHeader } from './FetchData'
@@ -38,6 +39,9 @@ import AddCompany from '../pages/company/AddCompany'
 import CompanyDetails from '../pages/company/CompanyDetails'
 import EditCompany from '../pages/company/EditCompany'
 import Leads from '../pages/leads/Leads'
+import Tasks from '../pages/tasks/Tasks'
+import { TaskDetails } from '../pages/tasks/TaskDetails'
+import { EditTask } from '../pages/tasks/EditTask'
 import AddContacts from '../pages/contacts/AddContacts'
 import { EditLead } from '../pages/leads/EditLead'
 import LeadDetails from '../pages/leads/LeadDetails'
@@ -68,6 +72,7 @@ import { StyledListItemButton, StyledListItemText } from '../styles/CssStyled'
 import MyContext from '../context/Context'
 import { UserContext } from '../context/UserContext'
 import { Constants } from '../utils/Constants'
+import { Dashboard } from '../pages/dashboard/Dashboard'
 
 // declare global {
 //     interface Window {
@@ -78,7 +83,7 @@ import { Constants } from '../utils/Constants'
 export default function Sidebar (props: any) {
   const navigate = useNavigate()
   const location = useLocation()
-  const [screen, setScreen] = useState('contacts')
+  const [screen, setScreen] = useState('dashboard')
   const [drawerWidth, setDrawerWidth] = useState(200)
   const [headerWidth, setHeaderWidth] = useState(drawerWidth)
   const [userDetail, setUserDetail] = useState('')
@@ -113,9 +118,9 @@ export default function Sidebar (props: any) {
     if (
       location.pathname.split('/')[1] === '' ||
       location.pathname.split('/')[1] === undefined ||
-      location.pathname.split('/')[2] === 'leads'
+      location.pathname.split('/')[2] === 'dashboard'
     ) {
-      setScreen('leads')
+      setScreen('dashboard')
     } else if (location.pathname.split('/')[2] === 'contacts') {
       setScreen('contacts')
     } else if (location.pathname.split('/')[2] === 'opportunities') {
@@ -128,8 +133,12 @@ export default function Sidebar (props: any) {
       setScreen('users')
     } else if (location.pathname.split('/')[2] === 'cases') {
       setScreen('cases')
+    } else if (location.pathname.split('/')[2] === 'tasks') {
+      setScreen('tasks')
     } else if (location.pathname.split('/')[2] === 'settings') {
       setScreen('settings')
+    } else if (location.pathname.split('/')[2] === 'leads') {
+      setScreen('leads')
     }
   }
 
@@ -155,12 +164,14 @@ export default function Sidebar (props: any) {
       return ['contacts']
     }
     const list = [
+      'dashboard', 
       'leads',
       'contacts',
       'opportunities',
       'accounts',
       'companies',
-      'cases'
+      'cases',
+      'tasks'
     ]
     if ([Constants.ADMIN, Constants.SALES_MANAGER].includes(userCtx.user.role)) {
       list.push('users')
@@ -214,11 +225,23 @@ export default function Sidebar (props: any) {
         ) : (
           <FaBriefcase />
         )
+      case 'tasks':
+        return screen === 'tasks' ? (
+          <FaTasks fill="#3e79f7" />
+        ) : (
+          <FaTasks />
+        )
       case 'settings':
         return screen === 'settings' ? (
           <FaWrench fill="#3e79f7" />
         ) : (
           <FaWrench />
+        )
+      case 'dashboard':
+        return screen === 'dashboard' ? (
+          <FaDiceD6 fill="#3e79f7" />
+        ) : (
+          <FaDiceD6 />
         )
       default:
         return <FaDiceD6 fill="#3e79f7" />
@@ -425,7 +448,8 @@ export default function Sidebar (props: any) {
                             <Route index element={<Navigate to="/contacts" replace />} />
                             </Routes> */}
             <Routes>
-              <Route index element={<Leads />} />
+            <Route index element={<Dashboard />} />
+            <Route path="/app/dashboard" element={<Dashboard />} />
               {/* <Route path='/' element={<Contacts />} /> */}
               <Route path="/app/leads" element={<Leads />} />
               <Route path="/app/leads/add-leads" element={<AddLeads />} />
@@ -488,10 +512,14 @@ export default function Sidebar (props: any) {
                 element={<EditOpportunity />}
               />
               <Route path="/app/cases" element={<Cases />} />
-              <Route path="/app/settings" element={<Settings />} />
               <Route path="/app/cases/add-case" element={<AddCase />} />
               <Route path="/app/cases/edit-case" element={<EditCase />} />
               <Route path="/app/cases/case-details" element={<CaseDetails />} />
+              <Route path="/app/tasks" element={<Tasks />} />
+              <Route path="/app/tasks/task-details" element={<TaskDetails />} />
+              <Route path="/app/tasks/edit-task" element={<EditTask />} />
+              <Route path="/app/tasks/add-task" element={<EditTask />} />
+              <Route path="/app/settings" element={<Settings />} />
             </Routes>
           </Box>
         </MyContext.Provider>
