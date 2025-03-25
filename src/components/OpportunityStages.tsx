@@ -46,22 +46,28 @@ export function OpportunityStages ({ orderedStageList, currentStage, onStageChan
         setStageInfo(stages)
     }, [currentStage])
 
+    function handleStageClick (newStage: string) {
+        if (newStage !== currentStage) {
+            onStageChange(newStage)
+        }
+    }
+
     return (
         <div className='stages-panel'>
-            {stageInfo.map((stage: any, index: number) => { 
+            {stageInfo.slice(0, stageInfo.length - 2).map((stage: any, index: number) => { 
                 return (
                     <>
-                        <Stage 
-                            key={`${stage.title}-${stage.selected || ''}`}
-                            stageProps={stage} 
-                            onClick={() => onStageChange(stage.title)}
-                            {...props} 
-                        />
-                        {index !== stageInfo.length - 1 && 
+                        {index !== 0 && 
                         <StageConnector 
                             color={stage.selected ? defaultSelectedColor : defaultNonSelectedColor} 
                             key={`${stage.title}-${stage.selected || ''}-connector`}
                         />}
+                        <Stage 
+                            key={`${stage.title}-${stage.selected || ''}`}
+                            stageProps={stage} 
+                            onClick={() => handleStageClick(stage.title)}
+                            {...props} 
+                        />
                     </>
                 ) 
             })}
