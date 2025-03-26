@@ -11,14 +11,15 @@ import {
   Button,
   Chip
 } from '@mui/material'
-import { fetchData } from '../../components/FetchData'
+import { compileHeader, fetchData } from '../../components/FetchData'
 import { OpportunityUrl } from '../../services/ApiUrls'
 import { Tags } from '../../components/Tags'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import { FaPlus, FaStar } from 'react-icons/fa'
 import FormateTime from '../../components/FormateTime'
 import { Label } from '../../components/Label'
-import { COUNTRIES } from '../../utils/Constants'
+import { COUNTRIES, HTTP_METHODS } from '../../utils/Constants'
+import { Stage, StageConnector, OpportunityStages } from '../../components/OpportunityStages'
 
 export const formatDate = (dateString: any) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -106,7 +107,9 @@ type opportunityStage={
     id:string, 
     role:string, 
     user_details:{
-      email:string, id:string
+      email:string, 
+      id:string,
+      profile_pic: string
     }
   }, 
   changed_at:string
@@ -155,7 +158,6 @@ export const OpportunityDetails = (props: any) => {
     }
     fetchData(`${OpportunityUrl}/${id}/`, 'GET', null as any, Header)
       .then((res) => {
-        console.log(res, 'edd')
         if (!res.error) {
           setOpportunityDetails(res?.opportunity_obj)
           setUsers(res?.users)
@@ -163,7 +165,6 @@ export const OpportunityDetails = (props: any) => {
         }
       })
       .catch((err) => {
-        // console.error('Error:', err)
         ;<Snackbar
           open={err}
           autoHideDuration={4000}
@@ -241,12 +242,50 @@ export const OpportunityDetails = (props: any) => {
   const module = 'Opportunities'
   const crntPage = 'Opportunity Details'
   const backBtn = 'Back To Opportunities'
-  console.log(state, 'oppdetail')
   const userDetail = (userId: any, e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
     navigate('/app/users/user-details', { state: { userId, detail: true } })
   }
 
+  const leadStages = []
+  for (const stage of state?.stage) {
+    let stateInfo: {title: string, color?: string } = { title: stage[0] }
+    if (stage[0] === 'CLOSED WON') {
+      stateInfo.color = 'rgb(8, 86, 8)'
+    } else if (stage[0] === 'CLOSED LOST') {
+      stateInfo.color = 'rgb(132, 26, 26)'
+    }
+    leadStages.push(stateInfo)
+  }
+
+  function handleStageChange (newStage: string) {
+    const opportunityCopy = structuredClone(state?.opportunity_obj) 
+    if (opportunityCopy) {
+      opportunityCopy.stage = newStage
+    }
+    fetchData(`${OpportunityUrl}/${state.opportunityId}/`, HTTP_METHODS.PATCH, JSON.stringify({ stage: newStage }), compileHeader())
+    .then((res: any) => {
+      if (!res.error) {
+        setOpportunityDetails(res?.opportunity_obj)
+        setOpportunityStageHistory(res?.stage_history)
+      }
+    })
+    .catch((err) => {
+      ;<Snackbar
+        open={err}
+        autoHideDuration={4000}
+        onClose={() => navigate('/app/opportunities')}
+      >
+        <Alert
+          onClose={() => navigate('/app/opportunities')}
+          severity="error"
+          sx={{ width: '100%' }}
+        >
+          Failed to load!
+        </Alert>
+      </Snackbar>
+    })
+  }
   return (
     <Box sx={{ mt: '60px' }}>
       <div>
@@ -262,11 +301,12 @@ export const OpportunityDetails = (props: any) => {
             mt: '110px',
             p: '20px',
             display: 'flex',
-            flexDirection: 'row',
+            flexDirection: 'column',
             justifyContent: 'space-between'
           }}
         >
-          <Box sx={{ width: '65%' }}>
+          {/* <Box sx={{ width: '65%' }}> */}
+          <Box sx={{ width: '100%' }}>
             <Box
               sx={{
                 borderRadius: '10px',
@@ -291,7 +331,73 @@ export const OpportunityDetails = (props: any) => {
                     color: '#1a3353f0'
                   }}
                 >
-                  Opportunity Information
+                  Opportunity Stage
+                </div>
+                <div
+                  style={{
+                    color: 'gray',
+                    fontSize: '16px',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      justifyContent: 'flex-end',
+                      alignItems: 'center',
+                      marginRight: '15px'
+                    }}
+                  >
+                    last updated &nbsp;
+                    {FormateTime(opportunityStageHistory?.[0]?.changed_at)} &nbsp; by
+                    &nbsp;
+                    <Avatar
+                      src={opportunityStageHistory?.[0]?.changed_by?.user_details?.profile_pic}
+                      alt={opportunityStageHistory?.[0]?.changed_by?.user_details?.email}
+                    />
+                    &nbsp; &nbsp;
+                    {opportunityStageHistory?.[0]?.changed_by?.user_details?.email}
+                  </div>
+                </div>
+              </div>
+              <div
+                style={{
+                  padding: '10px',
+                  borderBottom: '1px solid lightgray',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                <OpportunityStages 
+                  orderedStageList={ leadStages } 
+                  currentStage={opportunityDetails?.stage} 
+                  onStageChange={handleStageChange}
+                />
+              </div>
+              <div
+                style={{
+                  padding: '20px',
+                  borderBottom: '1px solid lightgray',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+              >
+                <div
+                  style={{
+                    fontWeight: 600,
+                    fontSize: '18px',
+                    color: '#1a3353f0'
+                  }}
+                >
+                  Opportunity Details
                 </div>
                 <div
                   style={{
@@ -321,8 +427,6 @@ export const OpportunityDetails = (props: any) => {
                     />
                     &nbsp; &nbsp;
                     {opportunityDetails?.created_by?.email}
-                    {/* {opportunityDetails?.first_name}&nbsp;
-                                        {opportunityDetails?.last_name} */}
                   </div>
                 </div>
               </div>
@@ -347,7 +451,7 @@ export const OpportunityDetails = (props: any) => {
                 >
                   {opportunityDetails?.tags?.length
                     ? opportunityDetails?.tags.map((tagData: any) => (
-                        <Label tags={tagData} />
+                        <Label tags={tagData.name} />
                       ))
                     : ''}
                 </Stack>
@@ -462,27 +566,32 @@ export const OpportunityDetails = (props: any) => {
                   <div className="title2">Assigned Users</div>
                   <div className="title3" style={{
                       display: 'flex',
-                      flexDirection: 'row',
+                      flexDirection: 'column',
                       justifyContent: 'flex-start',
-                      alignItems: 'center',
-                      marginRight: '15px'
+                      alignItems: 'flex-start'
+                      // marginRight: '15px'
                     }}>
-                {opportunityDetails?.assigned_to?.length
-                  ? opportunityDetails.assigned_to.map(
-                      (item: any, i: any) => (
-                              <Avatar
-                                key={i}
-                                src={item?.user_details?.profile_pic}
-                                alt={item?.user_details?.email}
-                              />
-                      )
-                    )
-                  : ('----')}
-                {opportunityDetails?.assigned_to?.length
+                    {opportunityDetails?.assigned_to?.length
+                      ? opportunityDetails.assigned_to.map(
+                          (item: any, i: any) => (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                <Avatar
+                                  key={i}
+                                  sx={{ width: 24, height: 24 }}
+                                  src={item?.user_details?.profile_pic}
+                                  alt={item?.user_details?.email}
+                                />
+                                <p>{item?.user_details?.email}</p>
+                              </div>
+                                  
+                          )
+                        )
+                      : ('----')}
+                {/* {opportunityDetails?.assigned_to?.length
                   ? opportunityDetails.assigned_to.map(
                       (item: any, i: any) => (item?.user_details?.email)
                     ).join(',')
-                  : ''}
+                  : ''} */}
                   </div>
                 </div>
                 <div style={{ width: '32%' }}>
@@ -574,7 +683,8 @@ export const OpportunityDetails = (props: any) => {
               </div>
             </Box>
           </Box>
-          <Box sx={{ width: '34%' }}>
+          {/* ATTACHMENTS SECTION BEGIN */}
+          <Box sx={{ width: '100%' }}>
             <Box
               sx={{
                 borderRadius: '10px',
@@ -639,6 +749,7 @@ export const OpportunityDetails = (props: any) => {
               </div>
             </Box>
           </Box>
+          {/* ATTACHMENTS SECTION END */}
         </Box>
       </div>
     </Box>

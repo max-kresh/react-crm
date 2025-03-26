@@ -40,6 +40,7 @@ import {
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 import { COUNTRIES, HTTP_METHODS } from '../../utils/Constants'
+import TagOptions from '../../components/TagOption'
 
 const tooltips = {
   amount: 'Potential Revenue Opportunity',
@@ -151,7 +152,6 @@ export function LeadForm ({ state, method }: StateProps) {
   const [error, setError] = useState(false)
   const [selectedContacts, setSelectedContacts] = useState<any[]>(state?.value?.contacts || [])
   const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>(state?.value?.assigned_to || [])
-  const [selectedTags, setSelectedTags] = useState<any[]>(state?.value?.tags || [])
   const [selectedCountry, setSelectedCountry] = useState<any[]>([])
   const [sourceSelectOpen, setSourceSelectOpen] = useState(false)
   const [statusSelectOpen, setStatusSelectOpen] = useState(false)
@@ -159,6 +159,9 @@ export function LeadForm ({ state, method }: StateProps) {
   const [industrySelectOpen, setIndustrySelectOpen] = useState(false)
   const [contactsSelectOpen, setContactsSelectOpen] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
+
+  // tagsKey enforces tags field to re-render
+  const [tagsKey, setTagsKey] = useState<number>(0)
 
   // this variable controls the selected option for "Use From" select component.
   let selectedContact:any = null
@@ -225,24 +228,6 @@ export function LeadForm ({ state, method }: StateProps) {
         assigned_to: val.length > 0 ? val : [] // val.map((item: any) => item.id) : []
       })
       setSelectedAssignTo(val)
-    } else if (title === 'tags') {
-      if (val.length > 0 && val[val.length - 1].id === ADD_NEW_TAG_ID_PLACEHOLDER) {
-        val.pop()
-        const tagName = prompt('Enter New Tag')
-        const sameValues = state?.tags.filter((tag: any) => tag.name === tagName)
-        if (tagName && selectedTags.filter((tag: any) => tag.name === tagName.trim()).length === 0) {
-          if (sameValues.length === 0) {
-            val.push({ name: tagName.trim() })
-          } else {
-            val.push(sameValues[0])
-          }
-        }
-      }
-      setFormData({
-        ...formData,
-        tags: val.length > 0 ? val : []
-      })
-      setSelectedTags(val)
     } else {
       setFormData({ 
         ...formData, 
@@ -377,14 +362,16 @@ export function LeadForm ({ state, method }: StateProps) {
     setErrors({})
     setSelectedContacts([])
     setSelectedAssignTo([])
-    setSelectedTags([])
+    // setSelectedTags([])
+    setTagsKey((prev: number) => prev + 1)
   }
   const onCancel = () => {
     setFormData(compileInitialFormData())
     setError(false)
     setSelectedContacts(state?.value?.contacts || [])
     setSelectedAssignTo(state?.value?.assigned_to || [])
-    setSelectedTags(state?.value?.tags || [])
+    // setSelectedTags(state?.value?.tags || [])
+    setTagsKey((prev: number) => prev + 1)
     setSelectedCountry([])
     setSourceSelectOpen(false)
     setStatusSelectOpen(false)
@@ -429,6 +416,14 @@ export function LeadForm ({ state, method }: StateProps) {
       }
       setFormData((prev: any) => ({ ...prev, ...contactInfo, contactsSelect: contact }))
     }
+  }
+
+  function handleTagChange (newTagsList: any) {
+    setFormData((prev: any) => ({
+        ...prev,
+        tags: newTagsList
+      })
+    )
   }
 
   return (
@@ -894,7 +889,17 @@ export function LeadForm ({ state, method }: StateProps) {
                       </div>
                     </div>
                     <div className="fieldContainer2">
-                      <div className="fieldSubContainer">
+                      <TagOptions 
+                        tooltips={tooltips.tags}
+                        allTags={state?.tags}
+                        // objectTags={state?.value?.tags}
+                        objectTags={formData.tags}
+                        tagErrors={errors?.tags?.[0]}
+                        onTagsChange={(value: any) => handleTagChange(value)}
+                        key={tagsKey}
+                      />
+
+                      {/* <div className="fieldSubContainer">
                         <div className="fieldTitle" title={tooltips.tags}>Tags</div>
                         <FormControl
                           error={!!errors?.tags?.[0]}
@@ -962,7 +967,7 @@ export function LeadForm ({ state, method }: StateProps) {
                             {errors?.tags?.[0] || ''}
                           </FormHelperText>
                         </FormControl>
-                      </div>
+                      </div> */}
                       <div className="fieldSubContainer">
                         <div className="fieldTitle" title={tooltips.probability}>Probability</div>
                         <TextField
