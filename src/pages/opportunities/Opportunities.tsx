@@ -49,6 +49,7 @@ import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { capitalizeWords } from '../../utils/UtilFunctions'
 import OpportunityListView from './OpportunityListView'
+import OpportunityStageView from './OpportunityStageView'
 
 const LIST_VIEW = 'list_view'
 const STAGE_VIEW = 'stage_view'
@@ -368,6 +369,9 @@ export default function Opportunities (props: any) {
         onOpportunityClick={handleOpportunityClick}
         onDeleteOpportunity={handleDeleteOpportunity}
       />}
+      {currentViewTab === STAGE_VIEW && 
+        <OpportunityStageView opportunities={responseData.opportunities}/>
+      }
       {loading && (
             <Spinner />
           )}
