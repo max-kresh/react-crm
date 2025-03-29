@@ -146,10 +146,10 @@ export default function OpportunityListView ({
                             <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'nowrap', gap: '10px' }}>
                               <Avatar
                                 src={item?.assigned_to?.user_details?.profile_pic}
-                                alt={item?.assigned_to.user_details?.email}
+                                alt={item?.assigned_to?.user_details?.email}
                                 sx={{ width: '40px', height: '40px' }}
                               />
-                              <p key={index}>{profile.user_details?.email}</p>
+                              <p key={index}>{profile?.user_details?.email}</p>
                             </div>
                           ) : '---'}
                         </TableCell>
