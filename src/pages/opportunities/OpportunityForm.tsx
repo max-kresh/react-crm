@@ -71,7 +71,7 @@ interface FormData {
   lead_source: string
   probability: number
   description: string
-  assigned_to: string[]
+  assigned_to: any
   contacts: string[]
   due_date: string
   tags: string[]
@@ -92,7 +92,9 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
   const [error, setError] = useState(false)
   const [reset, setReset] = useState(false)
   const [selectedContacts, setSelectedContacts] = useState<any[]>([])
-  const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>([])
+  const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>(
+    state?.value?.assigned_to || []
+  )
   const [selectedTeams, setSelectedTeams] = useState<any[]>([])
   const [selectedCountry, setSelectedCountry] = useState<any[]>([])
   const [leadSelectOpen, setLeadSelectOpen] = useState(false)
@@ -562,7 +564,7 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
                         >
                           <Autocomplete
                             multiple
-                            value={selectedAssignTo}
+                            value={formData.assigned_to || []} 
                             limitTags={2}
                             options={state.users || []}
                             getOptionLabel={(option: any) =>
@@ -585,7 +587,7 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
                                   }}
                                   variant="outlined"
                                   label={
-                                    state.users ? option?.user__email : option
+                                    option?.user_details?.email || option
                                   }
                                   {...getTagProps({ index })}
                                 />

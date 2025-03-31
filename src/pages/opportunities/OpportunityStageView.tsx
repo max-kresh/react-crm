@@ -5,24 +5,31 @@ import { Avatar } from '@mui/material'
 import FormateTime from '../../components/FormateTime'
 import { FaEdit, FaSearchPlus, FaTrashAlt } from 'react-icons/fa'
 
+function titlePretty (title: string) {
+    return capitalizeWords(title.toLowerCase().replace('/', ' / '))
+}
+
 function StageViewTab ({ title, isActive, onTabClick }: any) {
-    const cardTitle = capitalizeWords(title.toLowerCase().replace('/', ' / '))
     return (
         <div
             className={`stage-tab${isActive ? ' stage-tab-selected' : ''}`}
             onClick={() => onTabClick(title)}
         >
-            {cardTitle}
+            {capitalizeWords(title)}
         </div>
     )
 }
 
-function OpportunityCard ({ opportunity, opportunityStageHistory, badgeColor }: any) {
+function OpportunityCard ({ opportunity, badgeColor, onAction }: any) {
     return (
         <div className='opportunity-card'>
             <div className='opportunity-card-header'>
                 <p className='opportunity-name'>{opportunity.name}</p>
-                <div className='header-badge' style={{ backgroundColor: badgeColor }}/>
+                <div 
+                    className='header-badge' 
+                    style={{ backgroundColor: badgeColor }}
+                    title={`Stage: ${titlePretty(opportunity?.stage || '')}`}
+                />
                 <div className='opportunity-tag-panel'>
                     {opportunity.tags.map((tag: any, index: number) => <p key={`${tag.name}-${index}`} className='opportunity-tag'>
                         {tag.name}
@@ -75,15 +82,15 @@ function OpportunityCard ({ opportunity, opportunityStageHistory, badgeColor }: 
                 </tbody>
             </table>
             <div className='card-toolbar-container'>
-                <p title='Edit'><FaEdit /></p>
-                <p title='See the details'><FaSearchPlus /></p>
-                <p title='Delete'><FaTrashAlt /></p>
+                <p title='Edit' onClick={() => onAction('edit', opportunity)}><FaEdit /></p>
+                <p title='See the details' onClick={() => onAction('details', opportunity)}><FaSearchPlus /></p>
+                <p title='Delete' onClick={() => onAction('delete', opportunity)}><FaTrashAlt /></p>
             </div>
         </div>
     )
 }
 
-export default function OpportunityStageView ({ opportunities, selectedTab, onTabChange, opportunityStages }: any) {
+export default function OpportunityStageView ({ opportunities, selectedTab, onTabChange, onAction, opportunityStages }: any) {
     const selectedStage = opportunityStages.filter((stage: any) => stage.name === selectedTab)
     const badgeColor = selectedStage.length ? selectedStage[0].color : 'black'
     return (
@@ -99,7 +106,13 @@ export default function OpportunityStageView ({ opportunities, selectedTab, onTa
             <div className='cards-container'>
                 {opportunities.length > 0 
                     ? opportunities?.map((opportunity: any, index: number) =>
-                    <OpportunityCard opportunity={opportunity} key={index} className='opportunity-card' badgeColor={badgeColor} />
+                    <OpportunityCard 
+                        opportunity={opportunity} 
+                        key={index} 
+                        onAction={onAction}
+                        className='opportunity-card' 
+                        badgeColor={badgeColor} 
+                    />
                 )
                 : <div className='no-opportunities'>
                 No opportunities found for stage {selectedTab}

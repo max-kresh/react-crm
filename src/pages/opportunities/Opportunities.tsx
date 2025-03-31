@@ -32,6 +32,7 @@ import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { capitalizeWords } from '../../utils/UtilFunctions'
 import OpportunityListView from './OpportunityListView'
 import OpportunityStageView from './OpportunityStageView'
+import { COUNTRIES } from '../../utils/Constants'
 
 const LIST_VIEW = 'list_view'
 const STAGE_VIEW = 'stage_view'
@@ -243,6 +244,56 @@ export default function Opportunities (props: any) {
     }
   }
 
+  function handleOpportunityAction (action: string, opportunity: any) {
+    if (action === 'edit') {
+         let country: string[] | undefined
+             for (country of COUNTRIES) {
+               if (
+                 Array.isArray(country) &&
+                 country.includes(opportunity?.country || '')
+               ) {
+                 const firstElement = country[0]
+                 break
+               }
+             }
+             navigate('/app/opportunities/edit-opportunity', {
+               state: {
+                 value: {
+                   name: opportunity?.name,
+                   account: opportunity?.account?.id,
+                   amount: opportunity?.amount,
+                   currency: opportunity?.currency,
+                   stage: opportunity?.stage,
+                   teams: opportunity?.teams,
+                   lead_source: opportunity?.lead_source,
+                   probability: opportunity?.probability,
+                   description: opportunity?.description,
+                   assigned_to: opportunity?.assigned_to,
+                   contacts: opportunity?.contacts?.map((k: any) => k.id),
+                   due_date: opportunity?.closed_on,
+                   tags: opportunity?.tags,
+                   opportunity_attachment: opportunity?.opportunity_attachment,
+                   lead: opportunity?.lead?.id
+                 },
+                 id: opportunity.id,
+                 contacts: responseData?.contacts || [],
+                 leadSource: responseData?.leadSource || [],
+                 currency: responseData?.currency || [],
+                 tags: responseData?.tags || [],
+                 account: responseData?.account || [],
+                 stage: responseData?.stage || [],
+                 users: responseData?.users || [],
+                 teams: responseData?.teams || [],
+                 leads: responseData?.leads || []
+               }
+             })
+    } else if (action === 'details') {
+      handleOpportunityClick(opportunity?.id)    
+    } else if (action === 'delete') {
+      handleDeleteOpportunity(opportunity?.id)
+  }
+}
+
   return (
     <Box sx={{ mt: '60px', position: 'relative' }}>
       <CustomToolbar>
@@ -358,6 +409,7 @@ export default function Opportunities (props: any) {
           opportunityStages={opportunityStages}
           onTabChange={handleStageViewTabChange}
           selectedTab={currentStageTab}
+          onAction={handleOpportunityAction}
         />
       }
       {loading && (

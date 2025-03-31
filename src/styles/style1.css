@@ -66,6 +66,7 @@
     justify-items: stretch;
     border: 1px gray solid;
     overflow: hidden;
+    box-shadow: 3px 2px gray;
 }
 
 .opportunity-card-header {
