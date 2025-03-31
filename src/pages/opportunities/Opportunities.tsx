@@ -7,26 +7,13 @@ import {
   List,
   Stack,
   Tab,
-  TablePagination,
   Tabs,
-  Toolbar,
   Typography,
-  Link,
   Select,
-  MenuItem,
-  TableContainer,
-  Table,
-  TableSortLabel,
-  TableCell,
-  TableRow,
-  TableHead,
-  Paper,
-  TableBody,
-  IconButton,
-  Container
+  MenuItem
 } from '@mui/material'
-import React, { SyntheticEvent, useEffect, useState } from 'react'
-import { Spinner } from '../../components/Spinner'
+import React, { useEffect, useState } from 'react'
+import { Spinner, SpinnerAbsolute } from '../../components/Spinner'
 import { FiPlus } from '@react-icons/all-files/fi/FiPlus'
 import { FiChevronLeft } from '@react-icons/all-files/fi/FiChevronLeft'
 import { FiChevronRight } from '@react-icons/all-files/fi/FiChevronRight'
@@ -34,15 +21,10 @@ import {
   CustomTab,
   CustomToolbar,
   FabLeft,
-  FabRight,
-  StyledTableCell,
-  StyledTableRow
+  FabRight
 } from '../../styles/CssStyled'
 import { useNavigate } from 'react-router-dom'
-import { fetchData } from '../../components/FetchData'
-import { getComparator, stableSort } from '../../components/Sorting'
-import { Label } from '../../components/Label'
-import { FaTrashAlt } from 'react-icons/fa'
+import { compileHeader, fetchData } from '../../components/FetchData'
 import { OpportunityUrl } from '../../services/ApiUrls'
 import { DeleteModal } from '../../components/DeleteModal'
 import { FiChevronUp } from '@react-icons/all-files/fi/FiChevronUp'
@@ -53,6 +35,30 @@ import OpportunityStageView from './OpportunityStageView'
 
 const LIST_VIEW = 'list_view'
 const STAGE_VIEW = 'stage_view'
+
+const LAST_USED_PAGE_VIEW = 'last_used_opportunity_page_view'
+const LAST_USED_STAGE_TAB = 'last_used_stage_tab'
+
+interface StageInterface {
+  name: string, color: string
+}
+
+export const opportunityStages: StageInterface[] = [
+  { name: 'QUALIFICATION', color: '#FFD700' }, // Gold - Initial interest stage
+  { name: 'NEEDS ANALYSIS', color: '#FF8C00' }, // Dark Orange - Understanding needs
+  { name: 'VALUE PROPOSITION', color: '#8A2BE2' }, // Blue Violet - Presenting value
+  { name: 'ID.DECISION MAKERS', color: '#4682B4' }, // Steel Blue - Identifying key people
+  { name: 'PERCEPTION ANALYSIS', color: '#20B2AA' }, // Light Sea Green - Gauging perception
+  { name: 'PROPOSAL/PRICE QUOTE', color: '#556B2F' }, // Dark Olive Green - Formal proposal
+  { name: 'NEGOTIATION/REVIEW', color: '#DC143C' }, // Crimson - Intense discussions
+  { name: 'CLOSED WON', color: '#228B22' }, // Forest Green - Success
+  { name: 'CLOSED LOST', color: '#8B0000' }, // Dark Red - Lost deal
+  { name: 'NOT STAGED', color: '#808080' } // Gray - No stage assigned
+]
+
+function isValidStage (stage: string): boolean {
+  return opportunityStages.some((opportunity: StageInterface) => opportunity.name === stage)
+}
 
 export default function Opportunities (props: any) {
   const navigate = useNavigate()
@@ -75,33 +81,38 @@ export default function Opportunities (props: any) {
   const [deleteRowModal, setDeleteRowModal] = useState(false)
   const [selectOpen, setSelectOpen] = useState(false)
 
-  const [currentViewTab, setCurrentViewTab] = useState<string>(STAGE_VIEW)
+  const lastUsedPageView = localStorage.getItem(LAST_USED_PAGE_VIEW) 
+  
+  const [currentViewTab, setCurrentViewTab] = useState<string>(
+    localStorage.getItem(LAST_USED_PAGE_VIEW) === LIST_VIEW ? LIST_VIEW : STAGE_VIEW
+  )
+
+  const lastUsedStageTab = localStorage.getItem(LAST_USED_STAGE_TAB) || ''
+  const [currentStageTab, setCurrentStageTab] = useState<string>(
+    isValidStage(lastUsedStageTab) ? lastUsedStageTab : opportunityStages[0].name
+  )
   const [recordsPerPage, setRecordsPerPage] = useState<number>(10)
-  const [recordsPerCard, setRecordsPerCard] = useState<number>(5)
 
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [opportunityToBeDeletedId, setOpportunityToBeDeletedId] = useState<string>('')
 
   useEffect(() => {
-    getOpportunities()
-  }, [currentPage, recordsPerPage, recordsPerCard])
+    getOpportunities(currentViewTab === STAGE_VIEW ? currentStageTab : '')
+  }, [currentPage, recordsPerPage])
 
-  const getOpportunities = async () => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
+  const getOpportunities = async (stageTab: string = '') => {
+    const stageQueryParam = currentViewTab === STAGE_VIEW ? `&stage=${stageTab}` : ''
     try {
       const offset = (currentPage - 1) * recordsPerPage
+      setLoading(true)
       await fetchData(
-        `${OpportunityUrl}/?offset=${offset}&limit=${recordsPerPage}`,
+        `${OpportunityUrl}/?offset=${offset}&limit=${recordsPerPage}${stageQueryParam}`,
         'GET',
         null as any,
-        Header
+        compileHeader()
       )
         .then((res) => {
+          if (!res.error) {
             setResponseData({
               totalPages: Math.ceil(res?.opportunities_count / recordsPerPage),
               opportunities: res?.opportunities,
@@ -115,10 +126,16 @@ export default function Opportunities (props: any) {
               users: res?.users,
               leads: res?.leads
             })
-            setLoading(false)
+            if (stageTab !== '') {
+              setCurrentStageTab(stageTab)
+              localStorage.setItem(LAST_USED_STAGE_TAB, stageTab)
+            }
+          }
+          setLoading(false)
         })
     } catch (error) {
       console.error('Error fetching data:', error)
+      setLoading(false)
     }
   }
 
@@ -190,47 +207,20 @@ export default function Opportunities (props: any) {
       .catch(() => {})
   }
   const handlePreviousPage = () => {
-    setLoading(true)
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
   }
 
   const handleNextPage = () => {
-    setLoading(true)
     setCurrentPage((prevPage) => Math.min(prevPage + 1, responseData?.totalPages))
   }
 
   const handleRecordsPerPage = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setLoading(true)
-    if (currentViewTab === LIST_VIEW) {
-      setRecordsPerPage(parseInt(event.target.value))
-    } else {
-      setRecordsPerCard(parseInt(event.target.value))
-    }
+    setRecordsPerPage(parseInt(event.target.value))
     setCurrentPage(1)
   }
 
-  // const handleRowSelect = (accountId: string) => {
-  //   const selectedIndex = selected.indexOf(accountId)
-  //   let newSelected: string[] = [...selected]
-  //   let newSelectedIds: string[] = [...selectedId]
-  //   let newIsSelectedId: boolean[] = [...isSelectedId]
-
-  //   if (selectedIndex === -1) {
-  //     newSelected.push(accountId)
-  //     newSelectedIds.push(accountId)
-  //     newIsSelectedId.push(true)
-  //   } else {
-  //     newSelected.splice(selectedIndex, 1)
-  //     newSelectedIds.splice(selectedIndex, 1)
-  //     newIsSelectedId.splice(selectedIndex, 1)
-  //   }
-
-  //   setSelected(newSelected)
-  //   setSelectedId(newSelectedIds)
-  //   setIsSelectedId(newIsSelectedId)
-  // }
   const modalDialog = 'Are You Sure You want to delete selected Opportunity?'
   const modalTitle = 'Delete Opportunity'
 
@@ -242,28 +232,21 @@ export default function Opportunities (props: any) {
     [50, '50 Records per page']
   ]
 
-  const recordsPerCardList = [
-    [5, '5 Records per card'],
-    [10, '10 Records per card'],
-    [15, '15 Records per card']
-  ]
-  
-  const recordsPerViewList = currentViewTab === STAGE_VIEW 
-    ? recordsPerCardList : recordsPerPageList
-
-  function handleChangeTab (e: any, val: string) {
+  function handlePageViewTabChange (e: any, val: string) {
     setCurrentViewTab(val)
-    localStorage.setItem('last_opportunity_tab', val)
+    localStorage.setItem(LAST_USED_PAGE_VIEW, val)
   }
 
-  useEffect(() => {
-    const lastTab = localStorage.getItem('last_opportunity_tab')
-    setCurrentViewTab(lastTab ?? STAGE_VIEW)
-  }, [])
+  function handleStageViewTabChange (selectedTab: string) {
+    if (isValidStage(selectedTab) && selectedTab !== currentStageTab) {
+      getOpportunities(selectedTab)
+    }
+  }
+
   return (
-    <Box sx={{ mt: '60px' }}>
+    <Box sx={{ mt: '60px', position: 'relative' }}>
       <CustomToolbar>
-        <Tabs defaultValue={currentViewTab} onChange={handleChangeTab} sx={{ mt: '26px' }}>
+        <Tabs defaultValue={currentViewTab} onChange={handlePageViewTabChange} sx={{ mt: '26px' }}>
           <CustomTab
             value={STAGE_VIEW}
             label={capitalizeWords(STAGE_VIEW.replace('_', ' '))}
@@ -287,7 +270,7 @@ export default function Opportunities (props: any) {
           sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
         >
           <Select
-            value={currentViewTab === LIST_VIEW ? recordsPerPage : recordsPerCard}
+            value={recordsPerPage}
             onChange={(e: any) => handleRecordsPerPage(e)}
             open={selectOpen}
             onOpen={() => setSelectOpen(true)}
@@ -310,8 +293,8 @@ export default function Opportunities (props: any) {
               '& .MuiSelect-select': { overflow: 'visible !important' }
             }}
           >
-            {recordsPerViewList?.length &&
-              recordsPerViewList.map((item: any, i: any) => (
+            {recordsPerPageList?.length &&
+              recordsPerPageList.map((item: any, i: any) => (
                 <MenuItem key={i} value={item[0]}>
                   {item[1]}
                 </MenuItem>
@@ -370,10 +353,15 @@ export default function Opportunities (props: any) {
         onDeleteOpportunity={handleDeleteOpportunity}
       />}
       {currentViewTab === STAGE_VIEW && 
-        <OpportunityStageView opportunities={responseData.opportunities}/>
+        <OpportunityStageView 
+          opportunities={responseData.opportunities} 
+          opportunityStages={opportunityStages}
+          onTabChange={handleStageViewTabChange}
+          selectedTab={currentStageTab}
+        />
       }
       {loading && (
-            <Spinner />
+            <SpinnerAbsolute />
           )}
       <DeleteModal
         onClose={deleteRowModalClose}
@@ -383,6 +371,7 @@ export default function Opportunities (props: any) {
         modalTitle={modalTitle}
         DeleteItem={deleteItem}
       />
+
     </Box>
   )
 }

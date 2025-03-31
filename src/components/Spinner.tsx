@@ -16,3 +16,11 @@ export function Spinner () {
     </Box>
   )
 }
+
+export function SpinnerAbsolute () {
+  return (
+    <div className={'spinner'}>
+      <CircularProgress />
+    </div>
+  )
+}

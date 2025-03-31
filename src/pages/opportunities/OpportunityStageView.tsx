@@ -1,27 +1,11 @@
 import { capitalizeWords } from '../../utils/UtilFunctions'
 
 import './../../styles/style1.css'
-import { useState } from 'react'
 import { Avatar } from '@mui/material'
 import FormateTime from '../../components/FormateTime'
 import { FaEdit, FaSearchPlus, FaTrashAlt } from 'react-icons/fa'
 
-const STAGES = [
-    { name: 'QUALIFICATION', color: '#FFD700' }, // Gold - Initial interest stage
-    { name: 'NEEDS ANALYSIS', color: '#FF8C00' }, // Dark Orange - Understanding needs
-    { name: 'VALUE PROPOSITION', color: '#8A2BE2' }, // Blue Violet - Presenting value
-    { name: 'ID.DECISION MAKERS', color: '#4682B4' }, // Steel Blue - Identifying key people
-    { name: 'PERCEPTION ANALYSIS', color: '#20B2AA' }, // Light Sea Green - Gauging perception
-    { name: 'PROPOSAL/PRICE QUOTE', color: '#556B2F' }, // Dark Olive Green - Formal proposal
-    { name: 'NEGOTIATION/REVIEW', color: '#DC143C' }, // Crimson - Intense discussions
-    { name: 'CLOSED WON', color: '#228B22' }, // Forest Green - Success
-    { name: 'CLOSED LOST', color: '#8B0000' }, // Dark Red - Lost deal
-    { name: 'NOT STAGED', color: '#808080' } // Gray - No stage assigned
-]
-
-const DUMMY_TAGS = ['VIP', 'High Profit', 'Fast Process']
-
-function StageCardHeader ({ title, isActive, onTabClick }: any) {
+function StageViewTab ({ title, isActive, onTabClick }: any) {
     const cardTitle = capitalizeWords(title.toLowerCase().replace('/', ' / '))
     return (
         <div
@@ -33,8 +17,7 @@ function StageCardHeader ({ title, isActive, onTabClick }: any) {
     )
 }
 
-function OpportunityCard ({ opportunity, opportunityStageHistory }: any) {
-    const badgeColor = STAGES.find((stage: any) => stage.name === opportunity.stage)?.color
+function OpportunityCard ({ opportunity, opportunityStageHistory, badgeColor }: any) {
     return (
         <div className='opportunity-card'>
             <div className='opportunity-card-header'>
@@ -76,15 +59,18 @@ function OpportunityCard ({ opportunity, opportunityStageHistory }: any) {
                     </tr>
                     <hr />
                     <tr>
-                        <th>Assigned To</th>
-                        {!opportunity?.assigned_to?.length && <td>---</td>}
-                        {opportunity?.assigned_to.length && 
-                        <td>
-                            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'start', justifyItems: 'start', margin: '0', padding: '0' }}>
-                                {opportunity.assigned_to.map((user: any) => 
-                                    <p style={{ margin: '3px', padding: 0 }} key={`assigned-to-${user?.user_details?.email || ''}`}>{user?.user_details?.email || ''}</p>)}
-                            </div>
-                        </td>}
+                        <th>Assigned To</th> 
+                        {opportunity?.assigned_to?.length === 0 ? <td>Not Assigned</td>
+                        : opportunity?.assigned_to?.length &&
+                            <td>
+                                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'start', justifyItems: 'start', margin: '0', padding: '0' }}>
+                                    {opportunity.assigned_to.map((user: any) =>
+                                        <p style={{ margin: '3px', padding: '0' }} key={`assigned-to-${user?.user_details?.email || ''}`}>
+                                            {user?.user_details?.email || ''}
+                                        </p>)}
+                                </div>
+                            </td>
+                        }
                     </tr>
                 </tbody>
             </table>
@@ -97,29 +83,29 @@ function OpportunityCard ({ opportunity, opportunityStageHistory }: any) {
     )
 }
 
-export default function OpportunityStageView ({ opportunities, stages = STAGES }: any) {
-    console.log('opportunities', opportunities)
-    const [selectedTab, setSelectedTab] = useState<string>(STAGES[1].name)
-
-    function handleChangeTab (newTab: string) {
-        setSelectedTab(newTab)
-    }
+export default function OpportunityStageView ({ opportunities, selectedTab, onTabChange, opportunityStages }: any) {
+    const selectedStage = opportunityStages.filter((stage: any) => stage.name === selectedTab)
+    const badgeColor = selectedStage.length ? selectedStage[0].color : 'black'
     return (
         <div className='stages-container'>
-            {stages.map((stage: any) =>
-                <StageCardHeader
+            {opportunityStages.map((stage: any) =>
+                <StageViewTab
                     key={`${stage.name}-header`}
                     title={stage.name}
-                    onTabClick={handleChangeTab}
+                    onTabClick={onTabChange}
                     isActive={stage.name === selectedTab}
                 />
             )}
             <div className='cards-container'>
-                {opportunities?.map((o: any, index: number) =>
-                    <OpportunityCard opportunity={o} key={index} className='opportunity-card' />
-                )}
+                {opportunities.length > 0 
+                    ? opportunities?.map((opportunity: any, index: number) =>
+                    <OpportunityCard opportunity={opportunity} key={index} className='opportunity-card' badgeColor={badgeColor} />
+                )
+                : <div className='no-opportunities'>
+                No opportunities found for stage {selectedTab}
+                </div>
+            }
             </div>
         </div>
     )
 }
-

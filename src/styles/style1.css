@@ -40,17 +40,32 @@
     background-color: rgb(246, 242, 242);
     grid-row: 2;
     grid-column: 1 / 11;
-    grid-template-columns: repeat(4, 1fr);
+    /* grid-template-columns: repeat(4, 1fr); */
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
     gap: 20px;
+}
+
+.no-opportunities {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    font-size: 1.5rem;
+    font-weight: 600;
+    grid-column: 1 / 11;
+    grid-row: 2;
 }
 
 .opportunity-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: start;
+    justify-content: space-between;
     justify-items: stretch;
     border: 1px gray solid;
+    overflow: hidden;
 }
 
 .opportunity-card-header {
@@ -163,6 +178,19 @@
     cursor: pointer;
     transform: scale(1.2); 
     /* transition: transform 0.2s ease-in-out;  */
+}
+
+.spinner {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 50vh;
+    left: 50%;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
 }
     
 
