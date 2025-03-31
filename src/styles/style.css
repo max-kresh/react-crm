@@ -615,6 +615,7 @@ input[type='number'] {
   place-items: center;
   margin: 10px;
   margin-bottom: 20px;
+  position: relative;
 }
 
 .stages-panel div {

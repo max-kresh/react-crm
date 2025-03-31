@@ -20,7 +20,14 @@ export function Spinner () {
 export function SpinnerAbsolute () {
   return (
     <div className={'spinner'}>
-      <CircularProgress />
+      <CircularProgress 
+        sx={{ 
+          backgroundColor: 'rgba(150, 150, 150, 0.2)', 
+          borderRadius: '50%'
+        }}
+        size='6vw'
+        color="secondary"
+      />
     </div>
   )
 }

@@ -13,7 +13,6 @@ import {
   MenuItem
 } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { Spinner, SpinnerAbsolute } from '../../components/Spinner'
 import { FiPlus } from '@react-icons/all-files/fi/FiPlus'
 import { FiChevronLeft } from '@react-icons/all-files/fi/FiChevronLeft'
 import { FiChevronRight } from '@react-icons/all-files/fi/FiChevronRight'
@@ -402,6 +401,7 @@ export default function Opportunities (props: any) {
         responseData={responseData}
         onOpportunityClick={handleOpportunityClick}
         onDeleteOpportunity={handleDeleteOpportunity}
+        spinner={loading}
       />}
       {currentViewTab === STAGE_VIEW && 
         <OpportunityStageView 
@@ -410,11 +410,9 @@ export default function Opportunities (props: any) {
           onTabChange={handleStageViewTabChange}
           selectedTab={currentStageTab}
           onAction={handleOpportunityAction}
+          spinner={loading}
         />
       }
-      {loading && (
-            <SpinnerAbsolute />
-          )}
       <DeleteModal
         onClose={deleteRowModalClose}
         open={deleteRowModal}

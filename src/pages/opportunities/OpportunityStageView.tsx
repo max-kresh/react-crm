@@ -4,6 +4,7 @@ import './../../styles/style1.css'
 import { Avatar } from '@mui/material'
 import FormateTime from '../../components/FormateTime'
 import { FaEdit, FaSearchPlus, FaTrashAlt } from 'react-icons/fa'
+import { SpinnerAbsolute } from '../../components/Spinner'
 
 function titlePretty (title: string) {
     return capitalizeWords(title.toLowerCase().replace('/', ' / '))
@@ -90,11 +91,19 @@ function OpportunityCard ({ opportunity, badgeColor, onAction }: any) {
     )
 }
 
-export default function OpportunityStageView ({ opportunities, selectedTab, onTabChange, onAction, opportunityStages }: any) {
+export default function OpportunityStageView ({ 
+    opportunities, 
+    selectedTab, 
+    onTabChange, 
+    onAction, 
+    opportunityStages,
+    spinner 
+}: any) {
     const selectedStage = opportunityStages.filter((stage: any) => stage.name === selectedTab)
     const badgeColor = selectedStage.length ? selectedStage[0].color : 'black'
     return (
         <div className='stages-container'>
+            {spinner && <SpinnerAbsolute />}
             {opportunityStages.map((stage: any) =>
                 <StageViewTab
                     key={`${stage.name}-header`}

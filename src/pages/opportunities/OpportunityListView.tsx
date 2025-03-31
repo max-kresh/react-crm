@@ -3,7 +3,7 @@ import { EnhancedTableHead } from '../../components/EnchancedTableHead'
 import { getComparator, stableSort } from '../../components/Sorting'
 import { Label } from '../../components/Label'
 import { FaTrashAlt } from 'react-icons/fa'
-import { Spinner } from '../../components/Spinner'
+import { SpinnerAbsolute } from '../../components/Spinner'
 import { useState } from 'react'
 
 interface HeadCell {
@@ -67,7 +67,8 @@ const headCells: readonly HeadCell[] = [
 export default function OpportunityListView ({ 
   responseData, 
   onOpportunityClick, 
-  onDeleteOpportunity
+  onDeleteOpportunity,
+  spinner
 }: any) {
   const [selected, setSelected] = useState<string[]>([])
   const [selectedId, setSelectedId] = useState<string[]>([])
@@ -88,6 +89,7 @@ export default function OpportunityListView ({
         <Paper
           sx={{ width: 'cal(100%-15px)', mb: 2, p: '0px 15px 15px 15px' }}
         >
+          {spinner && <SpinnerAbsolute />}
           <TableContainer>
             <Table>
               <EnhancedTableHead
