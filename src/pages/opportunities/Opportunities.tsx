@@ -80,8 +80,6 @@ export default function Opportunities (props: any) {
 
   const [deleteRowModal, setDeleteRowModal] = useState(false)
   const [selectOpen, setSelectOpen] = useState(false)
-
-  const lastUsedPageView = localStorage.getItem(LAST_USED_PAGE_VIEW) 
   
   const [currentViewTab, setCurrentViewTab] = useState<string>(
     localStorage.getItem(LAST_USED_PAGE_VIEW) === LIST_VIEW ? LIST_VIEW : STAGE_VIEW
@@ -98,7 +96,7 @@ export default function Opportunities (props: any) {
 
   useEffect(() => {
     getOpportunities(currentViewTab === STAGE_VIEW ? currentStageTab : '')
-  }, [currentPage, recordsPerPage])
+  }, [currentPage, recordsPerPage, currentViewTab])
 
   const getOpportunities = async (stageTab: string = '') => {
     const stageQueryParam = currentViewTab === STAGE_VIEW ? `&stage=${stageTab}` : ''
@@ -131,10 +129,10 @@ export default function Opportunities (props: any) {
               localStorage.setItem(LAST_USED_STAGE_TAB, stageTab)
             }
           }
-          setLoading(false)
         })
     } catch (error) {
       console.error('Error fetching data:', error)
+    } finally {
       setLoading(false)
     }
   }
@@ -159,10 +157,6 @@ export default function Opportunities (props: any) {
   }
 
   type SelectedItem = string[]
-
-  const isSelected = (name: string, selected: SelectedItem): boolean => {
-    return selected.indexOf(name) !== -1
-  }
 
   const handleOpportunityClick = (opportunityId: any) => {
     navigate('/app/opportunities/opportunity-details', {
@@ -350,7 +344,6 @@ export default function Opportunities (props: any) {
                 </MenuItem>
               ))}
           </Select>
-          {currentViewTab === LIST_VIEW && 
           <Box
             sx={{
               borderRadius: '7px',
@@ -386,7 +379,7 @@ export default function Opportunities (props: any) {
             >
               <FiChevronRight style={{ height: '15px' }} />
             </FabRight>
-          </Box>}
+          </Box>
           <Button
             variant="contained"
             startIcon={<FiPlus className="plus-icon" />}

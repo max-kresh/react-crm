@@ -26,7 +26,7 @@ export function SpinnerAbsolute () {
           borderRadius: '50%'
         }}
         size='6vw'
-        color="secondary"
+        // color="secondary"
       />
     </div>
   )

@@ -108,7 +108,6 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
   const [errors, setErrors] = useState<FormErrors>({})
 
   function compileInitialFormData () {
-    console.log('init data', state)
     return state?.value || {
       name: '',
       account: '',
@@ -150,7 +149,7 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
     } else if (title === 'assigned_to') {
       setFormData({
         ...formData,
-        assigned_to: val.length > 0 ? val.map((item: any) => item.id) : []
+        assigned_to: val.length > 0 ? val : []
       })
       setSelectedAssignTo(val)
     } else if (title === 'teams') {
@@ -270,7 +269,6 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
       })
     )
   }
-
   return (
     <Box sx={{ mt: '60px' }}>
       <CustomAppBar
@@ -566,7 +564,7 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
                             multiple
                             value={formData.assigned_to || []} 
                             limitTags={2}
-                            options={state.users || []}
+                            options={state?.users || []}
                             getOptionLabel={(option: any) =>
                               state.users ? option?.user__email : option
                             }
@@ -587,7 +585,7 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
                                   }}
                                   variant="outlined"
                                   label={
-                                    option?.user_details?.email || option
+                                    option?.user__email || option
                                   }
                                   {...getTagProps({ index })}
                                 />
