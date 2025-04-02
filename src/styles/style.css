@@ -596,3 +596,129 @@ input[type='number'] {
   display: 'flex';
   justify-content: 'space-between';
 }
+
+/* Opportunity details stage graph */
+
+:root {
+  --thickness: 10;
+  --line-height: calc(1px * var(--thickness));
+  --arrow-length: calc(2.5px * var(--thickness));
+  --diagonal: calc(var(--arrow-length) * 1.414); /*1.414 == sqrt(2) */
+  --circe-diameter: 60px;
+  --connector-rotation: 18deg
+}
+
+.stages-panel {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  grid-template-rows: repeat(1);
+  place-items: center;
+  margin: 10px;
+  margin-bottom: 20px;
+}
+
+.stages-panel div {
+  margin: 0;
+}
+
+.stage-circle {
+  display: flex;
+  color: white;
+  height: var(--circe-diameter);
+  font-weight: bold;
+  font-size: 1.1rem;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  grid-row: 2;
+}
+
+.stage-circle:hover {
+  filter: brightness(65%);
+  cursor: pointer;
+}
+
+.stage-label {
+  color: #1a3353f0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  grid-row: 3;
+}
+
+.connector {
+  display: flex;
+  align-items: center;
+  height: var(--diagonal);
+  position: relative;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  grid-row: 2;
+}
+
+.connector-line {
+  width: calc(100% - var(--diagonal)/2);
+  height: var(--line-height);
+  z-index: 10;
+}
+
+.connector-head {
+  width: var(--arrow-length);
+  height: var(--arrow-length);
+  z-index: 8;
+  position: absolute;
+  left: calc(100% - var(--arrow-length) - var(--arrow-length) * 0.207);
+  top: calc((var(--diagonal) - var(--arrow-length))/2);
+  transform: rotate(45deg);
+}
+
+.connector-head-clear {
+  width: calc(var(--diagonal)/2);
+  height: var(--diagonal);
+  position: absolute;
+  top: 0;
+  left: calc(100% - calc(var(--diagonal)));
+  z-index: 9;
+  background-color: white;
+}
+
+.connector-tail-clear {
+  width: var(--line-height);
+  height: var(--line-height);
+  position: absolute;
+  left: -5px;
+  top: calc((var(--diagonal) - var(--line-height))/2);
+  z-index: 11;
+  transform: rotate(45deg);
+  background-color: white;
+}
+
+.connector-upwards {
+  transform-origin: -30px calc(var(--diagonal)/2);
+  transform: rotate(calc(-1 * var(--connector-rotation)));
+
+}
+
+.connector-downwards {
+  transform-origin: -30px calc(var(--diagonal)/2);
+  transform: rotate(var(--connector-rotation));
+}
+
+.closed-stage-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  grid-column: 15;
+  place-self: 'center start'
+}
+
+.closed-lost-cell {
+  grid-row: 1;
+}
+
+.closed-won-cell {
+  grid-row: 3;
+}
