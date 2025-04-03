@@ -22,7 +22,7 @@ import {
   FabLeft,
   FabRight
 } from '../../styles/CssStyled'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { compileHeader, fetchData } from '../../components/FetchData'
 import { OpportunityUrl } from '../../services/ApiUrls'
 import { DeleteModal } from '../../components/DeleteModal'
@@ -36,9 +36,7 @@ import { COUNTRIES } from '../../utils/Constants'
 const LIST_VIEW = 'list_view'
 const STAGE_VIEW = 'stage_view'
 
-const LAST_USED_PAGE_VIEW = 'last_used_opportunity_page_view'
-const LAST_USED_STAGE_TAB = 'last_used_stage_tab'
-
+const LOCAL_STORAGE_PAGE_RECORD = 'opportunity_page_record'
 interface StageInterface {
   name: string, color: string
 }
@@ -56,12 +54,25 @@ export const opportunityStages: StageInterface[] = [
   { name: 'NOT STAGED', color: '#808080' } // Gray - No stage assigned
 ]
 
+const localStorageDefaultRecord = {
+  lastUsedPageView: STAGE_VIEW,
+  lastUsedStageTab: opportunityStages[0].name,
+  lastOpportunityId: '',
+  lastPage: 1,
+  lastRecordsPerPage: 10
+}
+
 function isValidStage (stage: string): boolean {
   return opportunityStages.some((opportunity: StageInterface) => opportunity.name === stage)
 }
 
+function isValidPageView (pageView: string): boolean {
+  return [LIST_VIEW, STAGE_VIEW].includes(pageView)
+}
+
 export default function Opportunities (props: any) {
   const navigate = useNavigate()
+  const { state } = useLocation()
   const [loading, setLoading] = useState(true)
 
   const [responseData, setResponseData] = useState({
@@ -78,26 +89,54 @@ export default function Opportunities (props: any) {
     leads: []
   })
 
+  var localStorageRecord = getAndValidateLocalStorageRecord()
+
   const [deleteRowModal, setDeleteRowModal] = useState(false)
   const [selectOpen, setSelectOpen] = useState(false)
   
-  const [currentViewTab, setCurrentViewTab] = useState<string>(
-    localStorage.getItem(LAST_USED_PAGE_VIEW) === LIST_VIEW ? LIST_VIEW : STAGE_VIEW
-  )
+  const [currentViewTab, setCurrentViewTab] = useState<string>(localStorageRecord.lastUsedPageView)
+  
+  const [currentStageTab, setCurrentStageTab] = useState<string>(localStorageRecord.lastUsedStageTab)
+  const [recordsPerPage, setRecordsPerPage] = useState<number>(localStorageRecord.lastRecordsPerPage)
 
-  const lastUsedStageTab = localStorage.getItem(LAST_USED_STAGE_TAB) || ''
-  const [currentStageTab, setCurrentStageTab] = useState<string>(
-    isValidStage(lastUsedStageTab) ? lastUsedStageTab : opportunityStages[0].name
-  )
-  const [recordsPerPage, setRecordsPerPage] = useState<number>(10)
+  const [currentPage, setCurrentPage] = useState<number>(localStorageRecord.lastPage)
+  const [selectedOpportunity, setSelectedOpportunity] = useState<string>('')
 
-  const [currentPage, setCurrentPage] = useState<number>(1)
-  const [opportunityToBeDeletedId, setOpportunityToBeDeletedId] = useState<string>('')
+  useEffect(() => {
+    const record = {
+      lastUsedPageView: currentViewTab,
+      lastUsedStageTab: currentStageTab,
+      lastOpportunityId: selectedOpportunity,
+      lastPage: currentPage,
+      lastRecordsPerPage: recordsPerPage
+    }
+    saveToLocalStorage(record)
+  }, [currentViewTab, currentStageTab, selectedOpportunity, currentPage, recordsPerPage])  
 
   useEffect(() => {
     getOpportunities(currentViewTab === STAGE_VIEW ? currentStageTab : '')
-  }, [currentPage, recordsPerPage, currentViewTab])
+  }, [currentPage, recordsPerPage, currentViewTab, currentStageTab])
 
+  function saveToLocalStorage (keyAndValues: any) {
+    localStorageRecord = { ...localStorageRecord, ...keyAndValues }
+    localStorage.setItem(LOCAL_STORAGE_PAGE_RECORD, JSON.stringify(localStorageRecord))
+  }
+
+  function getAndValidateLocalStorageRecord () {
+    const record = localStorage.getItem(LOCAL_STORAGE_PAGE_RECORD)
+    if (record) {
+      const parsedRecord = JSON.parse(record)
+      parsedRecord.lastOpportunityId = parsedRecord.lastOpportunityId || ''
+      parsedRecord.lastUsedPageView = isValidPageView(parsedRecord.lastUsedPageView) ? parsedRecord.lastUsedPageView : localStorageDefaultRecord.lastUsedPageView
+      parsedRecord.lastUsedStageTab = isValidStage(parsedRecord.lastUsedStageTab) ? parsedRecord.lastUsedStageTab : opportunityStages[0].name
+      parsedRecord.lastPage = parsedRecord.lastPage || localStorageDefaultRecord.lastPage
+      parsedRecord.lastRecordsPerPage = parsedRecord.lastRecordsPerPage || localStorageDefaultRecord.lastRecordsPerPage
+      return parsedRecord
+    } else {
+      return { ...localStorageDefaultRecord }
+    }
+  }
+  
   const getOpportunities = async (stageTab: string = '') => {
     const stageQueryParam = currentViewTab === STAGE_VIEW ? `&stage=${stageTab}` : ''
     try {
@@ -126,7 +165,6 @@ export default function Opportunities (props: any) {
             })
             if (stageTab !== '') {
               setCurrentStageTab(stageTab)
-              localStorage.setItem(LAST_USED_STAGE_TAB, stageTab)
             }
           }
         })
@@ -150,7 +188,8 @@ export default function Opportunities (props: any) {
           stage: responseData?.stage || [],
           users: responseData?.users || [],
           teams: responseData?.teams || [],
-          leads: responseData?.leads || []
+          leads: responseData?.leads || [],
+          turnBackRecords: localStorageRecord
         }
       })
     }
@@ -158,7 +197,7 @@ export default function Opportunities (props: any) {
 
   type SelectedItem = string[]
 
-  const handleOpportunityClick = (opportunityId: any) => {
+  const showOpportunityDetails = (opportunityId: any) => {
     navigate('/app/opportunities/opportunity-details', {
       state: {
         opportunityId,
@@ -171,13 +210,14 @@ export default function Opportunities (props: any) {
         stage: responseData?.stage || [],
         users: responseData?.users || [],
         teams: responseData?.teams || [],
-        leads: responseData?.leads || []
+        leads: responseData?.leads || [],
+        turnBackRecords: localStorageRecord
       }
     })
   }
 
   const handleDeleteOpportunity = (id: string) => {
-    setOpportunityToBeDeletedId(id)
+    setSelectedOpportunity(id)
     setDeleteRowModal((prev: boolean) => !prev)
   }
   const deleteRowModalClose = () => {
@@ -185,13 +225,7 @@ export default function Opportunities (props: any) {
   }
 
   const deleteItem = () => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
-    fetchData(`${OpportunityUrl}/${opportunityToBeDeletedId}/`, 'DELETE', null as any, Header)
+    fetchData(`${OpportunityUrl}/${selectedOpportunity}/`, 'DELETE', null as any, compileHeader())
       .then((res: any) => {
         if (!res.error) {
           deleteRowModalClose()
@@ -228,7 +262,6 @@ export default function Opportunities (props: any) {
 
   function handlePageViewTabChange (e: any, val: string) {
     setCurrentViewTab(val)
-    localStorage.setItem(LAST_USED_PAGE_VIEW, val)
   }
 
   function handleStageViewTabChange (selectedTab: string) {
@@ -277,11 +310,12 @@ export default function Opportunities (props: any) {
           stage: responseData?.stage || [],
           users: responseData?.users || [],
           teams: responseData?.teams || [],
-          leads: responseData?.leads || []
+          leads: responseData?.leads || [],
+          turnBackRecords: localStorageRecord
         }
       })
     } else if (action === 'details') {
-      handleOpportunityClick(opportunity?.id)    
+      showOpportunityDetails(opportunity?.id)    
     } else if (action === 'delete') {
       handleDeleteOpportunity(opportunity?.id)
     }
@@ -392,7 +426,7 @@ export default function Opportunities (props: any) {
       </CustomToolbar>
       {currentViewTab === LIST_VIEW && <OpportunityListView 
         responseData={responseData}
-        onOpportunityClick={handleOpportunityClick}
+        onOpportunityClick={showOpportunityDetails}
         onDeleteOpportunity={handleDeleteOpportunity}
         spinner={loading}
       />}
@@ -409,7 +443,7 @@ export default function Opportunities (props: any) {
       <DeleteModal
         onClose={deleteRowModalClose}
         open={deleteRowModal}
-        id={opportunityToBeDeletedId}
+        id={selectedOpportunity}
         modalDialog={modalDialog}
         modalTitle={modalTitle}
         DeleteItem={deleteItem}
