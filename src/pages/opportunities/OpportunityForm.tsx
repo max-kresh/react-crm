@@ -585,7 +585,7 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
                                   }}
                                   variant="outlined"
                                   label={
-                                    option?.user__email || option
+                                    option?.user_details.email || 'option'
                                   }
                                   {...getTagProps({ index })}
                                 />
