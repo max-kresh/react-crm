@@ -35,8 +35,6 @@ import { COUNTRIES } from '../../utils/Constants'
 
 const LIST_VIEW = 'list_view'
 const STAGE_VIEW = 'stage_view'
-
-const LOCAL_STORAGE_PAGE_RECORD = 'opportunity_page_record'
 interface StageInterface {
   name: string, color: string
 }
@@ -53,13 +51,6 @@ export const opportunityStages: StageInterface[] = [
   { name: 'CLOSED LOST', color: '#8B0000' }, // Dark Red - Lost deal
   { name: 'NOT STAGED', color: '#808080' } // Gray - No stage assigned
 ]
-
-const localStorageDefaultRecord = {
-  lastUsedPageView: STAGE_VIEW,
-  lastUsedStageTab: opportunityStages[0].name,
-  lastPage: 1,
-  lastRecordsPerPage: 10
-}
 
 function isValidStage (stage: string): boolean {
   return opportunityStages.some((opportunity: StageInterface) => opportunity.name === stage)
@@ -88,65 +79,39 @@ export default function Opportunities (props: any) {
     leads: []
   })
 
-  var localStorageRecord = getAndValidateLocalStorageRecord()
-
   const [deleteRowModal, setDeleteRowModal] = useState(false)
   const [selectOpen, setSelectOpen] = useState(false)
   
-  const [currentViewTab, setCurrentViewTab] = useState<string>(localStorageRecord.lastUsedPageView)
+  const [pageSettings, setPageSettings] = useState({
+    currentViewTab: STAGE_VIEW,
+    currentStageTab: opportunityStages[0].name,
+    recordsPerPage: 10,
+    currentPage: 1
+  })
   
-  const [currentStageTab, setCurrentStageTab] = useState<string>(localStorageRecord.lastUsedStageTab)
-  const [recordsPerPage, setRecordsPerPage] = useState<number>(localStorageRecord.lastRecordsPerPage)
-
-  const [currentPage, setCurrentPage] = useState<number>(localStorageRecord.lastPage)
   const [selectedOpportunityId, setSelectedOpportunityId] = useState<string>('')
 
   useEffect(() => {
-    const record = {
-      lastUsedPageView: currentViewTab,
-      lastUsedStageTab: currentStageTab,
-      lastPage: currentPage,
-      lastRecordsPerPage: recordsPerPage
-    }
-    saveToLocalStorage(record)
-  }, [currentViewTab, currentStageTab, selectedOpportunityId, currentPage, recordsPerPage])  
+    getOpportunities(pageSettings.currentViewTab === STAGE_VIEW ? pageSettings.currentStageTab : '')
+  }, [pageSettings])
 
   useEffect(() => {
-    getOpportunities(currentViewTab === STAGE_VIEW ? currentStageTab : '')
-  }, [currentPage, recordsPerPage, currentViewTab, currentStageTab])
-
-  function saveToLocalStorage (keyAndValues: any) {
-    localStorageRecord = { ...localStorageRecord, ...keyAndValues }
-    localStorage.setItem(LOCAL_STORAGE_PAGE_RECORD, JSON.stringify(localStorageRecord))
-  }
-
-  function getAndValidateLocalStorageRecord () {
-    const record = localStorage.getItem(LOCAL_STORAGE_PAGE_RECORD)
-    if (record) {
-      const parsedRecord = JSON.parse(record)
-      parsedRecord.lastUsedPageView = isValidPageView(parsedRecord.lastUsedPageView) ? parsedRecord.lastUsedPageView : localStorageDefaultRecord.lastUsedPageView
-      parsedRecord.lastUsedStageTab = isValidStage(parsedRecord.lastUsedStageTab) ? parsedRecord.lastUsedStageTab : opportunityStages[0].name
-      parsedRecord.lastPage = parsedRecord.lastPage || localStorageDefaultRecord.lastPage
-      parsedRecord.lastRecordsPerPage = parsedRecord.lastRecordsPerPage || localStorageDefaultRecord.lastRecordsPerPage
-      return parsedRecord
-    } else {
-      return { ...localStorageDefaultRecord }
-    }
-  }
-
-  useEffect(() => {
-    if (state && state.scrollToId) {
-      setSelectedOpportunityId(state.scrollToId)
-    }
+    setPageSettings((prev: any) => ({
+      currentViewTab: state?.turnBackRecord?.currentViewTab ?? prev.currentViewTab,
+      currentStageTab: state?.turnBackRecord?.currentStageTab ?? prev.currentStageTab,
+      recordsPerPage: state?.turnBackRecord?.recordsPerPage ?? prev.recordsPerPage,
+      currentPage: state?.turnBackRecord?.currentPage ?? prev.currentPage
+    }))
+    setSelectedOpportunityId((prev: any) => state?.turnBackRecord?.scrollTo ?? '')
   }, [state])
 
   const getOpportunities = async (stageTab: string = '') => {
-    const stageQueryParam = currentViewTab === STAGE_VIEW ? `&stage=${stageTab}` : ''
+    const stageQueryParam = pageSettings.currentViewTab === STAGE_VIEW ? `&stage=${stageTab}` : ''
     try {
-      const offset = (currentPage - 1) * recordsPerPage
+      const offset = (pageSettings.currentPage - 1) * pageSettings.recordsPerPage
       setLoading(true)
       await fetchData(
-        `${OpportunityUrl}/?offset=${offset}&limit=${recordsPerPage}${stageQueryParam}`,
+        `${OpportunityUrl}/?offset=${offset}&limit=${pageSettings.recordsPerPage}${stageQueryParam}`,
         'GET',
         null as any,
         compileHeader()
@@ -154,7 +119,7 @@ export default function Opportunities (props: any) {
         .then((res) => {
           if (!res.error) {
             setResponseData({
-              totalPages: Math.ceil(res?.opportunities_count / recordsPerPage),
+              totalPages: Math.ceil(res?.opportunities_count / pageSettings.recordsPerPage),
               opportunities: res?.opportunities,
               contacts: res?.contacts_list,
               account: res?.accounts_list,
@@ -166,9 +131,6 @@ export default function Opportunities (props: any) {
               users: res?.users,
               leads: res?.leads
             })
-            if (stageTab !== '') {
-              setCurrentStageTab(stageTab)
-            }
           }
         })
     } catch (error) {
@@ -213,7 +175,7 @@ export default function Opportunities (props: any) {
         users: responseData?.users || [],
         teams: responseData?.teams || [],
         leads: responseData?.leads || [],
-        scrollToId: opportunityId
+        turnBackRecord: { ...pageSettings, scrollTo: opportunityId }
       }
     })
   }
@@ -236,18 +198,27 @@ export default function Opportunities (props: any) {
       .catch(() => {})
   }
   const handlePreviousPage = () => {
-    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
+    setPageSettings((prev) => ({
+      ...prev,
+      currentPage: Math.max(prev.currentPage - 1, 1)
+    }))
   }
 
   const handleNextPage = () => {
-    setCurrentPage((prevPage) => Math.min(prevPage + 1, responseData?.totalPages))
+    setPageSettings((prev) => ({
+      ...prev,
+      currentPage: Math.min(prev.currentPage + 1, responseData?.totalPages)
+    }))
   }
 
   const handleRecordsPerPage = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setRecordsPerPage(parseInt(event.target.value))
-    setCurrentPage(1)
+    setPageSettings((prev) => ({
+      ...prev,
+      recordsPerPage: parseInt(event.target.value),
+      currentPage: 1
+    }))
   }
 
   const modalDialog = 'Are You Sure You want to delete selected Opportunity?'
@@ -262,12 +233,19 @@ export default function Opportunities (props: any) {
   ]
 
   function handlePageViewTabChange (e: any, val: string) {
-    setCurrentViewTab(val)
+    setPageSettings((prev) => ({
+      ...prev,
+      currentViewTab: val
+    }))
   }
 
-  function handleStageViewTabChange (selectedTab: string) {
-    if (isValidStage(selectedTab) && selectedTab !== currentStageTab) {
-      getOpportunities(selectedTab)
+  async function handleStageViewTabChange (selectedTab: string) {
+    if (isValidStage(selectedTab) && selectedTab !== pageSettings.currentStageTab) {
+      await getOpportunities(selectedTab)
+      setPageSettings((prev) => ({
+        ...prev,
+        currentStageTab: selectedTab
+      }))
     }
   }
 
@@ -313,7 +291,7 @@ export default function Opportunities (props: any) {
           users: responseData?.users || [],
           teams: responseData?.teams || [],
           leads: responseData?.leads || [],
-          scrollToId: opportunity.id
+          turnBackRecord: { ...pageSettings, scrollTo: opportunity.id }
         }
       })
     } else if (action === 'details') {
@@ -326,21 +304,21 @@ export default function Opportunities (props: any) {
   return (
     <Box sx={{ mt: '60px', position: 'relative' }}>
       <CustomToolbar>
-        <Tabs defaultValue={currentViewTab} onChange={handlePageViewTabChange} sx={{ mt: '26px' }}>
+        <Tabs defaultValue={pageSettings.currentViewTab} onChange={handlePageViewTabChange} sx={{ mt: '26px' }}>
           <CustomTab
             value={STAGE_VIEW}
             label={capitalizeWords(STAGE_VIEW.replace('_', ' '))}
             sx={{
-              backgroundColor: currentViewTab === STAGE_VIEW ? '#F0F7FF' : '#284871',
-              color: currentViewTab === STAGE_VIEW ? '#3f51b5' : 'white'
+              backgroundColor: pageSettings.currentViewTab === STAGE_VIEW ? '#F0F7FF' : '#284871',
+              color: pageSettings.currentViewTab === STAGE_VIEW ? '#3f51b5' : 'white'
             }}
           />
           <CustomTab
             value={LIST_VIEW}
             label={capitalizeWords(LIST_VIEW.replace('_', ' '))}
             sx={{
-              backgroundColor: currentViewTab === LIST_VIEW ? '#F0F7FF' : '#284871',
-              color: currentViewTab === LIST_VIEW ? '#3f51b5' : 'white',
+              backgroundColor: pageSettings.currentViewTab === LIST_VIEW ? '#F0F7FF' : '#284871',
+              color: pageSettings.currentViewTab === LIST_VIEW ? '#3f51b5' : 'white',
               ml: '5px'
             }}
           />
@@ -350,7 +328,7 @@ export default function Opportunities (props: any) {
           sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
         >
           <Select
-            value={recordsPerPage}
+            value={pageSettings.recordsPerPage}
             onChange={(e: any) => handleRecordsPerPage(e)}
             open={selectOpen}
             onOpen={() => setSelectOpen(true)}
@@ -394,7 +372,7 @@ export default function Opportunities (props: any) {
               p: '0px'
             }}
           >
-            <FabLeft onClick={handlePreviousPage} disabled={currentPage === 1}>
+            <FabLeft onClick={handlePreviousPage} disabled={pageSettings.currentPage === 1}>
               <FiChevronLeft style={{ height: '15px' }} />
             </FabLeft>
             <Typography
@@ -406,12 +384,12 @@ export default function Opportunities (props: any) {
                 textAlign: 'center'
               }}
             >
-              {currentPage} to {responseData?.totalPages}
+              {pageSettings.currentPage} to {responseData?.totalPages}
               {/* {renderPageNumbers()} */}
             </Typography>
             <FabRight
               onClick={handleNextPage}
-              disabled={currentPage === responseData?.totalPages}
+              disabled={pageSettings.currentPage === responseData?.totalPages}
             >
               <FiChevronRight style={{ height: '15px' }} />
             </FabRight>
@@ -426,18 +404,18 @@ export default function Opportunities (props: any) {
           </Button>
         </Stack>
       </CustomToolbar>
-      {currentViewTab === LIST_VIEW && <OpportunityListView 
+      {pageSettings.currentViewTab === LIST_VIEW && <OpportunityListView 
         responseData={responseData}
         onOpportunityClick={showOpportunityDetails}
         onDeleteOpportunity={handleDeleteOpportunity}
         spinner={loading}
       />}
-      {currentViewTab === STAGE_VIEW && 
+      {pageSettings.currentViewTab === STAGE_VIEW && 
         <OpportunityStageView 
           opportunities={responseData.opportunities} 
           opportunityStages={opportunityStages}
           onTabChange={handleStageViewTabChange}
-          selectedTab={currentStageTab}
+          selectedTab={pageSettings.currentStageTab}
           onAction={handleOpportunityAction}
           spinner={loading}
           scrollToId={selectedOpportunityId}

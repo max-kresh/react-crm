@@ -234,7 +234,7 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
       .then((res: any) => {
         if (!res.error) {
           resetForm()
-          navigate('/app/opportunities', { state: { scrollToId: state?.scrollToId } })
+          navigate('/app/opportunities', { state: { turnBackRecord: state?.turnBackRecord } })
         }
         if (res.error) {
           setError(true)
@@ -255,7 +255,7 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
     resetForm()
   }
   const backbtnHandle = () => {
-    navigate('/app/opportunities', { state: { scrollToId: state?.scrollToId } })
+    navigate('/app/opportunities', { state: { turnBackRecord: state?.turnBackRecord } })
   }
 
   const module = 'Opportunities'
