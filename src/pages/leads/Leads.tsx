@@ -82,12 +82,6 @@ export const CustomTablePagination = styled(TablePagination)`
   margin-right: 1;
 `
 
-export const Tabss = styled(Tab)({
-  height: '34px',
-  textDecoration: 'none',
-  fontWeight: 'bold'
-})
-
 export const ToolbarNew = styled(Toolbar)({
   minHeight: '48px',
   height: '48px',
@@ -112,10 +106,14 @@ export const ToolbarNew = styled(Toolbar)({
 
 export default function Leads (props: any) {
   const navigate = useNavigate()
-  const [tab, setTab] = useState('open')
+  const queryParams = new URLSearchParams(window.location.search)
+  
+  const [tab, setTab] = useState(queryParams.get('status') || 'assigned')
   const [loading, setLoading] = useState(true)
 
   const [leads, setLeads] = useState([])
+  const [leadsCount, setLeadsCount] = useState(0)
+
   const [valued, setValued] = useState(10)
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [page, setPage] = useState(0)
@@ -123,10 +121,6 @@ export default function Leads (props: any) {
   const [order] = useState('asc')
   const [orderBy] = useState('calories')
 
-  const [openLeads, setOpenLeads] = useState([])
-  const [openLeadsCount, setOpenLeadsCount] = useState(0)
-  const [closedLeads, setClosedLeads] = useState([])
-  const [openClosedCount, setClosedLeadsCount] = useState(0)
   const [contacts, setContacts] = useState([])
   const [status, setStatus] = useState([])
   const [source, setSource] = useState([])
@@ -137,19 +131,13 @@ export default function Leads (props: any) {
 
   const [selectOpen, setSelectOpen] = useState(false)
 
-  const [openCurrentPage, setOpenCurrentPage] = useState<number>(1)
-  const [openRecordsPerPage, setOpenRecordsPerPage] = useState<number>(10)
-  const [openTotalPages, setOpenTotalPages] = useState<number>(0)
-  const [openLoading, setOpenLoading] = useState(true)
-
-  const [closedCurrentPage, setClosedCurrentPage] = useState<number>(1)
-  const [closedRecordsPerPage, setClosedRecordsPerPage] = useState<number>(10)
-  const [closedTotalPages, setClosedTotalPages] = useState<number>(0)
-  const [closedLoading, setClosedLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [recordsPerPage, setRecordsPerPage] = useState<number>(10)
+  const [totalPages, setTotalPages] = useState<number>(0)
 
   const [deleteLeadModal, setDeleteLeadModal] = useState(false)
   const [selectedId, setSelectedId] = useState('')
-
+  
   useEffect(() => {
     if (!localStorage.getItem('org')) {
       getLeads()
@@ -159,10 +147,8 @@ export default function Leads (props: any) {
   useEffect(() => {
     getLeads()
   }, [
-    openCurrentPage,
-    openRecordsPerPage,
-    closedCurrentPage,
-    closedRecordsPerPage
+    currentPage,
+    recordsPerPage
   ])
   const getLeads = async () => {
     const Header = {
@@ -172,25 +158,18 @@ export default function Leads (props: any) {
       org: localStorage.getItem('org')
     }
     try {
-      const openOffset = (openCurrentPage - 1) * openRecordsPerPage
-      const closeOffset = (closedCurrentPage - 1) * closedRecordsPerPage
+      const offset = (currentPage - 1) * recordsPerPage
       await fetchData(
-        `${LeadUrl}/?offset=${tab === 'open' ? openOffset : closeOffset}&limit=${tab === 'open' ? openRecordsPerPage : closedRecordsPerPage}`,
+        `${LeadUrl}/?status=${tab}&offset=${offset}&limit=${recordsPerPage}`,
         'GET',
         null as any,
         Header
       ).then((res) => {
         if (!res.error) {
-          setOpenLeads(res?.open_leads?.open_leads)
-          setOpenLeadsCount(res?.open_leads?.leads_count)
-          setOpenTotalPages(
-            Math.ceil(res?.open_leads?.leads_count / openRecordsPerPage)
-          )
-          setClosedLeads(res?.close_leads?.close_leads)
-          setClosedLeadsCount(res?.close_leads?.leads_count)
-          setClosedTotalPages(
-            Math.ceil(res?.close_leads?.leads_count / closedRecordsPerPage)
-          )
+          setLeads(res?.leads?.leads)
+          setLeadsCount(res?.leads?.leads_count)
+          setTotalPages(Math.ceil(res?.leads?.leads_count / recordsPerPage))
+          
           setContacts(res?.contacts)
           setStatus(res?.status)
           setSource(res?.source)
@@ -206,47 +185,39 @@ export default function Leads (props: any) {
     }
   }
 
+  useEffect(() => {
+    if (tab !== null) {
+      getLeads()
+    }
+  }, [tab])
+
   const handleChangeTab = (e: SyntheticEvent, val: any) => {
     setTab(val)
   }
+  
   const handleRecordsPerPage = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    if (tab === 'open') {
-      setOpenLoading(true)
-      setOpenRecordsPerPage(parseInt(event.target.value))
-      setOpenCurrentPage(1)
-    } else {
-      setClosedLoading(true)
-      setClosedRecordsPerPage(parseInt(event.target.value))
-      setClosedCurrentPage(1)
-    }
+      setLoading(true)
+      setRecordsPerPage(parseInt(event.target.value))
+      setCurrentPage(1)
   }
   const handlePreviousPage = () => {
-    if (tab === 'open') {
-      setOpenLoading(true)
-      setOpenCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
-    } else {
-      setClosedLoading(true)
-      setClosedCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
-    }
+      setLoading(true)
+      setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
   }
 
   const handleNextPage = () => {
-    if (tab === 'open') {
-      setOpenLoading(true)
-      setOpenCurrentPage((prevPage) => Math.min(prevPage + 1, openTotalPages))
-    } else {
-      setClosedLoading(true)
-      setClosedCurrentPage((prevPage) =>
-        Math.min(prevPage + 1, closedTotalPages)
-      )
-    }
+      setLoading(true)
+      setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))
   }
   const onAddHandle = () => {
     if (!loading) {
       navigate('/app/leads/add-leads', {
         state: {
+          value: {
+            status: tab || ''
+          },
           detail: false,
           contacts: contacts || [],
           status: status || [],
@@ -338,7 +309,7 @@ export default function Leads (props: any) {
     [50, '50 Records per page']
   ]
 
-  const leadList = tab === 'open' ? openLeads : closedLeads
+  const leadList = leads
 
   return (
     <Box
@@ -347,13 +318,31 @@ export default function Leads (props: any) {
       }}
     >
       <CustomToolbar>
-        <Tabs defaultValue={tab} onChange={handleChangeTab} sx={{ mt: '26px' }}>
+        <Tabs defaultValue={tab} value={tab} onChange={handleChangeTab} sx={{ mt: '26px' }}>
           <CustomTab
-            value="open"
-            label="Open"
+            value="assigned"
+            label="Assigned"
             sx={{
-              backgroundColor: tab === 'open' ? '#F0F7FF' : '#284871',
-              color: tab === 'open' ? '#3f51b5' : 'white'
+              backgroundColor: tab === 'assigned' ? '#F0F7FF' : '#284871',
+              color: tab === 'assigned' ? '#3f51b5' : 'white'
+            }}
+          />
+          <CustomTab
+            value="in process"
+            label="In Process"
+            sx={{
+              backgroundColor: tab === 'in process' ? '#F0F7FF' : '#284871',
+              color: tab === 'in process' ? '#3f51b5' : 'white',
+              ml: '5px'
+            }}
+          />
+          <CustomTab
+            value="recycled"
+            label="Recycled"
+            sx={{
+              backgroundColor: tab === 'recycled' ? '#F0F7FF' : '#284871',
+              color: tab === 'recycled' ? '#3f51b5' : 'white',
+              ml: '5px'
             }}
           />
           <CustomTab
@@ -365,13 +354,22 @@ export default function Leads (props: any) {
               ml: '5px'
             }}
           />
+          <CustomTab
+            value="converted"
+            label="Converted"
+            sx={{
+              backgroundColor: tab === 'converted' ? '#F0F7FF' : '#284871',
+              color: tab === 'converted' ? '#3f51b5' : 'white',
+              ml: '5px'
+            }}
+          />
         </Tabs>
 
         <Stack
           sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}
         >
           <Select
-            value={tab === 'open' ? openRecordsPerPage : closedRecordsPerPage}
+            value={recordsPerPage}
             onChange={(e: any) => handleRecordsPerPage(e)}
             open={selectOpen}
             onOpen={() => setSelectOpen(true)}
@@ -417,9 +415,7 @@ export default function Leads (props: any) {
           >
             <FabLeft
               onClick={handlePreviousPage}
-              disabled={
-                tab === 'open' ? openCurrentPage === 1 : closedCurrentPage === 1
-              }
+              disabled={currentPage === 1}
             >
               <FiChevronLeft style={{ height: '15px' }} />
             </FabLeft>
@@ -432,17 +428,11 @@ export default function Leads (props: any) {
                 textAlign: 'center'
               }}
             >
-              {tab === 'open'
-                ? `${openCurrentPage} to ${openTotalPages}`
-                : `${closedCurrentPage} to ${closedTotalPages}`}
+              {`${currentPage} to ${totalPages}`}
             </Typography>
             <FabRight
               onClick={handleNextPage}
-              disabled={
-                tab === 'open'
-                  ? openCurrentPage === openTotalPages
-                  : closedCurrentPage === closedTotalPages
-              }
+              disabled={currentPage === totalPages}
             >
               <FiChevronRight style={{ height: '15px' }} />
             </FabRight>
@@ -496,10 +486,6 @@ export default function Leads (props: any) {
                           <span style={{ color: '#1a3353', fontWeight: 500 }}>
                             {item?.source || '--'}
                           </span>{' '}
-                          - status{' '}
-                          <span style={{ color: '#1a3353', fontWeight: 500 }}>
-                            {item?.status || '--'}
-                          </span>
                         </div>
                         <Box
                           sx={{

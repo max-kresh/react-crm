@@ -1,34 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import {
-  Avatar,
-  AvatarGroup,
   AccordionDetails,
   Accordion,
   Divider,
   AccordionSummary,
   Box,
   Button,
-  Card,
-  List,
   Stack,
-  Tab,
-  TablePagination,
-  Tabs,
-  Toolbar,
-  Typography,
-  Link,
-  Select,
-  MenuItem,
-  TableContainer,
-  Table,
-  TableSortLabel,
-  TableCell,
-  TableRow,
-  TableHead,
-  Paper,
-  TableBody,
-  IconButton,
-  Container
+  Typography
 } from '@mui/material'
 import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { FaCheckCircle } from 'react-icons/fa'
