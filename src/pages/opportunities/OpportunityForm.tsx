@@ -234,7 +234,7 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
       .then((res: any) => {
         if (!res.error) {
           resetForm()
-          navigate('/app/opportunities')
+          navigate('/app/opportunities', { state: { scrollToId: state?.scrollToId } })
         }
         if (res.error) {
           setError(true)

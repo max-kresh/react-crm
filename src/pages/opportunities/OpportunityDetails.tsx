@@ -219,7 +219,7 @@ export const OpportunityDetails = (props: any) => {
   }
 
   const backbtnHandle = () => {
-    navigate('/app/opportunities')
+    navigate('/app/opportunities', { state: { scrollToId: state?.scrollToId } })
   }
 
   const module = 'Opportunities'

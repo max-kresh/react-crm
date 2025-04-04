@@ -57,7 +57,7 @@ export const opportunityStages: StageInterface[] = [
 const localStorageDefaultRecord = {
   lastUsedPageView: STAGE_VIEW,
   lastUsedStageTab: opportunityStages[0].name,
-  lastOpportunityId: '',
+  selectedOpportunityId: '',
   lastPage: 1,
   lastRecordsPerPage: 10
 }
@@ -100,18 +100,18 @@ export default function Opportunities (props: any) {
   const [recordsPerPage, setRecordsPerPage] = useState<number>(localStorageRecord.lastRecordsPerPage)
 
   const [currentPage, setCurrentPage] = useState<number>(localStorageRecord.lastPage)
-  const [selectedOpportunity, setSelectedOpportunity] = useState<string>('')
+  const [selectedOpportunityId, setSelectedOpportunityId] = useState<string>('')
 
   useEffect(() => {
     const record = {
       lastUsedPageView: currentViewTab,
       lastUsedStageTab: currentStageTab,
-      lastOpportunityId: selectedOpportunity,
+      lastOpportunityId: selectedOpportunityId,
       lastPage: currentPage,
       lastRecordsPerPage: recordsPerPage
     }
     saveToLocalStorage(record)
-  }, [currentViewTab, currentStageTab, selectedOpportunity, currentPage, recordsPerPage])  
+  }, [currentViewTab, currentStageTab, selectedOpportunityId, currentPage, recordsPerPage])  
 
   useEffect(() => {
     getOpportunities(currentViewTab === STAGE_VIEW ? currentStageTab : '')
@@ -136,7 +136,13 @@ export default function Opportunities (props: any) {
       return { ...localStorageDefaultRecord }
     }
   }
-  
+
+  useEffect(() => {
+    if (state && state.scrollToId) {
+      setSelectedOpportunityId(state.scrollToId)
+    }
+  }, [state])
+
   const getOpportunities = async (stageTab: string = '') => {
     const stageQueryParam = currentViewTab === STAGE_VIEW ? `&stage=${stageTab}` : ''
     try {
@@ -188,8 +194,7 @@ export default function Opportunities (props: any) {
           stage: responseData?.stage || [],
           users: responseData?.users || [],
           teams: responseData?.teams || [],
-          leads: responseData?.leads || [],
-          turnBackRecords: localStorageRecord
+          leads: responseData?.leads || []
         }
       })
     }
@@ -211,13 +216,12 @@ export default function Opportunities (props: any) {
         users: responseData?.users || [],
         teams: responseData?.teams || [],
         leads: responseData?.leads || [],
-        turnBackRecords: localStorageRecord
+        scrollToId: opportunityId
       }
     })
   }
 
   const handleDeleteOpportunity = (id: string) => {
-    setSelectedOpportunity(id)
     setDeleteRowModal((prev: boolean) => !prev)
   }
   const deleteRowModalClose = () => {
@@ -225,7 +229,7 @@ export default function Opportunities (props: any) {
   }
 
   const deleteItem = () => {
-    fetchData(`${OpportunityUrl}/${selectedOpportunity}/`, 'DELETE', null as any, compileHeader())
+    fetchData(`${OpportunityUrl}/${selectedOpportunityId}/`, 'DELETE', null as any, compileHeader())
       .then((res: any) => {
         if (!res.error) {
           deleteRowModalClose()
@@ -271,6 +275,7 @@ export default function Opportunities (props: any) {
   }
 
   function handleOpportunityAction (action: string, opportunity: any) {
+    setSelectedOpportunityId(opportunity.id)
     if (action === 'edit') {
       let country: string[] | undefined
       for (country of COUNTRIES) {
@@ -311,7 +316,7 @@ export default function Opportunities (props: any) {
           users: responseData?.users || [],
           teams: responseData?.teams || [],
           leads: responseData?.leads || [],
-          turnBackRecords: localStorageRecord
+          scrollToId: opportunity.id
         }
       })
     } else if (action === 'details') {
@@ -438,12 +443,13 @@ export default function Opportunities (props: any) {
           selectedTab={currentStageTab}
           onAction={handleOpportunityAction}
           spinner={loading}
+          scrollToId={selectedOpportunityId}
         />
       }
       <DeleteModal
         onClose={deleteRowModalClose}
         open={deleteRowModal}
-        id={selectedOpportunity}
+        id={selectedOpportunityId}
         modalDialog={modalDialog}
         modalTitle={modalTitle}
         DeleteItem={deleteItem}

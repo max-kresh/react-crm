@@ -5,6 +5,7 @@ import { Avatar } from '@mui/material'
 import FormateTime from '../../components/FormateTime'
 import { FaEdit, FaSearchPlus, FaTrashAlt } from 'react-icons/fa'
 import { SpinnerAbsolute } from '../../components/Spinner'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 
 function titlePretty (title: string) {
     return capitalizeWords(title.toLowerCase().replace('/', ' / '))
@@ -21,9 +22,13 @@ function StageViewTab ({ title, isActive, onTabClick }: any) {
     )
 }
 
-function OpportunityCard ({ opportunity, badgeColor, onAction }: any) {
+function OpportunityCard ({ opportunity, badgeColor, onAction, refProp }: any) {
+    useEffect(() => {
+        refProp?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, [refProp])
+    
     return (
-        <div className='opportunity-card'>
+        <div className='opportunity-card' ref={refProp}>
             <div className='opportunity-card-header'>
                 <p className='opportunity-name'>{opportunity.name}</p>
                 <div 
@@ -97,10 +102,12 @@ export default function OpportunityStageView ({
     onTabChange, 
     onAction, 
     opportunityStages,
-    spinner 
+    spinner,
+    scrollToId
 }: any) {
     const selectedStage = opportunityStages.filter((stage: any) => stage.name === selectedTab)
     const badgeColor = selectedStage.length ? selectedStage[0].color : 'black'
+    const cardRef = useRef<HTMLDivElement>(null)
     return (
         <div className='stages-container'>
             {spinner && <SpinnerAbsolute />}
@@ -121,6 +128,7 @@ export default function OpportunityStageView ({
                         onAction={onAction}
                         className='opportunity-card' 
                         badgeColor={badgeColor} 
+                        refProp={opportunity.id === scrollToId ? cardRef : null}
                     />
                 )
                 : <div className='no-opportunities'>
