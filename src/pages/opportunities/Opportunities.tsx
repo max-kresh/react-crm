@@ -1,12 +1,8 @@
 import {
-  Avatar,
-  AvatarGroup,
   Box,
   Button,
   Card,
-  List,
   Stack,
-  Tab,
   Tabs,
   Typography,
   Select,
@@ -158,8 +154,6 @@ export default function Opportunities (props: any) {
       })
     }
   }
-
-  type SelectedItem = string[]
 
   const showOpportunityDetails = (opportunityId: any) => {
     navigate('/app/opportunities/opportunity-details', {
@@ -429,7 +423,6 @@ export default function Opportunities (props: any) {
         modalTitle={modalTitle}
         DeleteItem={deleteItem}
       />
-
     </Box>
   )
 }
