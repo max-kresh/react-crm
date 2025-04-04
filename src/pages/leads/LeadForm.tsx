@@ -317,7 +317,7 @@ export function LeadForm ({ state, method }: StateProps) {
       .then((res: any) => {
         if (!res.error) {
           resetForm()
-          navigate('/app/leads')
+          navigate(`/app/leads?status=${formData?.status || ''}`)
         }
         if (res.error) {
           setError(true)
@@ -388,13 +388,13 @@ export function LeadForm ({ state, method }: StateProps) {
         state: { leadId: state?.id, detail: true }
       })
     } else {
-      navigate('/app/leads')
+      navigate(`/app/leads?status=${formData?.status || ''}`)
     }
   }
 
   const module = 'Leads'
   const crntPage = method === HTTP_METHODS.POST ? 'Add Leads' : 'Edit Lead'
-  const backBtn = 'Back To Leads'
+  const backBtn = method === HTTP_METHODS.POST ? 'Back To Leads' : 'Back To Details'
 
   function handleContactSelect (e: any) {
     const contact = e.target.value

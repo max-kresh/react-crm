@@ -105,6 +105,7 @@ export type leadResponse = {
   industry: string
   skype_ID: string
   file: string
+  status_history: []
 
   close_date: string
   organization: string
@@ -182,10 +183,10 @@ function LeadDetails (props: any) {
         ;<Snackbar
           open={err}
           autoHideDuration={4000}
-          onClose={() => navigate('/app/leads')}
+          onClose={() => navigate(`/app/leads?status=${leadDetails?.status}`)}
         >
           <Alert
-            onClose={() => navigate('/app/leads')}
+            onClose={() => navigate(`/app/leads?status=${leadDetails?.status}`)}
             severity="error"
             sx={{ width: '100%' }}
           >
@@ -196,7 +197,7 @@ function LeadDetails (props: any) {
   }
   
   const backbtnHandle = () => {
-    navigate('/app/leads')
+    navigate(`/app/leads?status=${leadDetails?.status}`)
   }
   const resetForm = () => {
     setNote('')
@@ -763,7 +764,10 @@ function LeadDetails (props: any) {
                   )}
                 </Box>
               </div>
-              <div style={{ marginTop: '2%' }}>
+              {/* Description */}
+
+              {/* Description */}
+              <div style={{ marginTop: '3%' }}>
                 <div
                   style={{
                     padding: '20px',
@@ -774,21 +778,41 @@ function LeadDetails (props: any) {
                   }}
                 >
                   <div
-                    style={{ fontWeight: 600, fontSize: '18px', color: 'red' }}
+                    style={{
+                      fontWeight: 600,
+                      fontSize: '18px',
+                      color: '#1a3353f0'
+                    }}
                   >
-                    Lost Reason
+                    Status history
                   </div>
                 </div>
-                <p
-                  style={{
-                    fontSize: '16px',
-                    color: 'gray',
-                    padding: '15px',
-                    marginTop: '5%'
-                  }}
-                >
-                </p>
+                <Box sx={{ p: '15px' }}>
+                  {leadDetails?.status_history ? (
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: leadDetails?.status_history.map((v: any, i: number) => {
+                          const user: any = users.find((u: any) => u.id === v.changed_by)
+                          let changedBy = user.user_details.email
+                          let leadStatus: any = status.find((s, i) => s[0] === v.status)
+                          let changedAt = v.changed_at.substring(0, 10) + ' ' + v.changed_at.substring(11, 16)
+                          if (i === leadDetails?.status_history.length - 1) {
+                            return `${i + 1}. Lead created with <b>${leadStatus[1]}</b> status by <b>${changedBy}</b> at <b>${changedAt}</b>`
+                          }
+                          let previous: any = leadDetails?.status_history[i + 1]
+                          let leadStatusOriginal: any = status.find((s, i) => s[0] === previous.status)
+                          return `${i + 1}. Lead status changed from <b>${leadStatusOriginal[1]}</b> to 
+                              <b>${leadStatus[1]}</b> by <b>${changedBy}</b> at <b>${changedAt}</b>`
+                        }).join('<br><div style="height: 10px"></div>')
+                      }}
+                    />
+                  ) : (
+                    '---'
+                  )}
+                </Box>
               </div>
+              {/* Status history */}
+
             </Box>
           </Box>
           <Box sx={{ width: '34%' }}>
