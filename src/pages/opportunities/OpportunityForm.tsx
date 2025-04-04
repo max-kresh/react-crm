@@ -255,7 +255,7 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
     resetForm()
   }
   const backbtnHandle = () => {
-    navigate('/app/opportunities')
+    navigate('/app/opportunities', { state: { scrollToId: state?.scrollToId } })
   }
 
   const module = 'Opportunities'

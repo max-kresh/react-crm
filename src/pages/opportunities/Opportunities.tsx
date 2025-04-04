@@ -57,7 +57,6 @@ export const opportunityStages: StageInterface[] = [
 const localStorageDefaultRecord = {
   lastUsedPageView: STAGE_VIEW,
   lastUsedStageTab: opportunityStages[0].name,
-  selectedOpportunityId: '',
   lastPage: 1,
   lastRecordsPerPage: 10
 }
@@ -106,7 +105,6 @@ export default function Opportunities (props: any) {
     const record = {
       lastUsedPageView: currentViewTab,
       lastUsedStageTab: currentStageTab,
-      lastOpportunityId: selectedOpportunityId,
       lastPage: currentPage,
       lastRecordsPerPage: recordsPerPage
     }
@@ -126,7 +124,6 @@ export default function Opportunities (props: any) {
     const record = localStorage.getItem(LOCAL_STORAGE_PAGE_RECORD)
     if (record) {
       const parsedRecord = JSON.parse(record)
-      parsedRecord.lastOpportunityId = parsedRecord.lastOpportunityId || ''
       parsedRecord.lastUsedPageView = isValidPageView(parsedRecord.lastUsedPageView) ? parsedRecord.lastUsedPageView : localStorageDefaultRecord.lastUsedPageView
       parsedRecord.lastUsedStageTab = isValidStage(parsedRecord.lastUsedStageTab) ? parsedRecord.lastUsedStageTab : opportunityStages[0].name
       parsedRecord.lastPage = parsedRecord.lastPage || localStorageDefaultRecord.lastPage
