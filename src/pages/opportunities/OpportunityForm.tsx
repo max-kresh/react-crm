@@ -71,7 +71,7 @@ interface FormData {
   lead_source: string
   probability: number
   description: string
-  assigned_to: string[]
+  assigned_to: any
   contacts: string[]
   due_date: string
   tags: string[]
@@ -92,7 +92,9 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
   const [error, setError] = useState(false)
   const [reset, setReset] = useState(false)
   const [selectedContacts, setSelectedContacts] = useState<any[]>([])
-  const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>([])
+  const [selectedAssignTo, setSelectedAssignTo] = useState<any[]>(
+    state?.value?.assigned_to?.map((user: any) => ({ email: user.user_details?.email, id: user.user_details?.id })) || []
+  )
   const [selectedTeams, setSelectedTeams] = useState<any[]>([])
   const [selectedCountry, setSelectedCountry] = useState<any[]>([])
   const [leadSelectOpen, setLeadSelectOpen] = useState(false)
@@ -106,8 +108,15 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
   const [errors, setErrors] = useState<FormErrors>({})
 
   function compileInitialFormData () {
-    console.log('init data', state)
-    return state?.value || {
+    const stateData = structuredClone(state?.value)
+    
+    if (stateData && stateData.assigned_to) {
+      stateData.assigned_to = []
+      stateData?.assigned_to?.push(...state?.value?.assigned_to?.map((user: any) => 
+        ({ email: user.user_details?.email, id: user.user_details?.id })))
+    }
+    
+    return stateData || {
       name: '',
       account: '',
       amount: '',
@@ -148,7 +157,7 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
     } else if (title === 'assigned_to') {
       setFormData({
         ...formData,
-        assigned_to: val.length > 0 ? val.map((item: any) => item.id) : []
+        assigned_to: val.length > 0 ? val : []
       })
       setSelectedAssignTo(val)
     } else if (title === 'teams') {
@@ -233,7 +242,7 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
       .then((res: any) => {
         if (!res.error) {
           resetForm()
-          navigate('/app/opportunities')
+          navigate('/app/opportunities', { state: { turnBackRecord: state?.turnBackRecord } })
         }
         if (res.error) {
           setError(true)
@@ -254,7 +263,7 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
     resetForm()
   }
   const backbtnHandle = () => {
-    navigate('/app/opportunities')
+    navigate('/app/opportunities', { state: { turnBackRecord: state?.turnBackRecord } })
   }
 
   const module = 'Opportunities'
@@ -268,7 +277,6 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
       })
     )
   }
-
   return (
     <Box sx={{ mt: '60px' }}>
       <CustomAppBar
@@ -562,11 +570,11 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
                         >
                           <Autocomplete
                             multiple
-                            value={selectedAssignTo}
+                            value={formData.assigned_to || []} 
                             limitTags={2}
-                            options={state.users || []}
+                            options={state?.users?.map((user: any) => ({ email: user.user__email, id: user.id })) || []}
                             getOptionLabel={(option: any) =>
-                              state.users ? option?.user__email : option
+                              option?.email
                             }
                             onChange={(e: any, value: any) =>
                               handleChange2('assigned_to', value)
@@ -585,7 +593,7 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
                                   }}
                                   variant="outlined"
                                   label={
-                                    state.users ? option?.user__email : option
+                                    option?.email
                                   }
                                   {...getTagProps({ index })}
                                 />
