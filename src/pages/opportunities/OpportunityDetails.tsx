@@ -242,10 +242,6 @@ export const OpportunityDetails = (props: any) => {
   }
 
   function handleStageChange (newStage: string) {
-    const opportunityCopy = structuredClone(state?.opportunity_obj) 
-    if (opportunityCopy) {
-      opportunityCopy.stage = newStage
-    }
     setLoading(true)
     fetchData(`${OpportunityUrl}/${state.opportunityId}/`, 
       HTTP_METHODS.PATCH, JSON.stringify({ stage: newStage }), compileHeader())

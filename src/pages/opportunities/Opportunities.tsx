@@ -27,7 +27,7 @@ import { FiChevronDown } from '@react-icons/all-files/fi/FiChevronDown'
 import { capitalizeWords } from '../../utils/UtilFunctions'
 import OpportunityListView from './OpportunityListView'
 import OpportunityStageView from './OpportunityStageView'
-import { COUNTRIES } from '../../utils/Constants'
+import { COUNTRIES, HTTP_METHODS } from '../../utils/Constants'
 
 const LIST_VIEW = 'list_view'
 const STAGE_VIEW = 'stage_view'
@@ -217,10 +217,12 @@ export default function Opportunities (props: any) {
   ]
 
   function handlePageViewTabChange (e: any, val: string) {
-    setPageSettings((prev) => ({
-      ...prev,
-      currentViewTab: val
-    }))
+    if (isValidPageView(val)) {
+      setPageSettings((prev) => ({
+        ...prev,
+        currentViewTab: val
+      }))
+    }
   }
 
   async function handleStageViewTabChange (selectedTab: string) {
@@ -284,6 +286,28 @@ export default function Opportunities (props: any) {
       handleDeleteOpportunity(opportunity?.id)
     }
   }
+
+  function handleOpportunityStageChange (opportunityId: string, newStage: string) {
+    if (newStage !== pageSettings.currentStageTab) {
+      setLoading(true)
+      fetchData(`${OpportunityUrl}/${opportunityId}/`, 
+        HTTP_METHODS.PATCH, JSON.stringify({ stage: newStage }), compileHeader())
+      .then((res: any) => {
+        if (!res.error) {
+          const index = responseData.opportunities.findIndex((opportunity: any) => opportunity.id === opportunityId)
+          if (index !== -1) {
+            responseData.opportunities.splice(index, 1)
+          }
+        }
+      })
+      .catch((error) => {
+        console.error('Error updating stage:', error)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+    }
+  }  
 
   return (
     <Box sx={{ mt: '60px', position: 'relative' }}>
@@ -403,6 +427,7 @@ export default function Opportunities (props: any) {
           onAction={handleOpportunityAction}
           spinner={loading}
           scrollToId={selectedOpportunityId}
+          onStageChange={handleOpportunityStageChange}
         />
       }
       <DeleteModal

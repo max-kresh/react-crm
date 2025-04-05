@@ -181,7 +181,7 @@
     /* transition: transform 0.2s ease-in-out;  */
 }
 
-.spinner {
+.spinner-absolute {
     width: 30px;
     height: 30px;
     position: absolute;
@@ -192,6 +192,20 @@
     flex-direction: column;
     align-items: center;
     justify-items: center;
+}
+
+.dragging-card {
+  overflow: hidden; /* Hides extra content */
+  position: relative;
+}
+
+.dragging-card:active {
+  filter: blur(1px);
+}
+
+.receive-card {
+  background-color: rgba(129, 234, 109, 0.999);
+  transform: scale(1.1);
 }
     
 

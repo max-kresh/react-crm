@@ -5,17 +5,33 @@ import { Avatar } from '@mui/material'
 import FormateTime from '../../components/FormateTime'
 import { FaEdit, FaSearchPlus, FaTrashAlt } from 'react-icons/fa'
 import { SpinnerAbsolute } from '../../components/Spinner'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { on } from 'events'
 
 function titlePretty (title: string) {
     return capitalizeWords(title.toLowerCase().replace('/', ' / '))
 }
 
-function StageViewTab ({ title, isActive, onTabClick }: any) {
+function StageViewTab ({ title, isActive, onTabClick, onCardDrop }: any) {
+    const [dropping, setDropping] = useState(false)
+    function handleCardDrop (event: any) {
+        event.preventDefault()
+        setDropping(false)
+        const id = event.dataTransfer.getData('text/plain')
+        onCardDrop(id, title)
+        event.dataTransfer.clearData()
+    }
+    function handleDragOver (event: any) {
+        event.preventDefault()
+        setDropping(true)
+    }
     return (
         <div
-            className={`stage-tab${isActive ? ' stage-tab-selected' : ''}`}
+            className={`stage-tab${isActive ? ' stage-tab-selected' : ''}${dropping ? ' receive-card' : ''}`}
             onClick={() => onTabClick(title)}
+            onDrop={handleCardDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={() => setDropping(false)}
         >
             {capitalizeWords(title)}
         </div>
@@ -23,14 +39,29 @@ function StageViewTab ({ title, isActive, onTabClick }: any) {
 }
 
 function OpportunityCard ({ opportunity, badgeColor, onAction, refProp }: any) {
+    const [dragging, setDragging] = useState(false)
+    
     useEffect(() => {
         refProp?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }, [refProp])
     
+    function dragStart (event: any) {
+        event.dataTransfer.setData('text/plain', opportunity.id)
+        setDragging(true)
+    }
+    const draggingClass = dragging ? ' dragging-card' : ''
     return (
-        <div className='opportunity-card' ref={refProp}>
+        <div className={'opportunity-card'} ref={refProp}>
             <div className='opportunity-card-header'>
-                <p className='opportunity-name'>{opportunity.name}</p>
+                <p 
+                    className={`opportunity-name${draggingClass}`} 
+                    draggable="true" 
+                    onDragStart={dragStart} 
+                    onDragEnd={() => setDragging(false)}
+                    id={opportunity.id}
+                >
+                    {opportunity.name}
+                </p>
                 <div 
                     className='header-badge' 
                     style={{ backgroundColor: badgeColor }}
@@ -103,7 +134,8 @@ export default function OpportunityStageView ({
     onAction, 
     opportunityStages,
     spinner,
-    scrollToId
+    scrollToId,
+    onStageChange
 }: any) {
     const selectedStage = opportunityStages.filter((stage: any) => stage.name === selectedTab)
     const badgeColor = selectedStage.length ? selectedStage[0].color : 'black'
@@ -117,6 +149,7 @@ export default function OpportunityStageView ({
                     title={stage.name}
                     onTabClick={onTabChange}
                     isActive={stage.name === selectedTab}
+                    onCardDrop={onStageChange}
                 />
             )}
             <div className='cards-container'>
