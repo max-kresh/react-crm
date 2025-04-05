@@ -33,7 +33,7 @@ function StageViewTab ({ title, isActive, onTabClick, onCardDrop }: any) {
             onDragOver={handleDragOver}
             onDragLeave={() => setDropping(false)}
         >
-            {capitalizeWords(title)}
+            {titlePretty(title)}
         </div>
     )
 }

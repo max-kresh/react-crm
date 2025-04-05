@@ -44,8 +44,7 @@ export const opportunityStages: StageInterface[] = [
   { name: 'PROPOSAL/PRICE QUOTE', color: '#556B2F' }, // Dark Olive Green - Formal proposal
   { name: 'NEGOTIATION/REVIEW', color: '#DC143C' }, // Crimson - Intense discussions
   { name: 'CLOSED WON', color: '#228B22' }, // Forest Green - Success
-  { name: 'CLOSED LOST', color: '#8B0000' }, // Dark Red - Lost deal
-  { name: 'NOT STAGED', color: '#808080' } // Gray - No stage assigned
+  { name: 'CLOSED LOST', color: '#8B0000' } // Dark Red - Lost deal
 ]
 
 function isValidStage (stage: string): boolean {
@@ -88,10 +87,11 @@ export default function Opportunities (props: any) {
   const [selectedOpportunityId, setSelectedOpportunityId] = useState<string>('')
 
   useEffect(() => {
-    getOpportunities(pageSettings.currentViewTab === STAGE_VIEW ? pageSettings.currentStageTab : '')
+    getOpportunities()
   }, [pageSettings])
 
-  const getOpportunities = async (stageTab: string = '') => {
+  const getOpportunities = async () => {
+    const stageTab = pageSettings.currentViewTab === STAGE_VIEW ? pageSettings.currentStageTab : ''
     const stageQueryParam = pageSettings.currentViewTab === STAGE_VIEW ? `&stage=${stageTab}` : ''
     try {
       const offset = (pageSettings.currentPage - 1) * pageSettings.recordsPerPage
@@ -232,7 +232,7 @@ export default function Opportunities (props: any) {
 
   async function handleStageViewTabChange (selectedTab: string) {
     if (isValidStage(selectedTab) && selectedTab !== pageSettings.currentStageTab) {
-      await getOpportunities(selectedTab)
+      await getOpportunities()
       setPageSettings((prev) => ({
         ...prev,
         currentStageTab: selectedTab
