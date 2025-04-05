@@ -16,7 +16,7 @@ import { FaPlus, FaStar } from 'react-icons/fa'
 import FormateTime from '../../components/FormateTime'
 import { Label } from '../../components/Label'
 import { COUNTRIES, HTTP_METHODS } from '../../utils/Constants'
-import { OpportunityStages } from '../../components/OpportunityStages'
+import { OpportunityStages } from './OpportunityStages'
 
 export const formatDate = (dateString: any) => {
   const options: Intl.DateTimeFormatOptions = {
