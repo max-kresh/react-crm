@@ -723,3 +723,214 @@ input[type='number'] {
 .closed-won-cell {
   grid-row: 3;
 }
+
+/* Opportunity details stage graph end */
+
+/* Opportunity card view */
+* {
+  box-sizing: border-box;
+}
+
+.stages-container {
+  display: grid;
+  grid-template-columns: repeat(11, 1fr);
+  gap: 5px;
+  margin: 50px 30PX;
+}
+
+.stage-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #3f51b5;
+  height: 40px;
+  border-radius: 15px 15px 0 0;
+  text-align: center;
+  box-shadow: 3px 2px grey;
+  padding: 5px;
+  background-color: #C0C7CF;
+}
+
+.stage-tab-selected {
+  background-color: #284871;
+  color: white;
+}
+
+.stage-tab:hover {
+  filter: brightness(65%);
+  cursor: pointer;
+}
+
+.cards-container {
+  display: grid;
+  background-color: rgb(246, 242, 242);
+  grid-row: 2;
+  grid-column: 1 / 11;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); 
+  gap: 20px;
+}
+
+.no-opportunities {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  font-size: 1.5rem;
+  font-weight: 600;
+  grid-column: 1 / 11;
+  grid-row: 2;
+}
+
+.opportunity-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  justify-items: stretch;
+  border: 1px gray solid;
+  overflow: hidden;
+  box-shadow: 3px 2px gray;
+}
+
+.opportunity-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+  justify-content: center;
+  background-color: #3f51b5;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9;
+  width: 100%;
+  text-align: center;
+  padding: 5px;
+  position: relative;
+  overflow: hidden;
+  height: 90px;
+}
+
+.opportunity-name {
+  width: 90%;
+}
+
+.header-badge {
+  width: 80px;
+  height: 80px;
+  position: absolute;
+  top: -40px;
+  left: -40px;
+  transform-origin: 50% 50%;
+  transform: rotate(-45deg);
+}
+
+.opportunity-tag-panel {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.opportunity-tag {
+  background-color: #682e46;
+  border-radius: 7px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 7px;
+  margin: 0;
+}
+
+.created-by-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.revenue-amount {
+  color:#c32265;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.card-table {
+  width: 100%;
+  padding: 10px;
+}
+
+.card-table tr {
+  display: flex; 
+  width: 100%; 
+}
+
+.card-table th, 
+.card-table td {
+  display: flex;
+  text-align: left; 
+  vertical-align: middle; 
+  align-items: center;
+  padding: 5px; 
+}
+
+.card-table th {
+  font-weight: 600;
+  width: 45%;
+}
+
+.card-table td {
+  font-weight: 400;
+  justify-items: center;
+  width: 55%;
+}
+
+.card-table {
+  table-layout: fixed; 
+}
+
+.card-toolbar-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  height: 50px;
+  padding: 0 10px;
+  background-color: rgb(228, 224, 224);
+  margin-top: auto;
+}
+
+.card-toolbar-container p:hover {
+  cursor: pointer;
+  transform: scale(1.2); 
+}
+
+.spinner-absolute {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+}
+
+.dragging-card {
+overflow: hidden; /* Hides extra content */
+position: relative;
+}
+
+.dragging-card:active {
+filter: blur(1px);
+}
+
+.receive-card {
+background-color: rgba(129, 234, 109, 0.999);
+transform: scale(1.1);
+}
+/* Opportunity card view end*/

@@ -1,6 +1,6 @@
 import { capitalizeWords } from '../../utils/UtilFunctions'
 
-import './../../styles/style1.css'
+import './../../styles/style.css'
 import { Avatar } from '@mui/material'
 import FormateTime from '../../components/FormateTime'
 import { FaEdit, FaSearchPlus, FaTrashAlt } from 'react-icons/fa'
