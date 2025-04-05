@@ -77,12 +77,12 @@ export default function Opportunities (props: any) {
 
   const [deleteRowModal, setDeleteRowModal] = useState(false)
   const [selectOpen, setSelectOpen] = useState(false)
-  
+
   const [pageSettings, setPageSettings] = useState({
-    currentViewTab: STAGE_VIEW,
-    currentStageTab: opportunityStages[0].name,
-    recordsPerPage: 10,
-    currentPage: 1
+    currentViewTab: state?.turnBackRecord?.currentViewTab ?? STAGE_VIEW,
+    currentStageTab: state?.turnBackRecord?.currentStageTab ?? opportunityStages[0].name,
+    recordsPerPage: state?.turnBackRecord?.recordsPerPage ?? 10,
+    currentPage: state?.turnBackRecord?.currentPage ?? 1
   })
   
   const [selectedOpportunityId, setSelectedOpportunityId] = useState<string>('')
@@ -90,16 +90,6 @@ export default function Opportunities (props: any) {
   useEffect(() => {
     getOpportunities(pageSettings.currentViewTab === STAGE_VIEW ? pageSettings.currentStageTab : '')
   }, [pageSettings])
-
-  useEffect(() => {
-    setPageSettings((prev: any) => ({
-      currentViewTab: state?.turnBackRecord?.currentViewTab ?? prev.currentViewTab,
-      currentStageTab: state?.turnBackRecord?.currentStageTab ?? prev.currentStageTab,
-      recordsPerPage: state?.turnBackRecord?.recordsPerPage ?? prev.recordsPerPage,
-      currentPage: state?.turnBackRecord?.currentPage ?? prev.currentPage
-    }))
-    setSelectedOpportunityId((prev: any) => state?.turnBackRecord?.scrollTo ?? '')
-  }, [state])
 
   const getOpportunities = async (stageTab: string = '') => {
     const stageQueryParam = pageSettings.currentViewTab === STAGE_VIEW ? `&stage=${stageTab}` : ''

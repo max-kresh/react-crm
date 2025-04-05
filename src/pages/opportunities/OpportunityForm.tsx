@@ -155,7 +155,6 @@ export function OpportunityForm ({ state, httpReqMethod }: any) {
       })
       setSelectedContacts(val)
     } else if (title === 'assigned_to') {
-      console.log('valll', val)
       setFormData({
         ...formData,
         assigned_to: val.length > 0 ? val : []
