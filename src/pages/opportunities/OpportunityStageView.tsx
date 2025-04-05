@@ -46,22 +46,22 @@ function OpportunityCard ({ opportunity, badgeColor, onAction, refProp }: any) {
     }, [refProp])
     
     function dragStart (event: any) {
+        event.dataTransfer.setDragImage(event.target, 50, 50)
         event.dataTransfer.setData('text/plain', opportunity.id)
         setDragging(true)
     }
     const draggingClass = dragging ? ' dragging-card' : ''
     return (
-        <div className={'opportunity-card'} ref={refProp}>
+        <div 
+            className={`opportunity-card${draggingClass}`} 
+            ref={refProp}
+            draggable="true" 
+            onDragStart={dragStart} 
+            onDragEnd={() => setDragging(false)}
+            id={opportunity.id}
+        >
             <div className='opportunity-card-header'>
-                <p 
-                    className={`opportunity-name${draggingClass}`} 
-                    draggable="true" 
-                    onDragStart={dragStart} 
-                    onDragEnd={() => setDragging(false)}
-                    id={opportunity.id}
-                >
-                    {opportunity.name}
-                </p>
+                <p className='opportunity-name'>{opportunity.name}</p>
                 <div 
                     className='header-badge' 
                     style={{ backgroundColor: badgeColor }}

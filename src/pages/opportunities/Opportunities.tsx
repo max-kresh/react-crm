@@ -171,15 +171,20 @@ export default function Opportunities (props: any) {
     setDeleteRowModal(false)
   }
 
-  const deleteItem = () => {
-    fetchData(`${OpportunityUrl}/${selectedOpportunityId}/`, 'DELETE', null as any, compileHeader())
+  const deleteItem = async () => {
+    setLoading(true)
+    await fetchData(`${OpportunityUrl}/${selectedOpportunityId}/`, 'DELETE', null as any, compileHeader())
       .then((res: any) => {
         if (!res.error) {
           deleteRowModalClose()
-          getOpportunities()
+          responseData.opportunities = responseData.opportunities.filter((opportunity: any) => opportunity.id !== selectedOpportunityId)
         }
       })
       .catch(() => {})
+      .finally(() => {
+        setLoading(false)
+      }
+    )
   }
   const handlePreviousPage = () => {
     setPageSettings((prev) => ({

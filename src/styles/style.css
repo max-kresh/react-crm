@@ -926,7 +926,7 @@ position: relative;
 }
 
 .dragging-card:active {
-filter: blur(1px);
+  filter: blur(1px);
 }
 
 .receive-card {
