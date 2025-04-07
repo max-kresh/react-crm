@@ -172,13 +172,29 @@ export function EditOpportunity () {
   }, [reset, quill, state?.value])
 
   useEffect(() => {
-    if (quill && initialContentRef.current === null) {
-      // Save the initial state (HTML content) of the Quill editor only if not already saved
-      initialContentRef.current = formData.description
-      quill.clipboard.dangerouslyPasteHTML(formData.description)
+    if (quill && quillRef.current) {
+      // Set the initial content (only once)
+      if (initialContentRef.current === null && formData.description) {
+        initialContentRef.current = formData.description
+        quill.clipboard.dangerouslyPasteHTML(formData.description)
+      }
+  
+      const handleTextChange = () => {
+        const html = quillRef.current.firstChild.innerHTML
+        setFormData((prev) => ({
+          ...prev,
+          description: html
+        }))
+      }
+  
+      quill.on('text-change', handleTextChange)
+  
+      return () => {
+        quill.off('text-change', handleTextChange)
+      }
     }
   }, [quill, formData.description])
-
+  
   const backbtnHandle = () => {
     if (state?.edit) {
       navigate('/app/opportunities')

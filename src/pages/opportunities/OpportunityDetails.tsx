@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
-  Card,
-  Link,
   Avatar,
   Box,
   Snackbar,
@@ -13,12 +11,12 @@ import {
 } from '@mui/material'
 import { fetchData } from '../../components/FetchData'
 import { OpportunityUrl } from '../../services/ApiUrls'
-import { Tags } from '../../components/Tags'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import { FaPlus, FaStar } from 'react-icons/fa'
 import FormateTime from '../../components/FormateTime'
 import { Label } from '../../components/Label'
 import { COUNTRIES } from '../../utils/Constants'
+import { userResponse } from '../users/UserDetails'
 
 export const formatDate = (dateString: any) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -118,28 +116,7 @@ export const OpportunityDetails = (props: any) => {
   const [opportunityDetails, setOpportunityDetails] = useState<opportunityResponse | null>(
     null
   )
-  const [usersDetails, setUsersDetails] = useState<
-    Array<{
-      user_details: {
-        email: string
-        id: string
-        profile_pic: string
-      }
-    }>
-  >([])
-  const [selectedCountry, setSelectedCountry] = useState([])
-  const [attachments, setAttachments] = useState([])
-  const [tags, setTags] = useState([])
-  const [source, setSource] = useState([])
-  const [status, setStatus] = useState([])
-  const [industries, setIndustries] = useState([])
-  const [contacts, setContacts] = useState([])
-  const [users, setUsers] = useState([])
-  const [teams, setTeams] = useState([])
-  const [leads, setLeads] = useState([])
-  const [comments, setComments] = useState([])
-  const [commentList, setCommentList] = useState('Recent Last')
-  const [note, setNote] = useState('')
+  const [users, setUsers] = useState<userResponse[] | null>(null)
   const [opportunityStageHistory, setOpportunityStageHistory] = useState<opportunityStage[]>([])
 
   useEffect(() => {
@@ -178,16 +155,6 @@ export const OpportunityDetails = (props: any) => {
           </Alert>
         </Snackbar>
       })
-  }
-  const accountCountry = (country: string) => {
-    let countryName: string[] | undefined
-    for (countryName of COUNTRIES) {
-      if (Array.isArray(countryName) && countryName.includes(country)) {
-        const ele = countryName
-        break
-      }
-    }
-    return countryName?.[1]
   }
   const editHandle = () => {
     // navigate('/contacts/edit-contacts', { state: { value: contactDetails, address: newAddress } })
@@ -433,7 +400,7 @@ export const OpportunityDetails = (props: any) => {
                 <div style={{ width: '32%' }}>
                   <div className="title2">Users</div>
                   <div className="title3">
-                    {opportunityDetails?.users || '----'}
+                    {users?.map((user, index) => <p>{user.user_details.email}</p>) || '----'}
                   </div>
                 </div>
                 <div style={{ width: '32%' }}>

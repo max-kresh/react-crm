@@ -24,7 +24,7 @@ import { AntSwitch } from '../../styles/CssStyled'
 import { ContactUrl, UserUrl } from '../../services/ApiUrls'
 import { fetchData, compileHeader } from '../../components/FetchData'
 
-type response = {
+export type userResponse = {
   user_details: {
     email: string
     is_active: boolean
@@ -60,7 +60,7 @@ export const formatDate = (dateString: any) => {
 export default function UserDetails () {
   const navigate = useNavigate()
   const { state } = useLocation()
-  const [userDetails, setUserDetails] = useState<response | null>(null)
+  const [userDetails, setUserDetails] = useState<userResponse | null>(null)
 
   useEffect(() => {
     getUserDetail(state.userId)

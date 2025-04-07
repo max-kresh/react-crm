@@ -128,6 +128,20 @@ export function AddOpportunity () {
     if (quill) {
       // Save the initial state (HTML content) of the Quill editor
       initialContentRef.current = quillRef.current.firstChild.innerHTML
+
+      const handleTextChange = () => {
+        const html = quillRef.current.firstChild.innerHTML
+        setFormData((prev) => ({
+          ...prev,
+          description: html
+        }))
+      }
+  
+      quill.on('text-change', handleTextChange)
+  
+      return () => {
+        quill.off('text-change', handleTextChange)
+      }
     }
   }, [quill])
 
@@ -187,14 +201,6 @@ export function AddOpportunity () {
         }))
       }
       reader.readAsDataURL(file)
-    }
-  }
-
-  const resetQuillToInitialState = () => {
-    // Reset the Quill editor to its initial state
-    setFormData({ ...formData, description: '' })
-    if (quill && initialContentRef.current !== null) {
-      quill.clipboard.dangerouslyPasteHTML(initialContentRef.current)
     }
   }
 
