@@ -921,8 +921,8 @@ input[type='number'] {
 }
 
 .dragging-card {
-overflow: hidden; /* Hides extra content */
-position: relative;
+  overflow: hidden;
+  position: relative;
 }
 
 .dragging-card:active {
@@ -930,7 +930,7 @@ position: relative;
 }
 
 .receive-card {
-background-color: rgba(129, 234, 109, 0.999);
-transform: scale(1.1);
+  background-color: rgba(129, 234, 109, 0.999);
+  transform: scale(1.1);
 }
 /* Opportunity card view end*/
