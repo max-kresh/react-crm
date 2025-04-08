@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import './../styles/style.css'
+import './../../styles/style.css'
 import { FaCheck, FaMinus } from 'react-icons/fa'
+import { SpinnerAbsolute } from '../../components/Spinner'
 
 const defaultSelectedColor = 'rgb(107, 107, 248)'
 const defaultNonSelectedColor = 'rgb(198, 191, 191)'
@@ -34,7 +35,7 @@ export function StageConnector ({ color, classes, styles }: any) {
     )
 }
 
-export function OpportunityStages ({ orderedStageList, currentStage, onStageChange, ...props }: any) {
+export function OpportunityStages ({ orderedStageList, currentStage, onStageChange, spinner, ...props }: any) {
     const [stageInfo, setStageInfo] = useState(orderedStageList)
 
     useEffect(() => {
@@ -58,6 +59,7 @@ export function OpportunityStages ({ orderedStageList, currentStage, onStageChan
     const closedWon = stageInfo[stageInfo.length - 2]
     return (
         <div className='stages-panel'>
+            {spinner && <SpinnerAbsolute />}
             {stageInfo.slice(0, stageInfo.length - 2).map((stage: any, index: number) =>
                 <>
                     {index !== 0 &&

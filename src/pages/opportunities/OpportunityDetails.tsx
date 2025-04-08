@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
-  Card,
-  Link,
   Avatar,
   Box,
   Snackbar,
@@ -13,13 +11,12 @@ import {
 } from '@mui/material'
 import { compileHeader, fetchData } from '../../components/FetchData'
 import { OpportunityUrl } from '../../services/ApiUrls'
-import { Tags } from '../../components/Tags'
 import { CustomAppBar } from '../../components/CustomAppBar'
 import { FaPlus, FaStar } from 'react-icons/fa'
 import FormateTime from '../../components/FormateTime'
 import { Label } from '../../components/Label'
 import { COUNTRIES, HTTP_METHODS } from '../../utils/Constants'
-import { Stage, StageConnector, OpportunityStages } from '../../components/OpportunityStages'
+import { OpportunityStages } from './OpportunityStages'
 
 export const formatDate = (dateString: any) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -130,33 +127,17 @@ export const OpportunityDetails = (props: any) => {
       }
     }>
   >([])
-  const [selectedCountry, setSelectedCountry] = useState([])
-  const [attachments, setAttachments] = useState([])
-  const [tags, setTags] = useState([])
-  const [source, setSource] = useState([])
-  const [status, setStatus] = useState([])
-  const [industries, setIndustries] = useState([])
-  const [contacts, setContacts] = useState([])
   const [users, setUsers] = useState([])
-  const [teams, setTeams] = useState([])
-  const [leads, setLeads] = useState([])
-  const [comments, setComments] = useState([])
-  const [commentList, setCommentList] = useState('Recent Last')
-  const [note, setNote] = useState('')
   const [opportunityStageHistory, setOpportunityStageHistory] = useState<opportunityStage[]>([])
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     getOpportunityDetails(state.opportunityId)
   }, [state.opportunityId])
 
   const getOpportunityDetails = (id: any) => {
-    const Header = {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: localStorage.getItem('Token'),
-      org: localStorage.getItem('org')
-    }
-    fetchData(`${OpportunityUrl}/${id}/`, 'GET', null as any, Header)
+    setLoading(true)
+    fetchData(`${OpportunityUrl}/${id}/`, 'GET', null as any, compileHeader())
       .then((res) => {
         if (!res.error) {
           setOpportunityDetails(res?.opportunity_obj)
@@ -179,6 +160,9 @@ export const OpportunityDetails = (props: any) => {
           </Alert>
         </Snackbar>
       })
+      .finally(() => {
+        setLoading(false)
+      })
   }
   const accountCountry = (country: string) => {
     let countryName: string[] | undefined
@@ -191,7 +175,6 @@ export const OpportunityDetails = (props: any) => {
     return countryName?.[1]
   }
   const editHandle = () => {
-    // navigate('/contacts/edit-contacts', { state: { value: contactDetails, address: newAddress } })
     let country: string[] | undefined
     for (country of COUNTRIES) {
       if (
@@ -236,7 +219,7 @@ export const OpportunityDetails = (props: any) => {
   }
 
   const backbtnHandle = () => {
-    navigate('/app/opportunities')
+    navigate('/app/opportunities', { state: { turnBackRecord: state?.turnBackRecord } })
   }
 
   const module = 'Opportunities'
@@ -259,11 +242,9 @@ export const OpportunityDetails = (props: any) => {
   }
 
   function handleStageChange (newStage: string) {
-    const opportunityCopy = structuredClone(state?.opportunity_obj) 
-    if (opportunityCopy) {
-      opportunityCopy.stage = newStage
-    }
-    fetchData(`${OpportunityUrl}/${state.opportunityId}/`, HTTP_METHODS.PATCH, JSON.stringify({ stage: newStage }), compileHeader())
+    setLoading(true)
+    fetchData(`${OpportunityUrl}/${state.opportunityId}/`, 
+      HTTP_METHODS.PATCH, JSON.stringify({ stage: newStage }), compileHeader())
     .then((res: any) => {
       if (!res.error) {
         setOpportunityDetails(res?.opportunity_obj)
@@ -284,6 +265,9 @@ export const OpportunityDetails = (props: any) => {
           Failed to load!
         </Alert>
       </Snackbar>
+    })
+    .finally(() => {
+      setLoading(false)
     })
   }
   return (
@@ -378,6 +362,7 @@ export const OpportunityDetails = (props: any) => {
                   orderedStageList={ leadStages } 
                   currentStage={opportunityDetails?.stage} 
                   onStageChange={handleStageChange}
+                  spinner={loading}
                 />
               </div>
               <div

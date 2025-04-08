@@ -132,7 +132,7 @@ const circleData = (percantages: number[], colors: string[], hoverColors: string
         <h5>Last Created Accounts:</h5>
         <ul>
           {response.accounts.last_five_accounts.map((account, i) => (
-            <li key={i}><a href='#' onClick = { (e) => { objectDetail('account', account.id, e) } } >{account.name}</a> created by {account.created_by.email}</li>
+            <li key={i}><a href='#' onClick = { (e) => { objectDetail('account', account.id, e) } } >{account.name}</a> created by {account.created_by?.email}</li>
           ))}
         </ul>
         </div>
@@ -150,7 +150,7 @@ const circleData = (percantages: number[], colors: string[], hoverColors: string
         <h5>Last Created Leads:</h5>
         <ul>
           {response.leads.last_five_leads.map((lead, i) => (
-            <li key={i}><a href='#' onClick = { (e) => { objectDetail('lead', lead.id, e) } } >{lead.title} {lead.first_name} {lead.last_name}</a> created by {lead.created_by.email}</li>
+            <li key={i}><a href='#' onClick = { (e) => { objectDetail('lead', lead.id, e) } } >{lead.title} {lead.first_name} {lead.last_name}</a> created by {lead.created_by?.email}</li>
           ))}
         </ul>
         </div>
@@ -170,7 +170,7 @@ const circleData = (percantages: number[], colors: string[], hoverColors: string
         <h5>Last Created Opportunities:</h5>
         <ul>
           {response.opportunities.last_five_opportunities.map((opportunity, i) => (
-            <li key={i}><a href='#' onClick = { (e) => { objectDetail('opportunity', opportunity.id, e) } } >{opportunity.name}</a> created by {opportunity.created_by.email}</li>
+            <li key={i}><a href='#' onClick = { (e) => { objectDetail('opportunity', opportunity.id, e) } } >{opportunity.name}</a> created by {opportunity.created_by?.email}</li>
           ))}
         </ul>
     </div>
